@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using OleVanSanten.TestTools.Structure.Attributes;
 
 namespace Lecture_3_Solutions
 {
@@ -18,8 +19,10 @@ namespace Lecture_3_Solutions
                 Radius = 0;
         }
 
+        [ReadonlyProperty]
         public Point Center { get; }
 
+        [ReadonlyProperty]
         public double Radius { get; }
 
         public override double CalculateArea()

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Structure.Attributes;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_3_Solutions
 {
@@ -19,6 +20,7 @@ namespace Lecture_3_Solutions
 
         public int ID { get; }
 
+        [ReadonlyProperty]
         public string Name {
             get { return _name; }
             private set 
@@ -71,15 +73,5 @@ namespace Lecture_3_Solutions
         {
             return $"Employee {Name} ({Title})";
         }
-
-        // TestTools Code
-        [PropertySet("Title")]
-        public void SetTitle(string value) => Title = value;
-
-        [PropertySet("MonthlySalary")]
-        public void SetMonthlySalary(decimal value) => MonthlySalary = value;
-
-        [PropertySet("Seniority")]
-        public void SetSeniority(int value) => Seniority = value;
     }
 }

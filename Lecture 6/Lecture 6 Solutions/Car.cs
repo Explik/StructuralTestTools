@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_6_Solutions
 {
@@ -41,19 +41,6 @@ namespace Lecture_6_Solutions
         {
             Car other = obj as Car;
             return other == null ? 1 : this.ID.CompareTo(other.ID);
-        }
-
-        // TestTools Code
-        [PropertySet("ID")]
-        public void SetID(int id)
-        {
-            ID = id;
-        }
-
-        [PropertySet("Price")]
-        public void SetPrice(decimal price)
-        {
-            Price = price;
         }
     }
 }

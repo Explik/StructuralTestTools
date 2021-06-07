@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_6_Solutions
 {
@@ -16,9 +16,5 @@ namespace Lecture_6_Solutions
 
             Array.Sort(cars, Comparer);
         }
-
-        // TestTool Code
-        [PropertySet("Comparer")]
-        public void SetComparer(IComparer<Car> value) => Comparer = value;
     }
 }

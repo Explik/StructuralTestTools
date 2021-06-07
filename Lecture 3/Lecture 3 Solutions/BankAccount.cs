@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Structure.Attributes;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_3_Solutions
 {
@@ -17,6 +18,7 @@ namespace Lecture_3_Solutions
             SavingsRate = 0.02M;
         }
 
+        [ReadonlyProperty]
         public decimal Balance {
             get { return _balance; }
             private set
@@ -65,12 +67,5 @@ namespace Lecture_3_Solutions
             if (Balance < 0)
                 Balance -= Balance * BorrowingRate;
         }
-
-        // TestTools Code
-        [PropertySet("BorrowingRate")]
-        public void SetBorrowingRate(decimal value) => BorrowingRate = value;
-
-        [PropertySet("SavingsRate")]
-        public void SetSavingsRate(decimal value) => SavingsRate = value;
     }
 }

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <FromNamespace>Lecture_8_Solutions</FromNamespace>
+  <ToNamespace>Lecture_8</ToNamespace>
+  
+  <TypeTranslator Type="TestTools.Structure.SameNameTypeTranslator"/>
+  <MemberTranslator Type="TestTools.Structure.SameNameMemberTranslator"/>
+
+  <TypeVerifiers>
+    <TypeVerifier Type="TestTools.Structure.UnchangedTypeAccessLevelVerifier"/>
+    <TypeVerifier Type="TestTools.Structure.UnchangedTypeIsAbstractVerifier"/>
+    <TypeVerifier Type="TestTools.Structure.UnchangedTypeIsStaticVerifier"/>
+  </TypeVerifiers>
+
+  <MemberVerifiers>
+    <MemberVerifier Type="TestTools.Structure.UnchangedFieldTypeVerifier"/>
+    <MemberVerifier Type="TestTools.Structure.UnchangedMemberAccessLevelVerifier"/>
+    <MemberVerifier Type="TestTools.Structure.UnchangedMemberDeclaringType"/>
+    <MemberVerifier Type="TestTools.Structure.UnchangedMemberIsStaticVerifier"/>
+    <MemberVerifier Type="TestTools.Structure.UnchangedMemberIsVirtualVerifier"/>
+    <MemberVerifier Type="TestTools.Structure.UnchangedMemberTypeVerifier"/>
+    <MemberVerifier Type="TestTools.Structure.UnchangedPropertyTypeVerifier"/>
+  </MemberVerifiers>
+</Config>

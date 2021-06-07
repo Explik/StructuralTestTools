@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_9_Solutions
 {
@@ -55,9 +55,5 @@ namespace Lecture_9_Solutions
         {
             return GetEnumerator();
         }
-
-        // TestTools Code
-        [EventAdd("CollectionChanged")]
-        public void AddCollectionChanged(NotifyCollectionChangedEventHandler handler) => CollectionChanged += handler;
     }
 }

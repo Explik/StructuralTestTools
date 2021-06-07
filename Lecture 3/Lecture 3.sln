@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lecture 3 Tests", "Lecture 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lecture 3 Exercises", "Lecture 3 Exercises\Lecture 3 Exercises.csproj", "{CAFC9A0B-9912-444F-B409-FE9C773274D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTools", "..\TestTools\TestTools\TestTools.csproj", "{996B2492-0837-4F61-B37F-838F45EFCBAB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{CAFC9A0B-9912-444F-B409-FE9C773274D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAFC9A0B-9912-444F-B409-FE9C773274D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAFC9A0B-9912-444F-B409-FE9C773274D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{996B2492-0837-4F61-B37F-838F45EFCBAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{996B2492-0837-4F61-B37F-838F45EFCBAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{996B2492-0837-4F61-B37F-838F45EFCBAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{996B2492-0837-4F61-B37F-838F45EFCBAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

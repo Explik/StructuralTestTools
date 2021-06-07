@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_8_Solutions
 {
@@ -65,18 +65,5 @@ namespace Lecture_8_Solutions
                 throw new ArgumentException();
             Balance -= amount;
         }
-
-        // TestTools Code
-        [PropertySet("LowBalanceThreshold")]
-        public void SetLowBalanceThreshold(decimal value) => LowBalanceThreshold = value;
-
-        [PropertySet("HighBalanceThreshold")]
-        public void SetHighBalanceThreshold(decimal value) => HighBalanceThreshold = value;
-
-        [EventAdd("LowBalance")]
-        public void AddLowBalance(BalanceChangeHandler value) => LowBalance += value;
-
-        [EventAdd("HighBalance")]
-        public void AddHighBalance(BalanceChangeHandler value) => HighBalance += value;
     }
 }

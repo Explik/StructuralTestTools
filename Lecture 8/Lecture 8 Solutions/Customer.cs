@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_8_Solutions
 {
@@ -55,18 +55,5 @@ namespace Lecture_8_Solutions
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LastName"));
             }
         }
-
-        // TestTools Code
-        [PropertySet("ID")]
-        public void SetID(int value) => ID = value;
-
-        [PropertySet("FirstName")]
-        public void SetFirstName(string value) => FirstName = value;
-
-        [PropertySet("LastName")]
-        public void SetLastName(string value) => LastName = value;
-
-        [EventAdd("PropertyChanged")]
-        public void AddPropertyChanged(PropertyChangedEventHandler handler) => PropertyChanged += handler;
     }
 }

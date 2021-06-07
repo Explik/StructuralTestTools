@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using OleVanSanten.TestTools.Structure.Attributes;
 
 namespace Lecture_3_Solutions
 {
@@ -20,7 +21,10 @@ namespace Lecture_3_Solutions
                 P2 = new Point(0, 0);
         }
 
+        [ReadonlyProperty]
         public Point P1 { get; }
+
+        [ReadonlyProperty]
         public Point P2 { get; }
 
         public override double CalculateArea()

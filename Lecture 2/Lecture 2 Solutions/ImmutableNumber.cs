@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using OleVanSanten.TestTools.Structure.Attributes;
 
 namespace Lecture_2_Solutions
 {
@@ -11,6 +12,7 @@ namespace Lecture_2_Solutions
             Value = value;
         }
 
+        [ReadonlyProperty]
         public int Value { get; }
 
         public ImmutableNumber Add(ImmutableNumber operand)

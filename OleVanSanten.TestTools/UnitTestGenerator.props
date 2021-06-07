@@ -1,0 +1,6 @@
+﻿<Project>
+    <ItemGroup>
+        <CompilerVisibleProperty Include="UnitTestGenerator_IsConfig" />
+        <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="UnitTestGenerator_IsConfig" />
+    </ItemGroup>
+</Project>
