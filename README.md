@@ -59,7 +59,7 @@ This sample shows how the original unit test would look in compile time mode.
 ```C#
 [TemplatedTestMethod("Person.Age initializes as 0")]
 public void Person_AgeInitializesAsZero() {
-  Rewritten.Person person = new Rewritten.Person();
+  Original.Person person = new Original.Person();
   Assert.AreEqual(0, person.Age);
 }
 ```
