@@ -114,7 +114,7 @@ In compile time mode, the XML file is specified in the test project file.
 ### Type/Member-specific customization
 The project-wide configuration can be overwritten for a single type/member using attributes. 
 
-The project-wide TypeTranslator can be overwritten for a single type, if the type is associated with an attribute implementing <code>ITtypeTranslator</code>. The following example shows how the default type translation approach can be overwritten. The default approach is to translate the type Customer to a type Customer in a different namespace. The new approach is to translate the type Customer to either Customer or Client in the other namespace. 
+The project-wide TypeTranslator can be overwritten for a single type, if the type is associated with an attribute implementing <code>ITypeTranslator</code>. The following example shows how the default type translation approach can be overwritten. The default approach is to translate the type Customer to a type Customer in a different namespace. The new approach is to translate the type Customer to either Customer or Client in the other namespace. 
 ```C#
 [AlternateNames("Client")]
 public class Customer {}
