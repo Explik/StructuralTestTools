@@ -103,7 +103,7 @@ UnitTest test = Factory.CreateTest();
 ```
 
 In compile time mode, the XML file is specified in the test project file. 
-```C#
+```XML
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <AdditionalFiles Include="TestToolsConfig.xml" UnitTestGenerator_IsConfig="true" />
