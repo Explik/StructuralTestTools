@@ -5,20 +5,20 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class UnchangedFieldTypeVerifier : MemberVerifier
+    public class UnchangedFieldTypeVerifier : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.FieldType };
+        public MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.FieldType };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            FieldDescription translatedField = translatedMember as FieldDescription;
+            FieldDescription translatedField = args.TranslatedMember as FieldDescription;
 
-            Verifier.VerifyMemberType(translatedMember, new MemberTypes[] { MemberTypes.Field, MemberTypes.Property });
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new MemberTypes[] { MemberTypes.Field, MemberTypes.Property });
 
-            if (originalMember is FieldDescription originalField)
-                Verifier.VerifyFieldType(translatedField, originalField.FieldType);
-            else if (originalMember is PropertyDescription originalProperty)
-                Verifier.VerifyFieldType(translatedField, originalProperty.PropertyType);
+            if (args.OriginalMember is FieldDescription originalField)
+                args.Verifier.VerifyFieldType(translatedField, originalField.FieldType);
+            else if (args.OriginalMember is PropertyDescription originalProperty)
+                args.Verifier.VerifyFieldType(translatedField, originalProperty.PropertyType);
             else throw new NotImplementedException();
         }
     }

@@ -8,7 +8,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class AlternateNameMemberTranslator : MemberTranslator
+    public class AlternateNameMemberTranslator : IMemberTranslator
     {
         string[] _alternateNames;
 
@@ -17,21 +17,21 @@ namespace OleVanSanten.TestTools.Structure
             _alternateNames = alternateNames;
         }
 
-        public override MemberDescription Translate(MemberDescription member)
+        public MemberDescription Translate(MemberTranslatorArgs args)
         {
-            string[] names = _alternateNames.Union(new[] { member.Name }).ToArray();
+            string[] names = _alternateNames.Union(new[] { args.OriginalMember.Name }).ToArray();
 
-            IEnumerable<MemberDescription> members = TargetType.GetMembers().Where(m => names.Contains(m.Name));
+            IEnumerable<MemberDescription> members = args.TargetType.GetMembers().Where(m => names.Contains(m.Name));
 
             if (!members.Any())
-                Verifier.FailMemberNotFound(TargetType, names);
+                args.Verifier.FailMemberNotFound(args.TargetType, names);
 
             // Multiple MethodBase members may have the same name and only differ in argument list
-            if (member is MethodBaseDescription methodBase1)
+            if (args.OriginalMember is MethodBaseDescription methodBase1)
             {
                 foreach (var methodBase2 in members.OfType<MethodBaseDescription>())
                 {
-                    var parameterTypes1 = methodBase1.GetParameters().Select(p => Service.TranslateType(p.ParameterType));
+                    var parameterTypes1 = methodBase1.GetParameters().Select(p => args.TypeTranslatorService.TranslateType(p.ParameterType));
                     var parameterTypes2 = methodBase2.GetParameters().Select(p => p.ParameterType);
 
                     if (parameterTypes1.SequenceEqual(parameterTypes2))

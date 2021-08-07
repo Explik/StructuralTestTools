@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class MemberTypeVerifier : MemberVerifier
+    public class MemberTypeVerifier : IMemberVerifier
     {
         MemberTypes[] _memberTypes;
 
@@ -18,11 +18,11 @@ namespace OleVanSanten.TestTools.Structure
             _memberTypes = memberTypes;
         }
 
-        public override MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.MemberType };
+        public MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.MemberType };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, _memberTypes);
+            args.Verifier.VerifyMemberType(args.TranslatedMember, _memberTypes);
         }
     }
 }

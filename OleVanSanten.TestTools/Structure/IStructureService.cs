@@ -6,16 +6,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public interface IStructureService
+    public interface IStructureService : ITypeTranslatorService, ITypeVerifierService, IMemberTranslatorService, IMemberVerifierService
     {
-        bool IsTranslatableType(TypeDescription type);
-
-        TypeDescription TranslateType(TypeDescription type);
-
-        MemberDescription TranslateMember(MemberDescription memberInfo);
-
-        void VerifyType(TypeDescription original, ITypeVerifier[] verifiers);
-
-        void VerifyMember(MemberDescription original, IMemberVerifier[] verifiers);
     }
 }

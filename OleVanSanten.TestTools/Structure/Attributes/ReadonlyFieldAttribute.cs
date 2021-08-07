@@ -7,19 +7,15 @@ namespace OleVanSanten.TestTools.Structure.Attributes
 {
     public class ReadonlyFieldAttribute : Attribute, IMemberVerifier
     {
-        public VerifierServiceBase Verifier { get; set; }
-
-        public IStructureService Service { get; set; }
-
         public MemberVerificationAspect[] Aspects => new[] {  
             MemberVerificationAspect.MemberType,
             MemberVerificationAspect.FieldAccessLevel 
         };
 
-        public void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field });
-            Verifier.VerifyIsInitOnly((FieldDescription)translatedMember, true);
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field });
+            args.Verifier.VerifyIsInitOnly((FieldDescription)args.TranslatedMember, true);
         }
     }
 }

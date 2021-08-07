@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class TypeIsStaticVerifier : TypeVerifier
+    public class TypeIsStaticVerifier : ITypeVerifier
     {
         bool _isStatic;
 
@@ -14,13 +14,13 @@ namespace OleVanSanten.TestTools.Structure
             _isStatic = isStatic;
         }
 
-        public override TypeVerificationAspect[] Aspects => new[] {
+        public TypeVerificationAspect[] Aspects => new[] {
             TypeVerificationAspect.IsStatic 
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            Verifier.VerifyIsStatic(translatedType, _isStatic);
+            args.Verifier.VerifyIsStatic(args.TranslatedType, _isStatic);
         }
     }
 }

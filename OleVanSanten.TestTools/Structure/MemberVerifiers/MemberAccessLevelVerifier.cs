@@ -6,7 +6,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class MemberAccessLevelVerifier : MemberVerifier
+    public class MemberAccessLevelVerifier : IMemberVerifier
     {
         readonly AccessLevels[] _accessLevels;
 
@@ -19,7 +19,7 @@ namespace OleVanSanten.TestTools.Structure
             _accessLevels = accessLevels;
         }
 
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.ConstructorAccessLevel,
             MemberVerificationAspect.EventAddAccessLevel,
             MemberVerificationAspect.EventRemoveAccessLevel,
@@ -29,27 +29,27 @@ namespace OleVanSanten.TestTools.Structure
             MemberVerificationAspect.MethodAccessLevel
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            if (translatedMember is ConstructorDescription translatedConstructor)
+            if (args.TranslatedMember is ConstructorDescription translatedConstructor)
             {
-                Verifier.VerifyAccessLevel(translatedConstructor, _accessLevels);
+                args.Verifier.VerifyAccessLevel(translatedConstructor, _accessLevels);
             }
-            else if (translatedMember is EventDescription translatedEvent)
+            else if (args.TranslatedMember is EventDescription translatedEvent)
             {
-                Verifier.VerifyAccessLevel(translatedEvent, _accessLevels, AddMethod: true, RemoveMethod: true);
+                args.Verifier.VerifyAccessLevel(translatedEvent, _accessLevels, AddMethod: true, RemoveMethod: true);
             }
-            else if (translatedMember is FieldDescription translatedField)
+            else if (args.TranslatedMember is FieldDescription translatedField)
             {
-                Verifier.VerifyAccessLevel(translatedField, _accessLevels);
+                args.Verifier.VerifyAccessLevel(translatedField, _accessLevels);
             }
-            else if (translatedMember is PropertyDescription translatedProperty)
+            else if (args.TranslatedMember is PropertyDescription translatedProperty)
             {
-                Verifier.VerifyAccessLevel(translatedProperty, _accessLevels, GetMethod: true, SetMethod: true);
+                args.Verifier.VerifyAccessLevel(translatedProperty, _accessLevels, GetMethod: true, SetMethod: true);
             }
-            else if (translatedMember is MethodDescription translatedMethod)
+            else if (args.TranslatedMember is MethodDescription translatedMethod)
             {
-                Verifier.VerifyAccessLevel(translatedMethod, _accessLevels);
+                args.Verifier.VerifyAccessLevel(translatedMethod, _accessLevels);
             }
             else throw new NotImplementedException();
         }

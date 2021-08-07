@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class MemberIsAbstractVerifier : MemberVerifier
+    public class MemberIsAbstractVerifier : IMemberVerifier
     {
         bool _isAbstract;
 
@@ -14,23 +14,23 @@ namespace OleVanSanten.TestTools.Structure
             _isAbstract = isAbstract;
         }
 
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.PropertyGetIsAbstract,
             MemberVerificationAspect.PropertySetIsAbstract,
             MemberVerificationAspect.MethodIsAbstract
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property, MemberTypes.Method });
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property, MemberTypes.Method });
 
-            if (translatedMember is PropertyDescription translatedProperty)
+            if (args.TranslatedMember is PropertyDescription translatedProperty)
             {
-                Verifier.VerifyIsAbstract(translatedProperty, _isAbstract);
+                args.Verifier.VerifyIsAbstract(translatedProperty, _isAbstract);
             }
-            else if (translatedMember is MethodDescription translatedMethod)
+            else if (args.TranslatedMember is MethodDescription translatedMethod)
             {
-                Verifier.VerifyIsAbstract(translatedMethod, _isAbstract);
+                args.Verifier.VerifyIsAbstract(translatedMethod, _isAbstract);
             }
             else throw new NotImplementedException();
         }

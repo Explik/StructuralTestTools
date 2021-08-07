@@ -5,30 +5,30 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class UnchangedMemberIsVirtualVerifier : MemberVerifier
+    public class UnchangedMemberIsVirtualVerifier : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.PropertyGetIsVirtual,
             MemberVerificationAspect.PropertySetIsVirtual,
             MemberVerificationAspect.MethodIsVirtual
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            if (originalMember is PropertyDescription originalProperty)
+            if (args.OriginalMember is PropertyDescription originalProperty)
             {
-                Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property });
+                args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
 
                 if (originalProperty.CanRead)
-                    Verifier.VerifyIsVirtual((PropertyDescription)translatedMember, originalProperty.GetMethod.IsVirtual, GetMethod: true);
+                    args.Verifier.VerifyIsVirtual((PropertyDescription)args.TranslatedMember, originalProperty.GetMethod.IsVirtual, GetMethod: true);
 
                 if (originalProperty.CanWrite)
-                    Verifier.VerifyIsVirtual((PropertyDescription)translatedMember, originalProperty.SetMethod.IsVirtual, SetMethod: true);
+                    args.Verifier.VerifyIsVirtual((PropertyDescription)args.TranslatedMember, originalProperty.SetMethod.IsVirtual, SetMethod: true);
             }
-            else if (translatedMember is MethodDescription originalMethod)
+            else if (args.TranslatedMember is MethodDescription originalMethod)
             {
-                Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Method });
-                Verifier.VerifyIsStatic((MethodDescription)translatedMember, originalMethod.IsStatic);
+                args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Method });
+                args.Verifier.VerifyIsStatic((MethodDescription)args.TranslatedMember, originalMethod.IsStatic);
             }
             else throw new NotImplementedException();
         }

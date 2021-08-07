@@ -6,21 +6,21 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class PropertyIsReadonlyVerifier : MemberVerifier
+    public class PropertyIsReadonlyVerifier : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.MemberType,
             MemberVerificationAspect.PropertyGetAccessLevel,
             MemberVerificationAspect.PropertySetAccessLevel
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property });
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
 
-            if (translatedMember is PropertyDescription propertyInfo)
+            if (args.TranslatedMember is PropertyDescription propertyInfo)
             {
-                Verifier.VerifyIsReadonly(propertyInfo, DescriptionHelper.GetAccessLevel(((PropertyDescription)originalMember).GetMethod));
+                args.Verifier.VerifyIsReadonly(propertyInfo, DescriptionHelper.GetAccessLevel(propertyInfo.GetMethod));
             }
             else throw new NotImplementedException();
         }

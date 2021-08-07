@@ -6,24 +6,24 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class MemberIsReadonlyVerifier : MemberVerifier
+    public class MemberIsReadonlyVerifier : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.MemberType,
             MemberVerificationAspect.FieldAccessLevel
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
             
-            if (translatedMember is FieldDescription fieldInfo)
+            if (args.TranslatedMember is FieldDescription fieldInfo)
             {
-                Verifier.VerifyIsInitOnly(fieldInfo, true);
+                args.Verifier.VerifyIsInitOnly(fieldInfo, true);
             }
-            else if(translatedMember is PropertyDescription propertyInfo)
+            else if(args.TranslatedMember is PropertyDescription propertyInfo)
             {
-                Verifier.VerifyIsReadonly(propertyInfo, DescriptionHelper.GetAccessLevel(propertyInfo));
+                args.Verifier.VerifyIsReadonly(propertyInfo, DescriptionHelper.GetAccessLevel(propertyInfo));
             } 
         }
     }

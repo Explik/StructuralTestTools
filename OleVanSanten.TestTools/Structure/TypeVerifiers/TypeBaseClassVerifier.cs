@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class TypeBaseClassVerifier : TypeVerifier
+    public class TypeBaseClassVerifier : ITypeVerifier
     {
         Type _type;
 
@@ -14,14 +14,14 @@ namespace OleVanSanten.TestTools.Structure
             _type = type;
         }
 
-        public override TypeVerificationAspect[] Aspects => new[]
+        public TypeVerificationAspect[] Aspects => new[]
         {
             TypeVerificationAspect.IsSubclassOf
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            Verifier.VerifyBaseType(translatedType, new RuntimeTypeDescription(_type));
+            args.Verifier.VerifyBaseType(args.TranslatedType, new RuntimeTypeDescription(_type));
         }
     }
 }

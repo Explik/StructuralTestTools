@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class MemberIsStaticVerifier : MemberVerifier
+    public class MemberIsStaticVerifier : IMemberVerifier
     {
         bool _isStatic;
 
@@ -14,27 +14,27 @@ namespace OleVanSanten.TestTools.Structure
             _isStatic = isStatic;
         }
 
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.FieldIsStatic,
             MemberVerificationAspect.MethodIsStatic,
             MemberVerificationAspect.PropertyIsStatic
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property, MemberTypes.Method });
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field, MemberTypes.Property, MemberTypes.Method });
 
-            if (translatedMember is FieldDescription translatedField)
+            if (args.TranslatedMember is FieldDescription translatedField)
             {
-                Verifier.VerifyIsStatic(translatedField, _isStatic);
+                args.Verifier.VerifyIsStatic(translatedField, _isStatic);
             }
-            else if (translatedMember is PropertyDescription translatedProperty)
+            else if (args.TranslatedMember is PropertyDescription translatedProperty)
             {
-                Verifier.VerifyIsStatic(translatedProperty, _isStatic);
+                args.Verifier.VerifyIsStatic(translatedProperty, _isStatic);
             }
-            else if (translatedMember is MethodDescription translatedMethod)
+            else if (args.TranslatedMember is MethodDescription translatedMethod)
             {
-                Verifier.VerifyIsStatic(translatedMethod, _isStatic);
+                args.Verifier.VerifyIsStatic(translatedMethod, _isStatic);
             }
             else throw new NotImplementedException();
         }

@@ -8,8 +8,15 @@ namespace OleVanSanten.TestTools.Structure
 {
     public interface IMemberTranslator
     {
-        TypeDescription TargetType { get; set; }
-        VerifierServiceBase Verifier { get; set; }
-        MemberDescription Translate(MemberDescription member);
+        MemberDescription Translate(MemberTranslatorArgs args);
+    }
+
+    public struct MemberTranslatorArgs
+    {
+        public VerifierServiceBase Verifier { get; set; }
+        public ITypeTranslatorService TypeTranslatorService { get; set; }
+        public ITypeVerifierService TypeVerifierService { get; set; }
+        public TypeDescription TargetType { get; set; }
+        public MemberDescription OriginalMember { get; set; }
     }
 }

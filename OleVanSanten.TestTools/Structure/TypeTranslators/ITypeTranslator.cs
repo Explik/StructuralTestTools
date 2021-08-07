@@ -7,8 +7,13 @@ namespace OleVanSanten.TestTools.Structure
 {
     public interface ITypeTranslator
     {
-        NamespaceDescription TargetNamespace { get; set; }
-        VerifierServiceBase Verifier { get; set; }
-        TypeDescription Translate(TypeDescription type);
+        TypeDescription Translate(TypeTranslateArgs args);
+    }
+
+    public struct TypeTranslateArgs
+    {
+        public VerifierServiceBase Verifier { get; set; }
+        public NamespaceDescription TargetNamespace { get; set; }
+        public TypeDescription OriginalType { get; set; }
     }
 }

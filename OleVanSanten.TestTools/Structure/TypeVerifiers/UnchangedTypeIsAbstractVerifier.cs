@@ -5,15 +5,15 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class UnchangedTypeIsAbstractVerifier : TypeVerifier
+    public class UnchangedTypeIsAbstractVerifier : ITypeVerifier
     {
-        public override TypeVerificationAspect[] Aspects => new[] { 
+        public TypeVerificationAspect[] Aspects => new[] { 
             TypeVerificationAspect.IsAbstract
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            Verifier.VerifyIsAbstract(translatedType, originalType.IsAbstract);
+            args.Verifier.VerifyIsAbstract(args.TranslatedType, args.OriginalType.IsAbstract);
         }
     }
 }

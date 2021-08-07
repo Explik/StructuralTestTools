@@ -6,7 +6,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class DelegateSignatureVerifier : TypeVerifier
+    public class DelegateSignatureVerifier : ITypeVerifier
     {
         Type _delegateType; 
 
@@ -15,15 +15,15 @@ namespace OleVanSanten.TestTools.Structure
             _delegateType = delegateType;
         }
 
-        public override TypeVerificationAspect[] Aspects => new[]
+        public TypeVerificationAspect[] Aspects => new[]
         {
             TypeVerificationAspect.DelegateSignature
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            Verifier.VerifyIsDelegate(translatedType);
-            Verifier.VerifyDelegateSignature(translatedType, new RuntimeMethodDescription(_delegateType.GetMethod("Invoke")));
+            args.Verifier.VerifyIsDelegate(args.TranslatedType);
+            args.Verifier.VerifyDelegateSignature(args.TranslatedType, new RuntimeMethodDescription(_delegateType.GetMethod("Invoke")));
         }
     }
 }

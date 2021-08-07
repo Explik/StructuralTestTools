@@ -5,28 +5,28 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class UnchangedMemberTypeVerifier : MemberVerifier
+    public class UnchangedMemberTypeVerifier : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.MemberType };
+        public MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.MemberType };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            switch (originalMember.MemberType)
+            switch (args.OriginalMember.MemberType)
             {
                 case MemberTypes.Constructor:
-                    Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Constructor });
+                    args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Constructor });
                     break;
                 case MemberTypes.Event:
-                    Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Event });
+                    args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Event });
                     break;
                 case MemberTypes.Field:
-                    Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field });
+                    args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field });
                     break;
                 case MemberTypes.Method:
-                    Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Method });
+                    args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Method });
                     break;
                 case MemberTypes.Property:
-                    Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property });
+                    args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
                     break;
                 default: throw new NotImplementedException();
             }

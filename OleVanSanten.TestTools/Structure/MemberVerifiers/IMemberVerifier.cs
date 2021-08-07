@@ -10,10 +10,16 @@ namespace OleVanSanten.TestTools.Structure
     {
         MemberVerificationAspect[] Aspects { get; }
         
-        VerifierServiceBase Verifier { get; set; }
+        void Verify(MemberVerifierArgs args);
+    }
 
-        IStructureService Service { get; set; }
-
-        void Verify(MemberDescription originalMember, MemberDescription translatedMember);
+    public struct MemberVerifierArgs
+    {
+        public VerifierServiceBase Verifier { get; set; }
+        public ITypeTranslatorService TypeTranslatorService { get; set; }
+        public ITypeVerifierService TypeVerifierService { get; set; }
+        public IMemberTranslatorService MemberTranslatorService { get; set; }
+        public MemberDescription OriginalMember { get; set; }
+        public MemberDescription TranslatedMember { get; set; }
     }
 }

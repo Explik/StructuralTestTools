@@ -5,40 +5,40 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class UnchangedMemberDeclaringType : MemberVerifier
+    public class UnchangedMemberDeclaringType : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.MethodDeclaringType,
             MemberVerificationAspect.PropertyGetDeclaringType,
             MemberVerificationAspect.PropertySetDeclaringType
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            if (originalMember is MethodDescription originalMethod)
+            if (args.OriginalMember is MethodDescription originalMethod)
             {
-                var type = Service.TranslateType(originalMethod.DeclaringType);
-                Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Method });
-                Verifier.VerifyDeclaringType((MethodDescription)translatedMember, type);
+                var type = args.TypeTranslatorService.TranslateType(originalMethod.DeclaringType);
+                args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Method });
+                args.Verifier.VerifyDeclaringType((MethodDescription)args.TranslatedMember, type);
             }
-            else if (originalMember is PropertyDescription originalProperty)
+            else if (args.OriginalMember is PropertyDescription originalProperty)
             {
-                var type1 = originalProperty.CanRead ? Service.TranslateType(originalProperty.GetMethod.DeclaringType) : null;
-                var type2 = originalProperty.CanWrite ? Service.TranslateType(originalProperty.SetMethod.DeclaringType) : null;
+                var type1 = originalProperty.CanRead ? args.TypeTranslatorService.TranslateType(originalProperty.GetMethod.DeclaringType) : null;
+                var type2 = originalProperty.CanWrite ? args.TypeTranslatorService.TranslateType(originalProperty.SetMethod.DeclaringType) : null;
 
-                Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
+                args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
 
-                if (translatedMember is FieldDescription translatedField)
+                if (args.TranslatedMember is FieldDescription translatedField)
                 {
-                    Verifier.VerifyDeclaringType(translatedField, type1 ?? type2);
+                    args.Verifier.VerifyDeclaringType(translatedField, type1 ?? type2);
                 }
-                else if (translatedMember is PropertyDescription translatedProperty)
+                else if (args.TranslatedMember is PropertyDescription translatedProperty)
                 {
                     if (type1 != null)
-                        Verifier.VerifyDeclaringType(translatedProperty, type1, GetMethod: true);
+                        args.Verifier.VerifyDeclaringType(translatedProperty, type1, GetMethod: true);
                     
                     if (type2 != null)
-                        Verifier.VerifyDeclaringType(translatedProperty, type2, SetMethod: true);
+                        args.Verifier.VerifyDeclaringType(translatedProperty, type2, SetMethod: true);
                 }
             }
             else throw new NotImplementedException();

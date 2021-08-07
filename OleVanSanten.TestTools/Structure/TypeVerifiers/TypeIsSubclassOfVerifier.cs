@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class TypeIsSubclassOfVerifier : TypeVerifier
+    public class TypeIsSubclassOfVerifier : ITypeVerifier
     {
         Type _type;
 
@@ -14,15 +14,15 @@ namespace OleVanSanten.TestTools.Structure
             _type = type;
         }
 
-        public override TypeVerificationAspect[] Aspects => new[]
+        public TypeVerificationAspect[] Aspects => new[]
         {
             TypeVerificationAspect.IsSubclassOf
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            var baseType = Service.TranslateType(new RuntimeTypeDescription(_type));
-            Verifier.VerifyIsSubclassOf(translatedType, baseType);
+            var baseType = args.TypeTranslatorService.TranslateType(new RuntimeTypeDescription(_type));
+            args.Verifier.VerifyIsSubclassOf(args.TranslatedType, baseType);
         }
     }
 }

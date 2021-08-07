@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class TypeAccessLevelVerifier : TypeVerifier
+    public class TypeAccessLevelVerifier : ITypeVerifier
     {
         AccessLevels[] _accessLevels;
 
@@ -18,14 +18,14 @@ namespace OleVanSanten.TestTools.Structure
             _accessLevels = accessLevels;
         }
 
-        public override TypeVerificationAspect[] Aspects => new[]
+        public TypeVerificationAspect[] Aspects => new[]
         {
             TypeVerificationAspect.AccessLevel
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            Verifier.VerifyAccessLevel(translatedType, _accessLevels);
+            args.Verifier.VerifyAccessLevel(args.TranslatedType, _accessLevels);
         }
     }
 }

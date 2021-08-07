@@ -17,21 +17,8 @@ namespace OleVanSanten.TestTools.Structure
             _memberTranslator = new AlternateNameMemberTranslator(alternateNames);
         }
 
-        public NamespaceDescription TargetNamespace { 
-            get => _typeTranslator.TargetNamespace; 
-            set => _typeTranslator.TargetNamespace = value;
-        }
+        public TypeDescription Translate(TypeTranslateArgs args) => _typeTranslator.Translate(args);
 
-        public TypeDescription TargetType { 
-            get => _memberTranslator.TargetType; 
-            set => _memberTranslator.TargetType = value; 
-        }
-
-        public VerifierServiceBase Verifier { get; set; }
-        public IStructureService Service { get; set; }
-
-        public TypeDescription Translate(TypeDescription type) => _typeTranslator.Translate(type);
-
-        public MemberDescription Translate(MemberDescription member) => _memberTranslator.Translate(member);
+        public MemberDescription Translate(MemberTranslatorArgs args) => _memberTranslator.Translate(args);
     }
 }

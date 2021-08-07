@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class EventHandlerTypeVerifier : MemberVerifier
+    public class EventHandlerTypeVerifier : IMemberVerifier
     {
         Type _type;
 
@@ -14,15 +14,15 @@ namespace OleVanSanten.TestTools.Structure
             _type = type;
         }
 
-        public override MemberVerificationAspect[] Aspects => new[]
+        public MemberVerificationAspect[] Aspects => new[] 
         {
             MemberVerificationAspect.EventHandlerType
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Event });
-            Verifier.VerifyEventHandlerType((EventDescription)translatedMember, new RuntimeTypeDescription(_type));
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Event });
+            args.Verifier.VerifyEventHandlerType((EventDescription)args.TranslatedMember, new RuntimeTypeDescription(_type));
         }
     }
 }

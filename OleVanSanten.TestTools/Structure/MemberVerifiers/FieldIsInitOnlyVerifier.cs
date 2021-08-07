@@ -5,7 +5,7 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class FieldIsInitOnlyVerifier : MemberVerifier
+    public class FieldIsInitOnlyVerifier : IMemberVerifier
     {
         bool _isInitOnly;
 
@@ -14,15 +14,15 @@ namespace OleVanSanten.TestTools.Structure
             _isInitOnly = isInitOnly;
         }
 
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.MemberType,
             MemberVerificationAspect.FieldAccessLevel
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field });
-            Verifier.VerifyIsInitOnly((FieldDescription)translatedMember, _isInitOnly);
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field });
+            args.Verifier.VerifyIsInitOnly((FieldDescription)args.TranslatedMember, _isInitOnly);
         }
     }
 }

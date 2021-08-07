@@ -5,48 +5,48 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class UnchangedMemberIsStaticVerifier : MemberVerifier
+    public class UnchangedMemberIsStaticVerifier : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.FieldIsStatic,
             MemberVerificationAspect.MethodIsStatic,
             MemberVerificationAspect.PropertyIsStatic
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            if (originalMember is FieldDescription originalField)
+            if (args.OriginalMember is FieldDescription originalField)
             {
-                Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
+                args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
 
-                if (translatedMember is FieldDescription translatedField)
+                if (args.TranslatedMember is FieldDescription translatedField)
                 {
-                    Verifier.VerifyIsStatic(translatedField, originalField.IsStatic);
+                    args.Verifier.VerifyIsStatic(translatedField, originalField.IsStatic);
                 }
-                else if (translatedMember is PropertyDescription translatedProperty)
+                else if (args.TranslatedMember is PropertyDescription translatedProperty)
                 {
-                    Verifier.VerifyIsStatic(translatedProperty, originalField.IsStatic);
+                    args.Verifier.VerifyIsStatic(translatedProperty, originalField.IsStatic);
                 }
             }
-            else if (originalMember is PropertyDescription originalProperty)
+            else if (args.OriginalMember is PropertyDescription originalProperty)
             {
                 bool isStatic = originalProperty.CanRead ? originalProperty.GetMethod.IsStatic : originalProperty.SetMethod.IsStatic;
 
-                Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
+                args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
 
-                if (translatedMember is FieldDescription translatedField)
+                if (args.TranslatedMember is FieldDescription translatedField)
                 {
-                    Verifier.VerifyIsStatic(translatedField, isStatic);
+                    args.Verifier.VerifyIsStatic(translatedField, isStatic);
                 }
-                else if (translatedMember is PropertyDescription translatedProperty)
+                else if (args.TranslatedMember is PropertyDescription translatedProperty)
                 {
-                    Verifier.VerifyIsStatic(translatedProperty, isStatic);
+                    args.Verifier.VerifyIsStatic(translatedProperty, isStatic);
                 }
             }
-            else if (translatedMember is MethodDescription originalMethod)
+            else if (args.TranslatedMember is MethodDescription originalMethod)
             {
-                Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Method });
-                Verifier.VerifyIsStatic((MethodDescription)translatedMember, originalMethod.IsStatic);
+                args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Method });
+                args.Verifier.VerifyIsStatic((MethodDescription)args.TranslatedMember, originalMethod.IsStatic);
             }
             else throw new NotImplementedException();
         }

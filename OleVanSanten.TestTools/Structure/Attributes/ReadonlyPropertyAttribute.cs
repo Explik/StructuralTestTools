@@ -17,12 +17,12 @@ namespace OleVanSanten.TestTools.Structure.Attributes
             MemberVerificationAspect.PropertyGetAccessLevel 
         };
 
-        public void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property });
+            Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
 
-            var originalProperty = (PropertyDescription)originalMember;
-            var translatedProperty = (PropertyDescription)translatedMember;
+            var originalProperty = (PropertyDescription)args.OriginalMember;
+            var translatedProperty = (PropertyDescription)args.TranslatedMember;
             Verifier.VerifyIsReadonly(translatedProperty, DescriptionHelper.GetAccessLevel(originalProperty.GetMethod));
         }
     }

@@ -7,15 +7,11 @@ namespace OleVanSanten.TestTools.Structure.Attributes
 {
     public class FieldOrPropertyAttribute : Attribute, IMemberVerifier
     {
-        public VerifierServiceBase Verifier { get; set; }
-
         public MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.MemberType };
 
-        public IStructureService Service { get; set; }
-
-        public void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
         }
     }
 }

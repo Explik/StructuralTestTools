@@ -6,16 +6,16 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class UnchangedTypeIsStaticVerifier : TypeVerifier
+    public class UnchangedTypeIsStaticVerifier : ITypeVerifier
     {
-        public override TypeVerificationAspect[] Aspects => new[] { 
+        public TypeVerificationAspect[] Aspects => new[] { 
             TypeVerificationAspect.IsStatic
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            bool isStatic = originalType.IsAbstract && originalType.IsSealed;
-            Verifier.VerifyIsStatic(translatedType, isStatic);
+            bool isStatic = args.OriginalType.IsAbstract && args.OriginalType.IsSealed;
+            args.Verifier.VerifyIsStatic(args.TranslatedType, isStatic);
         }
     }
 }

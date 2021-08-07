@@ -83,11 +83,14 @@ namespace OleVanSanten.TestTools.Structure
 
             if (type.Namespace == FromNamespace.Name)
             {
+                TypeTranslateArgs translateArgs = new TypeTranslateArgs()
+                {
+                    Verifier = StructureVerifier,
+                    TargetNamespace = ToNamespace,
+                    OriginalType = type
+                };
                 ITypeTranslator translator = type.GetCustomTranslator() ?? TypeTranslator;
-                translator.TargetNamespace = ToNamespace;
-                translator.Verifier = StructureVerifier;
-
-                translatedType = translator.Translate(type);
+                translatedType = translator.Translate(translateArgs);
             }
             else translatedType = type;
 
@@ -104,14 +107,18 @@ namespace OleVanSanten.TestTools.Structure
         {
             if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
                 return memberInfo;
-            
+
+            MemberTranslatorArgs translatorArgs = new MemberTranslatorArgs()
+            {
+                Verifier = StructureVerifier,
+                TypeTranslatorService = this,
+                TypeVerifierService = this,
+                TargetType = TranslateType(memberInfo.DeclaringType),
+                OriginalMember = memberInfo,
+            };
             IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
 
-            translator.Service = this;
-            translator.Verifier = StructureVerifier;
-            translator.TargetType = TranslateType(memberInfo.DeclaringType);
-
-            return translator.Translate(memberInfo);
+            return translator.Translate(translatorArgs);
         }
 
         public MemberDescription TranslateMember(TypeDescription targetType, MemberDescription memberInfo)
@@ -119,51 +126,58 @@ namespace OleVanSanten.TestTools.Structure
             if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
                 return memberInfo;
 
+            MemberTranslatorArgs translatorArgs = new MemberTranslatorArgs()
+            {
+                Verifier = StructureVerifier,
+                TypeTranslatorService = this,
+                TypeVerifierService = this,
+                TargetType = targetType,
+                OriginalMember = memberInfo,
+            };
             IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
 
-            translator.Service = this;
-            translator.Verifier = StructureVerifier;
-            translator.TargetType = targetType;
-
-            return translator.Translate(memberInfo);
+            return translator.Translate(translatorArgs);
         }
 
         public void VerifyType(TypeDescription original, ITypeVerifier[] verifiers)
         {
-            TypeDescription translated = TranslateType(original);
+            TypeVerifierArgs verifierArgs = new TypeVerifierArgs()
+            {
+                Verifier = StructureVerifier,
+                TypeTranslatorService = this,
+                OriginalType = original,
+                TranslatedType = TranslateType(original)
+            };
 
             foreach (TypeVerificationAspect aspect in TypeVerificationOrder)
             {
                 ITypeVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
                 ITypeVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
-
-                if (verifier != null)
-                {
-                    verifier.Verifier = StructureVerifier;
-                    verifier.Service = this;
-                    verifier.Verify(original, translated);
-                }
+                verifier?.Verify(verifierArgs);
             }
         }
 
         public void VerifyMember(MemberDescription original, IMemberVerifier[] verifiers)
         {
             TypeDescription translatedType = TranslateType(original.DeclaringType);
-            MemberDescription translatedMember = TranslateMember(translatedType, original);
+
+            MemberVerifierArgs verifierArgs = new MemberVerifierArgs()
+            {
+                Verifier = StructureVerifier,
+                TypeTranslatorService = this,
+                TypeVerifierService = this,
+                MemberTranslatorService = this,
+                OriginalMember = original,
+                TranslatedMember = TranslateMember(translatedType, original)
+            };
 
             foreach (MemberVerificationAspect aspect in MemberVerificationOrder)
             {
                 IMemberVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
                 IMemberVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
 
-                if (verifier != null)
-                {
-                    verifier.Verifier = StructureVerifier;
-                    verifier.Service = this;
-                    verifier.Verify(original, translatedMember);
-                }
+                verifier?.Verify(verifierArgs);
             }
         }
-
     }
 }

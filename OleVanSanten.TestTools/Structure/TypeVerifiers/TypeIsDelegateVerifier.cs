@@ -5,16 +5,16 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class TypeIsDelegateVerifier : TypeVerifier
+    public class TypeIsDelegateVerifier : ITypeVerifier
     {
-        public override TypeVerificationAspect[] Aspects => new[]
+        public TypeVerificationAspect[] Aspects => new[]
         {
             TypeVerificationAspect.IsDelegate
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            Verifier.VerifyIsDelegate(translatedType);
+            args.Verifier.VerifyIsDelegate(args.TranslatedType);
         }
     }
 }

@@ -6,18 +6,18 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class PropertyIsWriteonlyVerifier : MemberVerifier
+    public class PropertyIsWriteonlyVerifier : IMemberVerifier
     {
-        public override MemberVerificationAspect[] Aspects => new[] {
+        public MemberVerificationAspect[] Aspects => new[] {
             MemberVerificationAspect.MemberType,
             MemberVerificationAspect.PropertyGetAccessLevel,
             MemberVerificationAspect.PropertySetAccessLevel
         };
 
-        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
+        public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property });
-            Verifier.VerifyIsWriteonly((PropertyDescription)translatedMember, DescriptionHelper.GetAccessLevel(translatedMember));
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
+            args.Verifier.VerifyIsWriteonly((PropertyDescription)args.TranslatedMember, DescriptionHelper.GetAccessLevel(args.TranslatedMember));
         }
     }
 }

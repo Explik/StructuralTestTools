@@ -5,16 +5,16 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class TypeIsInterfaceVerifier : TypeVerifier
+    public class TypeIsInterfaceVerifier : ITypeVerifier
     {
-        public override TypeVerificationAspect[] Aspects => new[] 
+        public TypeVerificationAspect[] Aspects => new[] 
         {
             TypeVerificationAspect.IsInterface 
         };
 
-        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
+        public void Verify(TypeVerifierArgs args)
         {
-            Verifier.VerifyIsInterface(translatedType);
+            args.Verifier.VerifyIsInterface(args.TranslatedType);
         }
     }
 }

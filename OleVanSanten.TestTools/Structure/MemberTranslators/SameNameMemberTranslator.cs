@@ -8,18 +8,18 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Structure
 {
-    public class SameNameMemberTranslator : MemberTranslator
+    public class SameNameMemberTranslator : IMemberTranslator
     {
-        public override MemberDescription Translate(MemberDescription member)
+        public MemberDescription Translate(MemberTranslatorArgs args)
         {
-            IEnumerable<MemberDescription> allMembers = TargetType.GetMembers();
-            IEnumerable<MemberDescription> matchingMembers = allMembers.Where(m => m.Name == member.Name);
+            IEnumerable<MemberDescription> allMembers = args.TargetType.GetMembers();
+            IEnumerable<MemberDescription> matchingMembers = allMembers.Where(m => m.Name == args.OriginalMember.Name);
 
             if (!matchingMembers.Any())
-                Verifier.FailMemberNotFound(TargetType, new[] { member.Name });
+                args.Verifier.FailMemberNotFound(args.TargetType, new[] { args.OriginalMember.Name });
 
-            // Multiple MethodBase members may have the same name and only differ in argument list
-            if (member is MethodBaseDescription methodBase1)
+            // Multiple MethodBase members may have the same name and only differ in parameter list
+            if (args.OriginalMember is MethodBaseDescription methodBase1)
             {
                 foreach (var methodBase2 in matchingMembers.OfType<MethodBaseDescription>())
                 {
@@ -29,7 +29,7 @@ namespace OleVanSanten.TestTools.Structure
                     if (methodBase2.IsGenericMethod)
                         methodBase3 = ((MethodDescription)methodBase2).MakeGenericMethod(methodBase1.GetGenericArguments());
 
-                    var parameterTypes1 = methodBase1.GetParameters().Select(p => Service.TranslateType(p.ParameterType));
+                    var parameterTypes1 = methodBase1.GetParameters().Select(p => args.TypeTranslatorService.TranslateType(p.ParameterType));
                     var parameterTypes2 = methodBase3.GetParameters().Select(p => p.ParameterType);
 
                     if (parameterTypes1.SequenceEqual(parameterTypes2))
@@ -38,9 +38,9 @@ namespace OleVanSanten.TestTools.Structure
 
                 // Fail if no matching method is found
                 if (methodBase1 is MethodDescription methodInfo)
-                    Verifier.FailMethodNotFound(TargetType, methodInfo);
+                    args.Verifier.FailMethodNotFound(args.TargetType, methodInfo);
                 if (methodBase1 is ConstructorDescription constructorInfo)
-                    Verifier.FailConstructorNotFound(TargetType, constructorInfo);
+                    args.Verifier.FailConstructorNotFound(args.TargetType, constructorInfo);
             }
             return matchingMembers.First();
         }
