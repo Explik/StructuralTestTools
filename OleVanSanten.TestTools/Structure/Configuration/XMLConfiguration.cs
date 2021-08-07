@@ -7,9 +7,9 @@ using OleVanSanten.TestTools.Structure;
 using System.Linq;
 using System.Reflection;
 
-namespace OleVanSanten.TestTools
+namespace OleVanSanten.TestTools.Structure
 {
-    public class XMLConfiguration
+    public class XMLConfiguration : IConfiguration
     {
         readonly XElement root;
 
@@ -81,7 +81,7 @@ namespace OleVanSanten.TestTools
             if (typeVerifiersElement == null)
                 return null;
 
-            foreach(var typeVerifierElement in typeVerifierElements)
+            foreach (var typeVerifierElement in typeVerifierElements)
             {
                 var typeVerifierTypeAttribute = typeVerifierElement.Attribute("Type");
 
@@ -90,10 +90,10 @@ namespace OleVanSanten.TestTools
 
                 output.Add(GetObject(typeVerifierTypeAttribute.Value) as ITypeVerifier);
             }
-			
-			if (output.All(v => v == null))
-				return null;
-			
+
+            if (output.All(v => v == null))
+                return null;
+
             return output.ToArray();
         }
 
@@ -129,10 +129,10 @@ namespace OleVanSanten.TestTools
 
                 output.Add(GetObject(memberVerifierTypeAttribute.Value) as IMemberVerifier);
             }
-			
-			if (output.All(v => v == null))
-				return null;
-			
+
+            if (output.All(v => v == null))
+                return null;
+
             return output.ToArray();
 
         }
@@ -153,7 +153,7 @@ namespace OleVanSanten.TestTools
                 {
                     var assembly = assemblyEnumerator.Current;
                     var type = assembly.GetTypes().FirstOrDefault(t => t.Namespace == namespaceName && t.Name == typeName);
-			
+
                     if (type != null)
                         return Activator.CreateInstance(type);
                 }
@@ -162,10 +162,10 @@ namespace OleVanSanten.TestTools
 
             // This method is somewhat unreliable at the moment, possibly due to a configuration issue.
             // Therefore, a null value (signifying property not configured) is used instead of throwing an exception
-			return null;
+            return null;
         }
 
-        private NamespaceDescription GetNamespace(NamespaceDescription @namespace,  string fullNamepaceName)
+        private NamespaceDescription GetNamespace(NamespaceDescription @namespace, string fullNamepaceName)
         {
             NamespaceDescription subNamespace = @namespace;
 
