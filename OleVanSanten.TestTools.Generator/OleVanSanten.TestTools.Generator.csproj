@@ -36,8 +36,11 @@
     
     <!-- Including OleVanSanten.TestTools as in package -->
     <!-- Based on https://stackoverflow.com/questions/67071355/source-generators-dependencies-not-loaded-in-visual-studio -->
-    <PackageReference Include="OleVanSanten.TestTools" Version="1.0.4" PrivateAssets="all" GeneratePathProperty="true" />
-    <EmbeddedResource Include="$(PKGOleVanSanten_TestTools)\lib\netstandard2.0\OleVanSanten.TestTools.dll" Visible="false" />
-    <None Include="$(PkgOleVanSanten_TestTools)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!--<EmbeddedResource Include="$(PKGOleVanSanten_TestTools)\lib\netstandard2.0\OleVanSanten.TestTools.dll" Visible="false" />-->
+    <!--<None Include="$(PkgOleVanSanten_TestTools)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\OleVanSanten.TestTools\OleVanSanten.TestTools.csproj" />
   </ItemGroup>
 </Project>

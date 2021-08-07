@@ -3,6 +3,7 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using System.Text;
 using OleVanSanten.TestTools.Structure;
 using OleVanSanten.TestTools.TypeSystem;
@@ -46,7 +47,7 @@ namespace TestTools_Tests.Structure
 
             Assert.IsTrue(service.IsTranslatableType(type));
         }
-
+        
         [TestMethod("TranslateType uses TypeTranslator if no custom translator is defined on type")]
         public void TranslateTypeUsesTypeTranslatorIfNoCustomTranslatorIsDefinedOnType()
         {
@@ -61,7 +62,7 @@ namespace TestTools_Tests.Structure
 
             service.TranslateType(originalType);
 
-            translator.Received().Translate(originalType);
+            translator.ReceivedWithAnyArgs().Translate(new TypeTranslateArgs());
         }
 
         [TestMethod("TranslateType does not use TypeTranslator if type is not in FromNamespace")]
@@ -78,7 +79,7 @@ namespace TestTools_Tests.Structure
 
             service.TranslateType(originalType);
 
-            translator.DidNotReceive().Translate(originalType);
+            translator.DidNotReceiveWithAnyArgs().Translate(new TypeTranslateArgs());
         }
 
         [TestMethod("TranslateType does not use TypeTranslator if custom translator is defined on type")]
@@ -95,7 +96,7 @@ namespace TestTools_Tests.Structure
 
             service.TranslateType(originalType);
 
-            translator.DidNotReceive().Translate(originalType);
+            translator.DidNotReceiveWithAnyArgs().Translate(new TypeTranslateArgs());
         }
 
         [TestMethod("VerifyType(Type, ITypeVerifier[]) uses all type verifiers")]
@@ -112,8 +113,8 @@ namespace TestTools_Tests.Structure
 
             service.VerifyType(typeToVerify, new[] { verifier1, verifier2 });
 
-            verifier1.Received().Verify(typeToVerify, typeToVerify);
-            verifier2.Received().Verify(typeToVerify, typeToVerify);
+            verifier1.ReceivedWithAnyArgs().Verify(new TypeVerifierArgs());
+            verifier2.ReceivedWithAnyArgs().Verify(new TypeVerifierArgs());
         }
 
         [TestMethod("TranslateMember uses MemberTranslator if no custom translator is defined on member")]
@@ -124,7 +125,7 @@ namespace TestTools_Tests.Structure
             var fieldToTranslate = new RuntimeFieldDescription(typeof(TestTypeWithoutCustomTranslator).GetField("FieldWithoutCustomTranslator"));
 
             ITypeTranslator typeTranslator = Substitute.For<ITypeTranslator>();
-            typeTranslator.Translate(typeToTranslate).Returns(typeToTranslate);
+            typeTranslator.Translate(new TypeTranslateArgs()).ReturnsForAnyArgs(typeToTranslate);
             IMemberTranslator memberTranslator = Substitute.For<IMemberTranslator>();
             StructureService service = new StructureService(@namespace, @namespace)
             {
@@ -134,7 +135,7 @@ namespace TestTools_Tests.Structure
 
             service.TranslateMember(fieldToTranslate);
 
-            memberTranslator.Received().Translate(fieldToTranslate);
+            memberTranslator.ReceivedWithAnyArgs().Translate(new MemberTranslatorArgs());
         }
 
         [TestMethod("TranslateMember does not use MemberTranslator if member's DeclaringType is not within FromNamespace")]
@@ -151,7 +152,7 @@ namespace TestTools_Tests.Structure
 
             service.TranslateMember(propertyToVerify);
 
-            memberTranslator.DidNotReceive().Translate(propertyToVerify);
+            memberTranslator.DidNotReceiveWithAnyArgs().Translate(new MemberTranslatorArgs());
         }
 
         [TestMethod("TranslateMember does not use MemberTranslator if custom translator is defined on member")]
@@ -162,7 +163,7 @@ namespace TestTools_Tests.Structure
             var fieldToTranslate = new RuntimeFieldDescription(typeof(TestTypeWithoutCustomTranslator).GetField("FieldWithCustomTranslator"));
 
             ITypeTranslator typeTranslator = Substitute.For<ITypeTranslator>();
-            typeTranslator.Translate(typeToTranslate).Returns(typeToTranslate);
+            typeTranslator.Translate(new TypeTranslateArgs()).ReturnsForAnyArgs(typeToTranslate);
             IMemberTranslator memberTranslator = Substitute.For<IMemberTranslator>();
             StructureService service = new StructureService(@namespace, @namespace)
             {
@@ -172,7 +173,7 @@ namespace TestTools_Tests.Structure
 
             service.TranslateMember(fieldToTranslate);
 
-            memberTranslator.DidNotReceive().Translate(fieldToTranslate);
+            memberTranslator.DidNotReceiveWithAnyArgs().Translate(new MemberTranslatorArgs());
         }
 
         [TestMethod("VerifyMember(MemberInfo, IMemberVerifier[]) uses all member verifiers")]
@@ -190,8 +191,8 @@ namespace TestTools_Tests.Structure
 
             service.VerifyMember(propertyToVerify, new[] { verifier1, verifier2 });
 
-            verifier1.Received().Verify(propertyToVerify, propertyToVerify);
-            verifier2.Received().Verify(propertyToVerify, propertyToVerify);
+            verifier1.ReceivedWithAnyArgs().Verify(new MemberVerifierArgs());
+            verifier2.ReceivedWithAnyArgs().Verify(new MemberVerifierArgs());
         }
     }
 }
