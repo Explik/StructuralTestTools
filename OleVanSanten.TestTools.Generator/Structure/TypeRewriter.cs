@@ -45,8 +45,9 @@ namespace OleVanSanten.TestTools.Structure
         {
             var originalConstructor = _resolver.GetConstructorDescription(node);
             var originalType = originalConstructor.DeclaringType;
+            var translatedType = _structureService.TranslateType(originalType);
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalType == translatedType)
                 return base.VisitObjectCreationExpression(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
@@ -56,7 +57,6 @@ namespace OleVanSanten.TestTools.Structure
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
-            var translatedType = _structureService.TranslateType(originalType);
             var newType = SyntaxFactory.ParseTypeName(translatedType.FullName);
             return node.WithType(newType);
         }
@@ -70,8 +70,9 @@ namespace OleVanSanten.TestTools.Structure
 
             var originalMethod = _resolver.GetMethodDescription(node);
             var originalType = originalMethod.DeclaringType;
+            var translatedMethod = _structureService.TranslateMember(originalMethod);
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalMethod == translatedMethod)
                 return base.VisitInvocationExpression(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
@@ -87,7 +88,6 @@ namespace OleVanSanten.TestTools.Structure
                 MemberVerificationAspect.MethodAccessLevel);
 
             // Potentially rewritting expression and method name 
-            var translatedMethod = _structureService.TranslateMember(originalMethod);
             var newName = GetNameSyntax((MethodDescription)translatedMethod);
             var newMemberExpression = (MemberAccessExpressionSyntax)Visit(memberExpression);
             var newExpression = newMemberExpression.WithName(newName);
@@ -104,14 +104,20 @@ namespace OleVanSanten.TestTools.Structure
         {
             var originalMember = _resolver.GetMemberDescription(node);
             var originalType = originalMember.DeclaringType;
+            var translatedMember = _structureService.TranslateMember(originalMember);
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalMember == translatedMember)
                 return base.VisitMemberAccessExpression(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             if (originalMember is EventDescription)
             {
-
+                _structureService.VerifyMember(
+                    originalMember,
+                    MemberVerifiers,
+                    MemberVerificationAspect.EventHandlerType,
+                    MemberVerificationAspect.EventAddAccessLevel,
+                    MemberVerificationAspect.EventRemoveAccessLevel);
             }
             else if (originalMember is FieldDescription)
             {
@@ -137,7 +143,6 @@ namespace OleVanSanten.TestTools.Structure
             }
 
             // Potentially rewritting member name
-            var translatedMember = _structureService.TranslateMember(originalMember);
             var newName = SyntaxFactory.IdentifierName(translatedMember.Name);
 
             // Potentially rewritting expression
@@ -149,14 +154,14 @@ namespace OleVanSanten.TestTools.Structure
         public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
         {
             var originalType = _resolver.GetTypeDescription(node);
+            var translatedType = _structureService.TranslateType(originalType);
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalType == translatedType)
                 return base.VisitVariableDeclaration(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
 
             // Potentially rewritting type
-            var translatedType = _structureService.TranslateType(originalType);
             var newType = GetTypeSyntax(translatedType);
 
             // Potentially rewritting variable declators

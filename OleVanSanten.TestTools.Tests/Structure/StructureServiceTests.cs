@@ -26,28 +26,6 @@ namespace TestTools_Tests.Structure
     [TestClass]
     public class StructureServiceTests
     {
-        [TestMethod("IsTranslatableType returns false if type is not from FromNamespace")]
-        public void IsTranslatableType_ReturnsFalseIfTypeIsFromFromNamespace()
-        {
-            var @namespace = new RuntimeNamespaceDescription("Empty.Namespace");
-            var type = new RuntimeTypeDescription(typeof(TestTypeWithoutCustomTranslator));
-
-            StructureService service = new StructureService(@namespace, @namespace);
-
-            Assert.IsFalse(service.IsTranslatableType(type));
-        }
-
-        [TestMethod("IsTranslatableType returns true if type is from FromNamespace")]
-        public void IsTranslatableType_ReturnsTrueIfTypeIsFromFromNamespace()
-        {
-            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
-            var type = new RuntimeTypeDescription(typeof(TestTypeWithoutCustomTranslator));
-
-            StructureService service = new StructureService(@namespace, @namespace);
-
-            Assert.IsTrue(service.IsTranslatableType(type));
-        }
-        
         [TestMethod("TranslateType uses TypeTranslator if no custom translator is defined on type")]
         public void TranslateTypeUsesTypeTranslatorIfNoCustomTranslatorIsDefinedOnType()
         {

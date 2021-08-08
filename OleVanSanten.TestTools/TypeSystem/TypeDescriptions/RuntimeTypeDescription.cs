@@ -20,6 +20,8 @@ namespace OleVanSanten.TestTools.TypeSystem
 
         public override TypeDescription BaseType => new RuntimeTypeDescription(Type.BaseType);
 
+        public override string FullName => Type.FullName;
+
         public override string Name => Type.Name;
 
         public override bool IsAbstract => Type.IsAbstract;

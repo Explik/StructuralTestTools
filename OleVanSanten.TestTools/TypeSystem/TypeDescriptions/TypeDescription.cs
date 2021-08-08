@@ -10,7 +10,18 @@ namespace OleVanSanten.TestTools.TypeSystem
     {
         public abstract TypeDescription BaseType { get; }
 
-        public virtual string FullName => $"{Namespace}.{Name}";
+        public virtual string FullName
+        {
+            get
+            {
+                var typeArguments = GetGenericArguments();
+
+                if (!typeArguments.Any())
+                    return $"{Namespace}.{Name}";
+
+                return $"{Namespace}.{Name}<{string.Join(",", typeArguments.Select(t => t.Name))}>";
+            }
+        }
 
         public abstract Attribute[] GetCustomAttributes();
 

@@ -13,46 +13,46 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace TestTools_Tests
 {
+    class Class
+    {
+        public void GenericMethod<T>()
+        {
+        }
+    }
+
+    class ClassA
+    {
+        public int Field_A;
+        public int Property_A { get; set; }
+        public event EventHandler Event_A;
+        public void Method_A()
+        {
+        }
+        public void GenericMethod_A<T>()
+        {
+        }
+    }
+
+    class ClassB
+    {
+        public int Field_B;
+        public int Property_B { get; set; }
+        public event EventHandler Event_B;
+        public void Method_B()
+        {
+        }
+        public void GenericMethod_B<T>()
+        {
+        }
+    }
+
+    class GenericClass<T>
+    {
+    }
+
     [TestClass]
     public class TypeRewriterTests
     {
-        class Class
-        {
-            public void GenericMethod<T>()
-            {
-            }
-        }
-
-        class ClassA
-        {
-            public int Field_A;
-            public int Property_A { get; set; }
-            public event EventHandler Event_A;
-            public void Method_A()
-            {
-            }
-            public void GenericMethod_A<T>()
-            {
-            }
-        }
-
-        class ClassB
-        {
-            public int Field_B;
-            public int Property_B { get; set; }
-            public event EventHandler Event_B;
-            public void Method_B()
-            {
-            }
-            public void GenericMethod_B<T>()
-            {
-            }
-        }
-
-        class GenericClass<T>
-        {
-        }
-
         [TestMethod("VisitObjectCreationExpression transforms constructor type")]
         public void VisitObjectCreationExpression_TransformsConstructorType()
         {
@@ -67,7 +67,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetConstructorDescription((ObjectCreationExpressionSyntax)null).ReturnsForAnyArgs(translatedConstructor);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
             structureService.TranslateMember(translatedConstructor).Returns(originalConstructor);
 
@@ -94,7 +93,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetMethodDescription((InvocationExpressionSyntax)null).ReturnsForAnyArgs(originalMethod);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
             structureService.TranslateMember(originalMethod).Returns(translatedMethod);
 
@@ -121,7 +119,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetMethodDescription((InvocationExpressionSyntax)null).ReturnsForAnyArgs(originalMethod);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
             structureService.TranslateMember(originalMethod).Returns(translatedMethod);
 
@@ -148,8 +145,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetMethodDescription((InvocationExpressionSyntax)null).ReturnsForAnyArgs(originalMethod);
-            structureService.IsTranslatableType(type).Returns(true);
-            structureService.IsTranslatableType(typeArgument).Returns(true);
             structureService.TranslateType(type).Returns(type);
             structureService.TranslateMember(originalMethod).Returns(translatedMethod);
 
@@ -176,7 +171,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetMemberDescription(null).ReturnsForAnyArgs(originalEvent);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
             structureService.TranslateMember(originalEvent).Returns(translatedEvent);
 
@@ -203,7 +197,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetMemberDescription(null).ReturnsForAnyArgs(originalField);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
             structureService.TranslateMember(originalField).Returns(translatedField);
 
@@ -230,7 +223,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetMemberDescription(null).ReturnsForAnyArgs(originalProperty);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
             structureService.TranslateMember(originalProperty).Returns(translatedProperty);
 
@@ -255,7 +247,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetTypeDescription((VariableDeclarationSyntax)null).ReturnsForAnyArgs(originalType);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
 
             // Setting up and testing rewriter ouput
@@ -280,7 +271,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetTypeDescription((VariableDeclarationSyntax)null).ReturnsForAnyArgs(originalType);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
 
             // Setting up and testing rewriter output
@@ -305,7 +295,6 @@ namespace TestTools_Tests
             var structureService = Substitute.For<IStructureService>();
 
             syntaxResolver.GetTypeDescription((VariableDeclarationSyntax)null).ReturnsForAnyArgs(originalType);
-            structureService.IsTranslatableType(originalType).Returns(true);
             structureService.TranslateType(originalType).Returns(translatedType);
 
             // Setting up and testing rewriter output

@@ -42,8 +42,9 @@ namespace OleVanSanten.TestTools.Structure
         {
             var originalType = new RuntimeTypeDescription(node.Type);
             var originalConstructor = new RuntimeConstructorDescription(node.Constructor);
+            var translatedConstructor = _structureService.TranslateMember(originalConstructor) as RuntimeConstructorDescription;
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalConstructor == translatedConstructor)
                 return base.VisitNew(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
@@ -53,7 +54,6 @@ namespace OleVanSanten.TestTools.Structure
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
-            var translatedConstructor = (RuntimeConstructorDescription)_structureService.TranslateMember(originalConstructor);
             return Expression.New(translatedConstructor.ConstructorInfo, node.Arguments.Select(Visit));
         }
 
@@ -61,8 +61,9 @@ namespace OleVanSanten.TestTools.Structure
         {
             var originalType = new RuntimeTypeDescription(node.Type);
             var originalMethod = new RuntimeMethodDescription(node.Method);
+            var translatedMethod = _structureService.TranslateMember(originalMethod) as RuntimeMethodDescription;
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalMethod == translatedMethod)
                 return base.VisitMethodCall(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
@@ -77,7 +78,6 @@ namespace OleVanSanten.TestTools.Structure
                 MemberVerificationAspect.MethodIsVirtual,
                 MemberVerificationAspect.MethodAccessLevel);
 
-            var translatedMethod = (RuntimeMethodDescription)_structureService.TranslateMember(originalMethod);
             MethodInfo methodInfo = translatedMethod.MethodInfo;
             ParameterInfo[] methodPars = methodInfo.GetParameters();
             Expression[] methodArgs = node.Arguments.Select(Visit).ToArray();
@@ -99,10 +99,8 @@ namespace OleVanSanten.TestTools.Structure
                         }
                     }
                 }
-
                 methodInfo = methodInfo.MakeGenericMethod(typeArguments);
             }
-
             return Expression.Call(Visit(node.Object), methodInfo, methodArgs);
         }
 
@@ -111,14 +109,13 @@ namespace OleVanSanten.TestTools.Structure
             var originalType = new RuntimeTypeDescription(node.Type);
             var factory = new RuntimeDescriptionFactory();
             var originalMember = factory.Create(node.Member);
+            var translatedMember = _structureService.TranslateMember(originalMember);
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalMember == translatedMember)
                 return base.VisitMember(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
-
-            var translatedMember = _structureService.TranslateMember(originalMember);
 
             if (translatedMember is FieldDescription fieldDescription)
             {
@@ -154,14 +151,13 @@ namespace OleVanSanten.TestTools.Structure
             var originalType = new RuntimeTypeDescription(node.Member.DeclaringType);
             var factory = new RuntimeDescriptionFactory();
             var originalMember = factory.Create(node.Member);
+            var translatedMember = _structureService.TranslateMember(originalMember);
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalMember == translatedMember)
                 return base.VisitMemberAssignment(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
-
-            var translatedMember = _structureService.TranslateMember(originalMember);
 
             if (translatedMember is FieldDescription fieldDescription)
             {
@@ -197,8 +193,9 @@ namespace OleVanSanten.TestTools.Structure
         protected override Expression VisitParameter(ParameterExpression node)
         {
             var originalType = new RuntimeTypeDescription(node.Type);
+            var translatedType = _structureService.TranslateType(originalType) as RuntimeTypeDescription;
 
-            if (!_structureService.IsTranslatableType(originalType))
+            if (originalType == translatedType)
                 return base.VisitParameter(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
@@ -209,7 +206,6 @@ namespace OleVanSanten.TestTools.Structure
             if (!_variableCache.ContainsKey(node))
             {
                 Random random = new Random();
-                var translatedType = (RuntimeTypeDescription)_structureService.TranslateType(originalType);
                 ParameterExpression newParameter = Expression.Parameter(translatedType.Type, random.Next().ToString());
 
                 _variableCache.Add(node, newParameter);

@@ -66,11 +66,6 @@ namespace OleVanSanten.TestTools.Structure
             ToNamespace = toNamespace;
         }
 
-        public bool IsTranslatableType(TypeDescription type)
-        {
-            return type.Namespace == FromNamespace.Name;
-        }
-
         public TypeDescription TranslateType(TypeDescription type)
         {
             TypeDescription translatedType;
