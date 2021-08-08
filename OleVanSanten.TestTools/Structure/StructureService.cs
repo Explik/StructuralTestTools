@@ -11,63 +11,44 @@ namespace OleVanSanten.TestTools.Structure
 {
     public class StructureService : IStructureService
     {
-        NamespaceDescription FromNamespace { get; set; }
+        private readonly NamespaceDescription _fromNamespace;
+        private readonly NamespaceDescription _toNamespace;
+        private readonly ITypeTranslator _typeTranslator;
+        private readonly IMemberTranslator _memberTranslator;
+        private readonly ITypeVerifier[] _typeVerifiers; 
+        private readonly TypeVerificationAspect[] _typeVerificationOrder;
+        private readonly IMemberVerifier[] _memberVerifiers;
+        private readonly MemberVerificationAspect[] _memberVerificationOrder;
 
-        NamespaceDescription ToNamespace { get; set; }
+        private readonly Dictionary<TypeDescription, TypeDescription> _translateTypeCache = new Dictionary<TypeDescription, TypeDescription>();
+        private readonly Dictionary<MemberDescription, MemberDescription> _translateMemberCache = new Dictionary<MemberDescription, MemberDescription>();
+        private readonly Dictionary<Tuple<TypeDescription, ITypeVerifier>, Exception> _verifyTypeCache = new Dictionary<Tuple<TypeDescription, ITypeVerifier>, Exception>();
+        private readonly Dictionary<Tuple<MemberDescription, IMemberVerifier>, Exception> _verifyMemberCache = new Dictionary<Tuple<MemberDescription, IMemberVerifier>, Exception>();
+
+        public StructureService(IConfiguration configuration)
+        {
+            // Unpacking configuration to avoid configuration changes affecting instance and invalidating the caches
+            _fromNamespace = configuration.FromNamespace;
+            _toNamespace = configuration.ToNamespace;
+            _typeTranslator = configuration.TypeTranslator;
+            _memberTranslator = configuration.MemberTranslator;
+            _typeVerifiers = configuration.TypeVerifiers.Select(i => i).ToArray();
+            _typeVerificationOrder = configuration.TypeVerificationOrder.Select(i => i).ToArray();
+            _memberVerifiers = configuration.MemberVerifiers.Select(i => i).ToArray();
+            _memberVerificationOrder = configuration.MemberVerificationOrder.Select(i => i).ToArray();
+        }
 
         public VerifierServiceBase StructureVerifier { get; set; }
 
-        public ITypeTranslator TypeTranslator { get; set; } = new SameNameTypeTranslator();
-
-        public IMemberTranslator MemberTranslator { get; set; } = new SameNameMemberTranslator();
-
-        public ICollection<TypeVerificationAspect> TypeVerificationOrder { get; set; } = new[]
-        {
-            TypeVerificationAspect.IsInterface,
-            TypeVerificationAspect.IsDelegate,
-            TypeVerificationAspect.IsSubclassOf,
-            TypeVerificationAspect.DelegateSignature,
-            TypeVerificationAspect.IsStatic,
-            TypeVerificationAspect.IsAbstract,
-            TypeVerificationAspect.AccessLevel
-        };
-
-        public ICollection<MemberVerificationAspect> MemberVerificationOrder { get; set; } = new[]
-        {
-            MemberVerificationAspect.MemberType,
-            MemberVerificationAspect.FieldType,
-            MemberVerificationAspect.FieldAccessLevel,
-            MemberVerificationAspect.FieldWriteability,
-            MemberVerificationAspect.PropertyType,
-            MemberVerificationAspect.PropertyIsStatic,
-            MemberVerificationAspect.PropertyGetIsAbstract,
-            MemberVerificationAspect.PropertyGetIsVirtual,
-            MemberVerificationAspect.PropertyGetDeclaringType,
-            MemberVerificationAspect.PropertyGetAccessLevel,
-            MemberVerificationAspect.PropertySetIsAbstract,
-            MemberVerificationAspect.PropertySetIsVirtual,
-            MemberVerificationAspect.PropertySetDeclaringType,
-            MemberVerificationAspect.PropertySetAccessLevel,
-            MemberVerificationAspect.MethodReturnType,
-            MemberVerificationAspect.MethodIsAbstract,
-            MemberVerificationAspect.MethodIsVirtual,
-            MemberVerificationAspect.MethodDeclaringType,
-            MemberVerificationAspect.MethodAccessLevel
-        };
-
-        public StructureService(NamespaceDescription fromNamespace, NamespaceDescription toNamespace)
-        {
-            if (fromNamespace == null)
-                throw new ArgumentNullException("fromNamespace cannot be null");
-            if (toNamespace == null)
-                throw new ArgumentNullException("toNamespace cannot be null");
-
-            FromNamespace = fromNamespace;
-            ToNamespace = toNamespace;
-        }
-
         public TypeDescription TranslateType(TypeDescription type)
         {
+            if (type.Namespace != _fromNamespace.Name)
+                return type;
+
+            if (_translateTypeCache.ContainsKey(type))
+                return _translateTypeCache[type];
+
+            // Translating type
             TypeDescription translatedType;
 
             if (type.IsArray)
@@ -76,15 +57,15 @@ namespace OleVanSanten.TestTools.Structure
                 return elementType.MakeArrayType();
             }
 
-            if (type.Namespace == FromNamespace.Name)
+            if (type.Namespace == _fromNamespace.Name)
             {
                 TypeTranslateArgs translateArgs = new TypeTranslateArgs()
                 {
                     Verifier = StructureVerifier,
-                    TargetNamespace = ToNamespace,
+                    TargetNamespace = _toNamespace,
                     OriginalType = type
                 };
-                ITypeTranslator translator = type.GetCustomTranslator() ?? TypeTranslator;
+                ITypeTranslator translator = type.GetCustomTranslator() ?? _typeTranslator;
                 translatedType = translator.Translate(translateArgs);
             }
             else translatedType = type;
@@ -95,83 +76,131 @@ namespace OleVanSanten.TestTools.Structure
                 var typeArguments = type.GetGenericArguments().Select(TranslateType).ToArray();
                 return translatedType.GetGenericTypeDefinition().MakeGenericType(typeArguments);
             }
+
+            _translateTypeCache.Add(type, translatedType);
             return translatedType;
         }
 
-        public MemberDescription TranslateMember(MemberDescription memberInfo)
+        public MemberDescription TranslateMember(MemberDescription member)
         {
-            if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
-                return memberInfo;
+            if (member.DeclaringType.Namespace != _fromNamespace.Name)
+                return member;
 
+            if (_translateMemberCache.ContainsKey(member))
+                return _translateMemberCache[member];
+            
+            // Translating member
             MemberTranslatorArgs translatorArgs = new MemberTranslatorArgs()
             {
                 Verifier = StructureVerifier,
                 TypeTranslatorService = this,
                 TypeVerifierService = this,
-                TargetType = TranslateType(memberInfo.DeclaringType),
-                OriginalMember = memberInfo,
+                TargetType = TranslateType(member.DeclaringType),
+                OriginalMember = member,
             };
-            IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
-
-            return translator.Translate(translatorArgs);
+            IMemberTranslator translator = member.GetCustomTranslator() ?? _memberTranslator;
+            MemberDescription translatedMember = translator.Translate(translatorArgs);
+            
+            _translateMemberCache.Add(member, translatedMember);
+            return translatedMember;
         }
 
-        public MemberDescription TranslateMember(TypeDescription targetType, MemberDescription memberInfo)
+        public void VerifyType(TypeDescription type)
         {
-            if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
-                return memberInfo;
-
-            MemberTranslatorArgs translatorArgs = new MemberTranslatorArgs()
-            {
-                Verifier = StructureVerifier,
-                TypeTranslatorService = this,
-                TypeVerifierService = this,
-                TargetType = targetType,
-                OriginalMember = memberInfo,
-            };
-            IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
-
-            return translator.Translate(translatorArgs);
+            VerifyType(type, _typeVerificationOrder);
         }
 
-        public void VerifyType(TypeDescription original, ITypeVerifier[] verifiers)
+        public void VerifyType(TypeDescription type, TypeVerificationAspect[] verificationAspects)
         {
-            TypeVerifierArgs verifierArgs = new TypeVerifierArgs()
+            foreach (TypeVerificationAspect aspect in _typeVerificationOrder.Where(verificationAspects.Contains))
             {
-                Verifier = StructureVerifier,
-                TypeTranslatorService = this,
-                OriginalType = original,
-                TranslatedType = TranslateType(original)
-            };
+                ITypeVerifier defaultVerifier = _typeVerifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
+                ITypeVerifier verifier = type.GetCustomVerifier(aspect) ?? defaultVerifier;
 
-            foreach (TypeVerificationAspect aspect in TypeVerificationOrder)
-            {
-                ITypeVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
-                ITypeVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
-                verifier?.Verify(verifierArgs);
+                if (verifier != null)
+                    VerifyType(type, verifier);
             }
         }
 
-        public void VerifyMember(MemberDescription original, IMemberVerifier[] verifiers)
+        public void VerifyMember(MemberDescription member, MemberVerificationAspect[] verificationAspects)
         {
-            TypeDescription translatedType = TranslateType(original.DeclaringType);
-
-            MemberVerifierArgs verifierArgs = new MemberVerifierArgs()
+            foreach (MemberVerificationAspect aspect in _memberVerificationOrder.Where(verificationAspects.Contains))
             {
-                Verifier = StructureVerifier,
-                TypeTranslatorService = this,
-                TypeVerifierService = this,
-                MemberTranslatorService = this,
-                OriginalMember = original,
-                TranslatedMember = TranslateMember(translatedType, original)
-            };
+                IMemberVerifier defaultVerifier = _memberVerifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
+                IMemberVerifier verifier = member.GetCustomVerifier(aspect) ?? defaultVerifier;
 
-            foreach (MemberVerificationAspect aspect in MemberVerificationOrder)
+                if (verifier != null)
+                    VerifyMember(member, verifier);
+            }
+        }
+
+        private void VerifyType(TypeDescription type, ITypeVerifier verifier)
+        {
+            Tuple<TypeDescription, ITypeVerifier> cacheKey = Tuple.Create(type, verifier);
+
+            if (_verifyTypeCache.ContainsKey(cacheKey))
             {
-                IMemberVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
-                IMemberVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
+                Exception ex = _verifyTypeCache[cacheKey];
 
-                verifier?.Verify(verifierArgs);
+                if (ex != null)
+                    throw ex;
+            }
+            else
+            {
+                TypeVerifierArgs verifierArgs = new TypeVerifierArgs()
+                {
+                    Verifier = StructureVerifier,
+                    TypeTranslatorService = this,
+                    OriginalType = type,
+                    TranslatedType = TranslateType(type)
+                };
+
+                try
+                {
+                    verifier.Verify(verifierArgs);
+                    _verifyTypeCache.Add(cacheKey, null);
+                }
+                catch (Exception ex)
+                {
+                    _verifyTypeCache.Add(cacheKey, ex);
+                    throw ex;
+                }
+            }
+        }
+
+        private void VerifyMember(MemberDescription member, IMemberVerifier verifier)
+        {
+            Tuple<MemberDescription, IMemberVerifier> cacheKey = Tuple.Create(member, verifier);
+
+            if (_verifyMemberCache.ContainsKey(cacheKey))
+            {
+                Exception ex = _verifyMemberCache[cacheKey];
+
+                if (ex != null)
+                    throw ex;
+            }
+            else
+            {
+                MemberVerifierArgs verifierArgs = new MemberVerifierArgs()
+                {
+                    Verifier = StructureVerifier,
+                    TypeTranslatorService = this,
+                    TypeVerifierService = this,
+                    MemberTranslatorService = this,
+                    OriginalMember = member,
+                    TranslatedMember = TranslateMember(member)
+                };
+
+                try
+                {
+                    verifier.Verify(verifierArgs);
+                    _verifyMemberCache.Add(cacheKey, null);
+                }
+                catch (Exception ex)
+                {
+                    _verifyMemberCache.Add(cacheKey, ex);
+                    throw ex;
+                }
             }
         }
     }

@@ -23,24 +23,6 @@ namespace OleVanSanten.TestTools.Structure
             _structureService = structureService;
         }
 
-        public ITypeVerifier[] TypeVerifiers { get; set; } = new ITypeVerifier[]
-        {
-                new UnchangedTypeAccessLevelVerifier(),
-                new UnchangedTypeIsAbstractVerifier(),
-                new UnchangedTypeIsStaticVerifier()
-        };
-
-        public IMemberVerifier[] MemberVerifiers { get; set; } = new IMemberVerifier[]
-        {
-                new UnchangedFieldTypeVerifier(),
-                new UnchangedMemberAccessLevelVerifier(),
-                new UnchangedMemberDeclaringType(),
-                new UnchangedMemberIsStaticVerifier(),
-                new UnchangedMemberIsVirtualVerifier(),
-                new UnchangedMemberTypeVerifier(),
-                new UnchangedPropertyTypeVerifier()
-        };
-
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
             var originalConstructor = _resolver.GetConstructorDescription(node);
@@ -50,10 +32,9 @@ namespace OleVanSanten.TestTools.Structure
             if (originalType == translatedType)
                 return base.VisitObjectCreationExpression(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyType(originalType);
             _structureService.VerifyMember(
                 originalConstructor,
-                MemberVerifiers,
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
@@ -75,10 +56,9 @@ namespace OleVanSanten.TestTools.Structure
             if (originalMethod == translatedMethod)
                 return base.VisitInvocationExpression(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyType(originalType);
             _structureService.VerifyMember(
                 originalMethod,
-                MemberVerifiers,
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.MethodDeclaringType,
                 MemberVerificationAspect.MethodReturnType,
@@ -109,12 +89,11 @@ namespace OleVanSanten.TestTools.Structure
             if (originalMember == translatedMember)
                 return base.VisitMemberAccessExpression(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyType(originalType);
             if (originalMember is EventDescription)
             {
                 _structureService.VerifyMember(
                     originalMember,
-                    MemberVerifiers,
                     MemberVerificationAspect.EventHandlerType,
                     MemberVerificationAspect.EventAddAccessLevel,
                     MemberVerificationAspect.EventRemoveAccessLevel);
@@ -123,7 +102,6 @@ namespace OleVanSanten.TestTools.Structure
             {
                 _structureService.VerifyMember(
                     originalMember,
-                    MemberVerifiers,
                     MemberVerificationAspect.FieldType,
                     MemberVerificationAspect.FieldIsStatic,
                     MemberVerificationAspect.FieldWriteability,
@@ -133,7 +111,6 @@ namespace OleVanSanten.TestTools.Structure
             {
                 _structureService.VerifyMember(
                        originalMember,
-                       MemberVerifiers,
                        MemberVerificationAspect.PropertyType,
                        MemberVerificationAspect.PropertyIsStatic,
                        MemberVerificationAspect.PropertySetDeclaringType,
@@ -159,7 +136,7 @@ namespace OleVanSanten.TestTools.Structure
             if (originalType == translatedType)
                 return base.VisitVariableDeclaration(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyType(originalType);
 
             // Potentially rewritting type
             var newType = GetTypeSyntax(translatedType);

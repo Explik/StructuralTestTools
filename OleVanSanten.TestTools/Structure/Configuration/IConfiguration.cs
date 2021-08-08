@@ -5,13 +5,16 @@ namespace OleVanSanten.TestTools.Structure
 {
     public interface IConfiguration
     {
-        NamespaceDescription GetFromNamespace(NamespaceDescription globalNamespace);
-        string GetFromNamespaceName();
-        IMemberTranslator GetMemberTranslator();
-        IMemberVerifier[] GetMemberVerifiers();
-        NamespaceDescription GetToNamespace(NamespaceDescription globalNamespace);
-        string GetToNamespaceName();
-        ITypeTranslator GetTypeTranslator();
-        ITypeVerifier[] GetTypeVerifiers();
+        NamespaceDescription GlobalNamespace { get; set; }
+        NamespaceDescription FromNamespace { get; }
+        NamespaceDescription ToNamespace { get; }
+
+        ITypeTranslator TypeTranslator { get; }
+        IMemberTranslator MemberTranslator { get; }
+
+        ITypeVerifier[] TypeVerifiers { get; }
+        TypeVerificationAspect[] TypeVerificationOrder { get; }
+        IMemberVerifier[] MemberVerifiers { get; }
+        MemberVerificationAspect[] MemberVerificationOrder { get; }
     }
 }

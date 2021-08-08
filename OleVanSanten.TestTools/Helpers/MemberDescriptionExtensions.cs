@@ -14,9 +14,14 @@ namespace OleVanSanten.TestTools.Helpers
             return memberInfo.GetCustomAttributes().OfType<IMemberTranslator>().FirstOrDefault();
         }
 
-        public static IMemberVerifier GetCustomVerifier(this MemberDescription memberInfo, MemberVerificationAspect aspect)
+        public static IMemberVerifier GetCustomVerifier(this MemberDescription member, MemberVerificationAspect aspect)
         {
-            return memberInfo.GetCustomAttributes().OfType<IMemberVerifier>().FirstOrDefault(ver => ver.Aspects.Contains(aspect));
+            return GetCustomVerifiers(member).FirstOrDefault(ver => ver.Aspects.Contains(aspect));
+        }
+
+        public static IMemberVerifier[] GetCustomVerifiers(this MemberDescription member)
+        {
+            return member.GetCustomAttributes().OfType<IMemberVerifier>().ToArray();
         }
     }
 }

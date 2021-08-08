@@ -7,6 +7,8 @@ namespace OleVanSanten.TestTools.Structure
 {
     public interface ITypeVerifierService
     {
-        void VerifyType(TypeDescription original, ITypeVerifier[] verifiers);
+        void VerifyType(TypeDescription original);
+        
+        void VerifyType(TypeDescription original, params TypeVerificationAspect[] aspects);
     }
 }

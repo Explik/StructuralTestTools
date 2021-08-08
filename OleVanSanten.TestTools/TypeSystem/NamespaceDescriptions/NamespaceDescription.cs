@@ -14,6 +14,25 @@ namespace OleVanSanten.TestTools.TypeSystem
 
         public virtual NamespaceDescription GetNamespace(string name)
         {
+            NamespaceDescription subNamespace = this;
+
+            foreach (var namespaceNamePart in name.Split('.'))
+                subNamespace = subNamespace.GetNestedNamespace(namespaceNamePart);
+
+            return subNamespace;
+        }
+
+        public abstract NamespaceDescription[] GetNamespaces();
+
+        public virtual TypeDescription GetType(string name)
+        {
+            return GetTypes().First(t => t.Name == name);
+        }
+
+        public abstract TypeDescription[] GetTypes();
+
+        protected virtual NamespaceDescription GetNestedNamespace(string name)
+        {
             // Creating predicate for either non-global pattern ("*.Name") or global pattern ("Name")
             Func<NamespaceDescription, bool> predicate;
             if (!string.IsNullOrEmpty(Name))
@@ -29,14 +48,5 @@ namespace OleVanSanten.TestTools.TypeSystem
             }
             return @namespace;
         }
-
-        public abstract NamespaceDescription[] GetNamespaces();
-
-        public virtual TypeDescription GetType(string name)
-        {
-            return GetTypes().First(t => t.Name == name);
-        }
-
-        public abstract TypeDescription[] GetTypes();
     }
 }

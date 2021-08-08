@@ -62,9 +62,11 @@ namespace OleVanSanten.TestTools
                 return;
 
             var configuration = GetConfiguration(context);
+            configuration.GlobalNamespace = new CompileTimeNamespaceDescription(context.Compilation, context.Compilation.GlobalNamespace);
+
             var syntaxResolver = new CompileTimeDescriptionResolver(context.Compilation);
-            var structureService = ConfigureStructureService(context.Compilation, configuration);
-            var typeRewriter = ConfigureTypeRewriter(syntaxResolver, structureService, configuration);
+            var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
+            var typeRewriter = new TypeRewriter(syntaxResolver, structureService);
             var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
 
             foreach (var node in syntaxReceiver.CandidateSyntax)
@@ -94,45 +96,6 @@ namespace OleVanSanten.TestTools
             //    }
             //}
             //return null;
-        }
-
-        private IStructureService ConfigureStructureService(Compilation compilation, XMLConfiguration config)
-        {
-            var globalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
-            var fromNamespace = config.GetFromNamespace(globalNamespace);
-            var toNamespace = config.GetToNamespace(globalNamespace);
-
-            var typeTranslator = config.GetTypeTranslator();
-            var memberTranslator = config.GetMemberTranslator();
-
-            var structureService = new StructureService(fromNamespace, toNamespace)
-            {
-                StructureVerifier = new VerifierService()
-            };
-
-            if (typeTranslator != null)
-                structureService.TypeTranslator = typeTranslator;
-
-            if (memberTranslator != null)
-                structureService.MemberTranslator = memberTranslator;
-
-            return structureService;
-        }
-
-        private TypeRewriter ConfigureTypeRewriter(ICompileTimeDescriptionResolver syntaxResolver, IStructureService structureService,  XMLConfiguration config)
-        {
-            var typeVerifiers = config.GetTypeVerifiers();
-            var memberVerifiers = config.GetMemberVerifiers();
-
-            var typeRewritter = new TypeRewriter(syntaxResolver, structureService);
-
-            if (typeVerifiers != null)
-                typeRewritter.TypeVerifiers = typeVerifiers;
-
-            if (memberVerifiers != null)
-                typeRewritter.MemberVerifiers = memberVerifiers;
-
-            return typeRewritter;
         }
 
         private class SyntaxReceiver : ISyntaxReceiver

@@ -33,10 +33,14 @@ namespace TestTools_Tests.Structure
             var originalType = new RuntimeTypeDescription(typeof(TestTypeWithoutCustomTranslator));
 
             ITypeTranslator translator = Substitute.For<ITypeTranslator>();
-            StructureService service = new StructureService(@namespace, @namespace)
+
+            IConfiguration configuration = new MemoryConfiguration()
             {
-                TypeTranslator = translator
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
+                TypeTranslator = translator,
             };
+            StructureService service = new StructureService(configuration);
 
             service.TranslateType(originalType);
 
@@ -50,10 +54,14 @@ namespace TestTools_Tests.Structure
             var originalType = new RuntimeTypeDescription(typeof(object));
 
             ITypeTranslator translator = Substitute.For<ITypeTranslator>();
-            StructureService service = new StructureService(@namespace, @namespace)
+
+            IConfiguration configuration = new MemoryConfiguration()
             {
-                TypeTranslator = translator
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
+                TypeTranslator = translator,
             };
+            StructureService service = new StructureService(configuration);
 
             service.TranslateType(originalType);
 
@@ -67,32 +75,18 @@ namespace TestTools_Tests.Structure
             var originalType = new RuntimeTypeDescription(typeof(TestTypeWithCustomTranslator));
 
             ITypeTranslator translator = Substitute.For<ITypeTranslator>();
-            StructureService service = new StructureService(@namespace, @namespace)
+
+            IConfiguration configuration = new MemoryConfiguration()
             {
-                TypeTranslator = translator
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
+                TypeTranslator = translator,
             };
+            StructureService service = new StructureService(configuration);
 
             service.TranslateType(originalType);
 
             translator.DidNotReceiveWithAnyArgs().Translate(new TypeTranslateArgs());
-        }
-
-        [TestMethod("VerifyType(Type, ITypeVerifier[]) uses all type verifiers")]
-        public void VerifyTypeOverloadUsesAllTypeVerifiers()
-        {
-            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
-            var typeToVerify = new RuntimeTypeDescription(typeof(object));
-
-            ITypeVerifier verifier1 = Substitute.For<ITypeVerifier>();
-            verifier1.Aspects.Returns(new[] { TypeVerificationAspect.AccessLevel });
-            ITypeVerifier verifier2 = Substitute.For<ITypeVerifier>();
-            verifier2.Aspects.Returns(new[] { TypeVerificationAspect.IsSubclassOf });
-            StructureService service = new StructureService(@namespace, @namespace);
-
-            service.VerifyType(typeToVerify, new[] { verifier1, verifier2 });
-
-            verifier1.ReceivedWithAnyArgs().Verify(new TypeVerifierArgs());
-            verifier2.ReceivedWithAnyArgs().Verify(new TypeVerifierArgs());
         }
 
         [TestMethod("TranslateMember uses MemberTranslator if no custom translator is defined on member")]
@@ -105,11 +99,15 @@ namespace TestTools_Tests.Structure
             ITypeTranslator typeTranslator = Substitute.For<ITypeTranslator>();
             typeTranslator.Translate(new TypeTranslateArgs()).ReturnsForAnyArgs(typeToTranslate);
             IMemberTranslator memberTranslator = Substitute.For<IMemberTranslator>();
-            StructureService service = new StructureService(@namespace, @namespace)
+
+            IConfiguration configuration = new MemoryConfiguration()
             {
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
                 TypeTranslator = typeTranslator,
                 MemberTranslator = memberTranslator
             };
+            StructureService service = new StructureService(configuration);
 
             service.TranslateMember(fieldToTranslate);
 
@@ -123,10 +121,13 @@ namespace TestTools_Tests.Structure
             var propertyToVerify = new RuntimePropertyDescription(typeof(string).GetProperty("Length"));
 
             IMemberTranslator memberTranslator = Substitute.For<IMemberTranslator>();
-            StructureService service = new StructureService(@namespace, @namespace)
+            IConfiguration configuration = new MemoryConfiguration()
             {
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
                 MemberTranslator = memberTranslator
             };
+            StructureService service = new StructureService(configuration);
 
             service.TranslateMember(propertyToVerify);
 
@@ -143,34 +144,19 @@ namespace TestTools_Tests.Structure
             ITypeTranslator typeTranslator = Substitute.For<ITypeTranslator>();
             typeTranslator.Translate(new TypeTranslateArgs()).ReturnsForAnyArgs(typeToTranslate);
             IMemberTranslator memberTranslator = Substitute.For<IMemberTranslator>();
-            StructureService service = new StructureService(@namespace, @namespace)
+
+            IConfiguration configuration = new MemoryConfiguration()
             {
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
                 TypeTranslator = typeTranslator,
                 MemberTranslator = memberTranslator
             };
+            StructureService service = new StructureService(configuration);
 
             service.TranslateMember(fieldToTranslate);
 
             memberTranslator.DidNotReceiveWithAnyArgs().Translate(new MemberTranslatorArgs());
-        }
-
-        [TestMethod("VerifyMember(MemberInfo, IMemberVerifier[]) uses all member verifiers")]
-        public void VerifyMemberOverloadUsesAllMemberVerifiers()
-        {
-            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
-            var propertyToVerify = new RuntimePropertyDescription(typeof(string).GetProperty("Length"));
-
-            // The verifiers must have aspects as StructureService depends on aspect to use the verifier
-            IMemberVerifier verifier1 = Substitute.For<IMemberVerifier>();
-            verifier1.Aspects.Returns(new[] { MemberVerificationAspect.PropertyType });
-            IMemberVerifier verifier2 = Substitute.For<IMemberVerifier>();
-            verifier2.Aspects.Returns(new[] { MemberVerificationAspect.PropertyIsStatic });
-            StructureService service = new StructureService(@namespace, @namespace);
-
-            service.VerifyMember(propertyToVerify, new[] { verifier1, verifier2 });
-
-            verifier1.ReceivedWithAnyArgs().Verify(new MemberVerifierArgs());
-            verifier2.ReceivedWithAnyArgs().Verify(new MemberVerifierArgs());
         }
     }
 }

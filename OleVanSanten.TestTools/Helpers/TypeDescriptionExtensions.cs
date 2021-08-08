@@ -21,7 +21,12 @@ namespace OleVanSanten.TestTools.Helpers
 
         public static ITypeVerifier GetCustomVerifier(this TypeDescription type, TypeVerificationAspect aspect)
         {
-            return type.GetCustomAttributes().OfType<ITypeVerifier>().FirstOrDefault(v => v.Aspects.Contains(aspect));
+            return GetCustomVerifiers(type).FirstOrDefault(v => v.Aspects.Contains(aspect));
+        }
+
+        public static ITypeVerifier[] GetCustomVerifiers(this TypeDescription type)
+        {
+            return type.GetCustomAttributes().OfType<ITypeVerifier>().ToArray();
         }
     }
 }

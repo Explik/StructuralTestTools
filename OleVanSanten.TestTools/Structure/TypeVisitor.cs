@@ -15,24 +15,6 @@ namespace OleVanSanten.TestTools.Structure
 
         Dictionary<ParameterExpression, ParameterExpression> _variableCache = new Dictionary<ParameterExpression, ParameterExpression>();
 
-        public ITypeVerifier[] TypeVerifiers { get; set; } = new ITypeVerifier[]
-        {
-            new UnchangedTypeAccessLevelVerifier(),
-            new UnchangedTypeIsAbstractVerifier(),
-            new UnchangedTypeIsStaticVerifier()
-        };
-
-        public IMemberVerifier[] MemberVerifiers { get; set; } = new IMemberVerifier[]
-        {
-            new UnchangedFieldTypeVerifier(),
-            new UnchangedMemberAccessLevelVerifier(),
-            new UnchangedMemberDeclaringType(),
-            new UnchangedMemberIsStaticVerifier(),
-            new UnchangedMemberIsVirtualVerifier(),
-            new UnchangedMemberTypeVerifier(),
-            new UnchangedPropertyTypeVerifier()
-        };
-
         public TypeVisitor(IStructureService structureService)
         {
             _structureService = structureService;
@@ -47,10 +29,9 @@ namespace OleVanSanten.TestTools.Structure
             if (originalConstructor == translatedConstructor)
                 return base.VisitNew(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyType(originalType);
             _structureService.VerifyMember(
                 originalConstructor,
-                MemberVerifiers,
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
@@ -66,10 +47,9 @@ namespace OleVanSanten.TestTools.Structure
             if (originalMethod == translatedMethod)
                 return base.VisitMethodCall(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyType(originalType);
             _structureService.VerifyMember(
                 originalMethod,
-                MemberVerifiers,
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.MethodDeclaringType,
                 MemberVerificationAspect.MethodReturnType,
@@ -114,14 +94,13 @@ namespace OleVanSanten.TestTools.Structure
             if (originalMember == translatedMember)
                 return base.VisitMember(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
-            _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
+            _structureService.VerifyType(originalType);
+            _structureService.VerifyMember(originalMember, MemberVerificationAspect.MemberType);
 
             if (translatedMember is FieldDescription fieldDescription)
             {
                 _structureService.VerifyMember(
                     fieldDescription,
-                    MemberVerifiers,
                     MemberVerificationAspect.FieldType,
                     MemberVerificationAspect.FieldIsStatic,
                     MemberVerificationAspect.FieldAccessLevel);
@@ -133,7 +112,6 @@ namespace OleVanSanten.TestTools.Structure
             {
                 _structureService.VerifyMember(
                        propertyDescription,
-                       MemberVerifiers,
                        MemberVerificationAspect.PropertyType,
                        MemberVerificationAspect.PropertyIsStatic,
                        MemberVerificationAspect.PropertyGetDeclaringType,
@@ -156,14 +134,13 @@ namespace OleVanSanten.TestTools.Structure
             if (originalMember == translatedMember)
                 return base.VisitMemberAssignment(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
-            _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
+            _structureService.VerifyType(originalType);
+            _structureService.VerifyMember(originalMember, MemberVerificationAspect.MemberType);
 
             if (translatedMember is FieldDescription fieldDescription)
             {
                 _structureService.VerifyMember(
                     translatedMember,
-                    MemberVerifiers,
                     MemberVerificationAspect.FieldType,
                     MemberVerificationAspect.FieldIsStatic,
                     MemberVerificationAspect.FieldWriteability,
@@ -176,7 +153,6 @@ namespace OleVanSanten.TestTools.Structure
             {
                 _structureService.VerifyMember(
                        translatedMember,
-                       MemberVerifiers,
                        MemberVerificationAspect.PropertyType,
                        MemberVerificationAspect.PropertyIsStatic,
                        MemberVerificationAspect.PropertySetDeclaringType,
@@ -198,7 +174,7 @@ namespace OleVanSanten.TestTools.Structure
             if (originalType == translatedType)
                 return base.VisitParameter(node);
 
-            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyType(originalType);
 
             // To preserve the referential equality of parameter expressions 
             // the function must return the exact same output for the same input.

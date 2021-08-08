@@ -7,6 +7,6 @@ namespace OleVanSanten.TestTools.Structure
 {
     public interface IMemberVerifierService
     {
-        void VerifyMember(MemberDescription original, IMemberVerifier[] verifiers);
+        void VerifyMember(MemberDescription original, params MemberVerificationAspect[] aspects);
     }
 }

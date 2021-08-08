@@ -60,10 +60,7 @@ namespace TestTools_Tests.Structure
             service.TranslateType(originalType).Returns(translatedType);
 
             // Setting up and testing visitor
-            TypeVisitor visitor = new TypeVisitor(service)
-            {
-                TypeVerifiers = new ITypeVerifier[0]
-            };
+            TypeVisitor visitor = new TypeVisitor(service); 
 
             Expression input = Expression.Parameter(typeof(ClassA));
             Expression expected = Expression.Parameter(typeof(ClassB));
@@ -87,11 +84,7 @@ namespace TestTools_Tests.Structure
             service.TranslateMember(originalConstructor).Returns(translatedConstructor);
 
             // Setting up and testing visitor
-            TypeVisitor visitor = new TypeVisitor(service)
-            {
-                TypeVerifiers = new ITypeVerifier[0],
-                MemberVerifiers = new IMemberVerifier[0]
-            };
+            TypeVisitor visitor = new TypeVisitor(service);
 
             Expression input = Expression.New(ClassAConstructor);
             Expression expected = Expression.New(ClassBConstructor);
@@ -115,11 +108,7 @@ namespace TestTools_Tests.Structure
             service.TranslateMember(originalMethod).Returns(translatedMethod);
 
             // Setting up and testing visitor
-            TypeVisitor visitor = new TypeVisitor(service)
-            {
-                TypeVerifiers = new ITypeVerifier[0],
-                MemberVerifiers = new IMemberVerifier[0]
-            };
+            TypeVisitor visitor = new TypeVisitor(service); 
 
             Expression input = Expression.Call(Expression.Parameter(typeof(ClassA)), ClassAVoidMethod);
             Expression expected = Expression.Call(Expression.Parameter(typeof(ClassB)), ClassBVoidMethod);
@@ -143,11 +132,7 @@ namespace TestTools_Tests.Structure
             service.TranslateMember(originalField).Returns(translatedField);
 
             // Setting up and testing visitor
-            TypeVisitor visitor = new TypeVisitor(service)
-            {
-                TypeVerifiers = new ITypeVerifier[0],
-                MemberVerifiers = new IMemberVerifier[0]
-            };
+            TypeVisitor visitor = new TypeVisitor(service); 
 
             Expression input = Expression.Field(Expression.Parameter(typeof(ClassA)), ClassAField);
             Expression expected = Expression.Field(Expression.Parameter(typeof(ClassB)), ClassBField);
@@ -171,11 +156,7 @@ namespace TestTools_Tests.Structure
             service.TranslateMember(originalProperty).Returns(translatedProperty);
 
             // Setting up and testing visitor
-            TypeVisitor visitor = new TypeVisitor(service)
-            {
-                TypeVerifiers = new ITypeVerifier[0],
-                MemberVerifiers = new IMemberVerifier[0]
-            };
+            TypeVisitor visitor = new TypeVisitor(service); 
 
             Expression input = Expression.Property(Expression.Parameter(typeof(ClassA)), ClassAProperty);
             Expression expected = Expression.Property(Expression.Parameter(typeof(ClassB)), ClassBProperty);
