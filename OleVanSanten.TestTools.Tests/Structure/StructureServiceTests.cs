@@ -26,6 +26,25 @@ namespace TestTools_Tests.Structure
     [TestClass]
     public class StructureServiceTests
     {
+        [TestMethod("TranslateType returns input if type is not in FromNamespace")]
+        public void TranslateTypeDoesNotUseTypeTranslatorIfTypeIsNotInFromNamespace()
+        {
+            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
+            var originalType = new RuntimeTypeDescription(typeof(object));
+
+            IConfiguration configuration = new MemoryConfiguration()
+            {
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
+                TypeTranslator = Substitute.For<ITypeTranslator>(),
+            };
+            StructureService service = new StructureService(configuration);
+
+            var translatedType = service.TranslateType(originalType);
+
+            Assert.AreSame(originalType, translatedType);
+        }
+
         [TestMethod("TranslateType uses TypeTranslator if no custom translator is defined on type")]
         public void TranslateTypeUsesTypeTranslatorIfNoCustomTranslatorIsDefinedOnType()
         {
@@ -47,27 +66,6 @@ namespace TestTools_Tests.Structure
             translator.ReceivedWithAnyArgs().Translate(new TypeTranslateArgs());
         }
 
-        [TestMethod("TranslateType does not use TypeTranslator if type is not in FromNamespace")]
-        public void TranslateTypeDoesNotUseTypeTranslatorIfTypeIsNotInFromNamespace()
-        {
-            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
-            var originalType = new RuntimeTypeDescription(typeof(object));
-
-            ITypeTranslator translator = Substitute.For<ITypeTranslator>();
-
-            IConfiguration configuration = new MemoryConfiguration()
-            {
-                FromNamespace = @namespace,
-                ToNamespace = @namespace,
-                TypeTranslator = translator,
-            };
-            StructureService service = new StructureService(configuration);
-
-            service.TranslateType(originalType);
-
-            translator.DidNotReceiveWithAnyArgs().Translate(new TypeTranslateArgs());
-        }
-
         [TestMethod("TranslateType does not use TypeTranslator if custom translator is defined on type")]
         public void TranslateTypeDoesNotUseTypeTranslatorIfCustomTranslatorIsDefinedOnType()
         {
@@ -87,6 +85,70 @@ namespace TestTools_Tests.Structure
             service.TranslateType(originalType);
 
             translator.DidNotReceiveWithAnyArgs().Translate(new TypeTranslateArgs());
+        }
+
+        [TestMethod("TranslateType caches result if no custom translator is defined on type")]
+        public void TranslateType_CachesTypeTranslatorResult()
+        {
+            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
+            var originalType = new RuntimeTypeDescription(typeof(TestTypeWithoutCustomTranslator));
+
+            ITypeTranslator translator = Substitute.For<ITypeTranslator>();
+
+            IConfiguration configuration = new MemoryConfiguration()
+            {
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
+                TypeTranslator = translator,
+            };
+            StructureService service = new StructureService(configuration);
+
+            var translatedType1 = service.TranslateType(originalType);
+            var translatedType2 = service.TranslateType(originalType);
+
+            Assert.AreSame(translatedType1, translatedType2);
+        }
+
+        [TestMethod("TranslateType caches result if custom translator is defined on type")]
+        public void TranslateType_CachesResult_IfCustomTranslatorIsDefinedOnType()
+        {
+            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
+            var originalType = new RuntimeTypeDescription(typeof(TestTypeWithCustomTranslator));
+
+            IConfiguration configuration = new MemoryConfiguration()
+            {
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
+                TypeTranslator = Substitute.For<ITypeTranslator>(),
+            };
+            StructureService service = new StructureService(configuration);
+
+            service.TranslateType(originalType);
+
+            var translatedType1 = service.TranslateType(originalType);
+            var translatedType2 = service.TranslateType(originalType);
+
+            Assert.AreSame(translatedType1, translatedType2);
+        }
+
+        [TestMethod("TranslateMember returns input if the member's declaring type is not in FromNamespace")]
+        public void TranslateMember_ReturnsInput_IfMembersDeclaringTypeIsNotInFromNamespace()
+        {
+            var @namespace = new RuntimeNamespaceDescription("TestTools_Tests.Structure");
+            var originalMember = new RuntimeMethodDescription(typeof(object).GetMethod("GetHashCode"));
+
+            var configuration = new MemoryConfiguration()
+            {
+                FromNamespace = @namespace,
+                ToNamespace = @namespace,
+                TypeTranslator = Substitute.For<ITypeTranslator>(),
+                MemberTranslator = Substitute.For<IMemberTranslator>()
+            };
+            var service = new StructureService(configuration);
+
+            var translatedMember = service.TranslateMember(originalMember);
+
+            Assert.AreSame(originalMember, translatedMember);
         }
 
         [TestMethod("TranslateMember uses MemberTranslator if no custom translator is defined on member")]
