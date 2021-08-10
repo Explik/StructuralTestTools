@@ -13,12 +13,19 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using OleVanSanten.TestTools.Structure;
 using OleVanSanten.TestTools.TypeSystem;
+using System.Threading.Tasks;
 
 namespace OleVanSanten.TestTools
 {
     [Generator]
     public class UnitTestGenerator : ISourceGenerator
     {
+        private XMLConfiguration _configuration;
+        private CompileTimeDescriptionResolver _syntaxResolver;
+        private StructureService _structureService;
+        private TypeRewriter _typeRewriter;
+        private TemplateRewriter _templateRewriter;
+
         static UnitTestGenerator()
         {
             // Based on https://stackoverflow.com/questions/67071355/source-generators-dependencies-not-loaded-in-visual-studio
@@ -31,8 +38,7 @@ namespace OleVanSanten.TestTools
                     return loadedAssembly;
                 }
 
-                string resourceName = $"TestTools.Generator.{name.Name}.dll";
-
+                string resourceName = $"{name.Name}.dll";
                 using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
                 if (resourceStream == null)
                 {
@@ -48,9 +54,9 @@ namespace OleVanSanten.TestTools
 
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG
-             Debugger.Launch();
-#endif
+//#if DEBUG
+//             Debugger.Launch();
+//#endif
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
         }
 
@@ -61,32 +67,29 @@ namespace OleVanSanten.TestTools
             if (syntaxReceiver == null)
                 return;
 
-            var configuration = GetConfiguration(context);
-            configuration.GlobalNamespace = new CompileTimeNamespaceDescription(context.Compilation, context.Compilation.GlobalNamespace);
+            _configuration ??= GetConfiguration(context);
+            _syntaxResolver ??= new CompileTimeDescriptionResolver(context.Compilation);
+            _structureService ??= new StructureService(_configuration) { StructureVerifier = new VerifierService() };
+            _typeRewriter ??= new TypeRewriter(_syntaxResolver, _structureService);
+            _templateRewriter ??= new TemplateRewriter(_syntaxResolver, _typeRewriter);
 
-            var syntaxResolver = new CompileTimeDescriptionResolver(context.Compilation);
-            var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
-            var typeRewriter = new TypeRewriter(syntaxResolver, structureService);
-            var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
-
-            foreach (var node in syntaxReceiver.CandidateSyntax)
-            {
-                if (syntaxResolver.GetTemplatedAttribute(node) == null)
-                    continue;
-
+            bool IsTemplated(ClassDeclarationSyntax n) => _syntaxResolver.GetTemplatedAttribute(n) == null;
+            Parallel.ForEach(syntaxReceiver.CandidateSyntax.Where(IsTemplated), node => {
                 var fileName = $"{node.Identifier}.g.cs";
-                var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot(context.CancellationToken));
+                var rewrittenNode = _templateRewriter.Visit(node.SyntaxTree.GetRoot(context.CancellationToken));
                 var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
                 context.AddSource(fileName, source);
-            }
+            });
         }
 
         private XMLConfiguration GetConfiguration(GeneratorExecutionContext context)
         {
             var xmlFiles = context.AdditionalFiles.Where(at => at.Path.EndsWith(".xml"));
             var rawConfig = xmlFiles.FirstOrDefault()?.GetText()?.ToString() ?? throw new ArgumentException("Configuration file is missing");
-            return new XMLConfiguration(rawConfig);
-
+            var config = new XMLConfiguration(rawConfig);
+            config.GlobalNamespace = new CompileTimeNamespaceDescription(context.Compilation, context.Compilation.GlobalNamespace);
+            
+            return config;
             //foreach (var xmlFile in xmlFiles)
             //{
             //    if (context.AnalyzerConfigOptions.GetOptions(xmlFile).TryGetValue("build_metadata.AdditionalFiles.UnitTestGenerator_IsConfig", out var isConfig))
