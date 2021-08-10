@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <FromNamespace>Lecture_2_Solutions</FromNamespace>
+  <ToNamespace>Lecture_2</ToNamespace>
+  
+  <TypeTranslator Type="OleVanSanten.TestTools.Structure.SameNameTypeTranslator"/>
+  <MemberTranslator Type="OleVanSanten.TestTools.Structure.SameNameMemberTranslator"/>
+
+  <TypeVerifiers>
+    <TypeVerifier Type="OleVanSanten.TestTools.Structure.UnchangedTypeAccessLevelVerifier"/>
+    <TypeVerifier Type="OleVanSanten.TestTools.Structure.UnchangedTypeIsAbstractVerifier"/>
+    <TypeVerifier Type="OleVanSanten.TestTools.Structure.UnchangedTypeIsStaticVerifier"/>
+  </TypeVerifiers>
+
+  <MemberVerifiers>
+    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedFieldTypeVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberAccessLevelVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberDeclaringType"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberIsStaticVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberIsVirtualVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberTypeVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedPropertyTypeVerifier"/>
+  </MemberVerifiers>
+</Config>
