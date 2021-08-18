@@ -1,0 +1,11 @@
+﻿<Project>
+  <PropertyGroup>
+    <TemplateUnitTestExe Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">"$(MSBuildThisFileDirectory)/net46/template-unit-tests.exe"</TemplateUnitTestExe>
+    <TemplateUnitTestExe Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' OR '$(TargetFrameworkIdentifier)' == '.NETStandard'">dotnet "$(MSBuildThisFileDirectory)/netcoreapp2.0/template-unit-tests.dll"</TemplateUnitTestExe>
+    <ConfigFile>"$(MSBuildProjectDir)/TestToolsConfig.xml"</ConfigFile>
+  </PropertyGroup>
+
+  <Target Name="GenerateTypescript" AfterTargets="CoreCompile">
+    <Exec Command="$(TemplateUnitTestExe) $(TargetPathWithTargetPlatformMoniker) --config $(ConfigFile)" />
+  </Target>
+</Project>

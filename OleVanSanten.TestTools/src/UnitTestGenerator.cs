@@ -24,7 +24,7 @@ namespace OleVanSanten.TestTools
             // Based on https://stackoverflow.com/questions/67071355/source-generators-dependencies-not-loaded-in-visual-studio
             AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
             {
-                AssemblyName name = new(args.Name);
+                AssemblyName name = new AssemblyName(args.Name);
                 Assembly loadedAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().FullName == name.FullName);
                 if (loadedAssembly != null)
                 {
@@ -33,16 +33,20 @@ namespace OleVanSanten.TestTools
 
                 string resourceName = $"TestTools.Generator.{name.Name}.dll";
 
-                using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-                if (resourceStream == null)
-                {
-                    return null;
+                using (Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)) {
+
+                    if (resourceStream == null)
+                    {
+                        return null;
+                    }
+
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        resourceStream.CopyTo(memoryStream);
+
+                        return Assembly.Load(memoryStream.ToArray());
+                    }
                 }
-
-                using MemoryStream memoryStream = new MemoryStream();
-                resourceStream.CopyTo(memoryStream);
-
-                return Assembly.Load(memoryStream.ToArray());
             };
         }
 
