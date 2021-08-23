@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+	<PropertyGroup>
+		<GenerateAssemblyVersionInfo Condition=" '$(GenerateAssemblyVersionInfo)' == '' and '$(TargetExt)' != '.dll' and '$(TargetExt)' != '.exe'">false</GenerateAssemblyVersionInfo>
+		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+
+		<_OVSTT_PlatformSuffix Condition=" '$(_OVSTT_PlatformSuffix)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">MSBuildCore/</_OVSTT_PlatformSuffix>
+		<_OVSTT_PlatformSuffix Condition=" '$(_OVSTT_PlatformSuffix)' == '' ">MSBuildFull/</_OVSTT_PlatformSuffix>
+		<OleVanSantenTestToolsTasksPath Condition=" '$(OleVanSantenTestToolsTasksPath)' == '' ">$(MSBuildThisFileDirectory)$(_OVSTT_PlatformSuffix)</OleVanSantenTestToolsTasksPath>
+	</PropertyGroup>
+	<UsingTask AssemblyFile="$(OleVanSantenTestToolsTasksPath)OleVanSanten.TestTools.Tasks.dll" TaskName="OleVanSanten.TestTools.Tasks.TemplateUnitTest"/>
+
+	<Target Name="TemplateUnitTests" DependsOnTargets="Build">
+		<OleVanSanten.TestTools.Tasks.TemplateUnitTest>
+			<Output TaskParameter="Config" PropertyName="ConfigPath" />
+		</OleVanSanten.TestTools.Tasks.TemplateUnitTest>
+	</Target>
+</Project>

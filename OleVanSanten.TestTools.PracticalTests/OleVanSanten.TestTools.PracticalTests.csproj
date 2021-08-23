@@ -1,14 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="CreateUnitTests">
+	
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Lecture_2_Tests</RootNamespace>
   </PropertyGroup>
-
-  <UsingTask TaskName="TemplatedUnitTest" TaskFactory ="MSBuildTasks.TemplatedUnitTest" AssemblyFile="C:\Users\dxied\source\repos\OleVanSanten\structural-testtool\OleVanSanten.TestTools\bin\Debug\publish\netstandard2.0\template-unit-tests.dll" />
-
-  <Target Name="TemplatedUnitTest" AfterTargets="AfterBuild">
-    <TemplatedUnitTest Config="Hello World 2" />
-  </Target>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
@@ -18,9 +13,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OleVanSanten.TestTools" Version="1.0.7" />
-    <PackageReference Include="OleVanSanten.TestTools.MSTest" Version="1.0.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.1" />
-    <!--<ProjectReference Include="..\OleVanSanten.TestTools\OleVanSanten.TestTools.csproj" />-->
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OleVanSanten.TestTools.MSTest\OleVanSanten.TestTools.MSTest.csproj" />
+  </ItemGroup>
+
+  <Target Name="CreateUnitTests" DependsOnTargets="TemplateUnitTests">
+	  <PropertyGroup>
+		  <Config>../TestToolsConfig.xml</Config>
+	  </PropertyGroup>
+	  <Message Text="Unit tests created" />
+  </Target>
+	
 </Project>
