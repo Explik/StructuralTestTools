@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		
-		<NuSpecFile>OleVanSanten.TestTools.nuspec</NuSpecFile>
+		<NuSpecFile>OleVanSanten.TestTools.MSBuild.nuspec</NuSpecFile>
 
 		<NoPackageAnalysis>true</NoPackageAnalysis>
 
@@ -25,7 +25,7 @@
 	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
 		<PropertyGroup>
 			<BuildSubDir Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">MSBuildCore\</BuildSubDir>
-			<BuildSubDir Condition=" '$(TargetFramework)' == 'net461' ">MSBuildFull\</BuildSubDir>
+			<BuildSubDir Condition=" '$(TargetFramework)' == 'net472' ">MSBuildFull\</BuildSubDir>
 		</PropertyGroup>
 		<Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' " />
 		<ItemGroup>
@@ -54,15 +54,14 @@
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
   </ItemDefinitionGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\OleVanSanten.TestTools\OleVanSanten.TestTools.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472' ">
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OleVanSanten.TestTools.MSBuild\OleVanSanten.TestTools.MSBuild.csproj" />
   </ItemGroup>
 </Project>

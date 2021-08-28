@@ -90,16 +90,6 @@ namespace OleVanSanten.TestTools
             var xmlFiles = context.AdditionalFiles.Where(at => at.Path.EndsWith(".xml"));
             var rawConfig = xmlFiles.FirstOrDefault()?.GetText()?.ToString() ?? throw new ArgumentException("Configuration file is missing");
             return new XMLConfiguration(rawConfig);
-
-            //foreach (var xmlFile in xmlFiles)
-            //{
-            //    if (context.AnalyzerConfigOptions.GetOptions(xmlFile).TryGetValue("build_metadata.AdditionalFiles.UnitTestGenerator_IsConfig", out var isConfig))
-            //    {
-            //        if(isConfig.Equals("true", StringComparison.OrdinalIgnoreCase))
-            //            return xmlFile.GetText()?.ToString();
-            //    }
-            //}
-            //return null;
         }
 
         private class SyntaxReceiver : ISyntaxReceiver

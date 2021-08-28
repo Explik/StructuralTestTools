@@ -6,24 +6,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
-    <PackageReference Include="coverlet.collector" Version="3.0.3">
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.6" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.6" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OleVanSanten.TestTools" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OleVanSanten.TestTools.Core\OleVanSanten.TestTools.Core.csproj" />
     <ProjectReference Include="..\OleVanSanten.TestTools.MSTest\OleVanSanten.TestTools.MSTest.csproj" />
   </ItemGroup>
-
+	
   <Target Name="CreateUnitTests" DependsOnTargets="TemplateUnitTests">
-	  <PropertyGroup>
-		  <Config>../TestToolsConfig.xml</Config>
-	  </PropertyGroup>
 	  <Message Text="Unit tests created" />
   </Target>
 	

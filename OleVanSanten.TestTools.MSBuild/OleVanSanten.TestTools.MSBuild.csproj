@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+	<DebugType>Full</DebugType>
+	<IsPackable>false</IsPackable>
+	<PackageId>OleVanSanten.TestTools.MSBuild</PackageId>
+  </PropertyGroup>
+	
+  <ItemGroup>
+	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+	<PackageReference Include="Microsoft.CodeAnalysis" Version="3.11.0" PrivateAssets="all" />
+	<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.11.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" PrivateAssets="all" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.11.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.StringTools" Version="1.0.0" />
+	<PackageReference Include="NuGet.ProjectModel" Version="5.11.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\OleVanSanten.TestTools.Core\OleVanSanten.TestTools.Core.csproj" />
+  </ItemGroup>
+</Project>

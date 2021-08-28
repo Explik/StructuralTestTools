@@ -47,21 +47,20 @@ namespace OleVanSanten.TestTools.Structure
 
         public override SyntaxNode VisitAttribute(AttributeSyntax node)
         {
-            var templatedAttribute = _resolver.GetTemplatedAttribute(node);
-
-            if (templatedAttribute == null)
+            var name = node.Name.ToString();
+            if (!name.Contains("Templated"))
                 return node;
 
-            // Rewritting templated-attribute type to non-templated-attribute type
-            var newName = SyntaxFactory.IdentifierName(templatedAttribute.EquavilentAttribute);
-
-            return node.WithName(newName);
+            var newName = node.Name.ToString().Replace("Templated", "");
+            var newNameSyntax = SyntaxFactory.ParseName(newName);
+            return node.WithName(newNameSyntax);
         }
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             // Only methods marked with an attritubes that are marked with TemplatedAttribute should be rewritten
-            if (_resolver.GetTemplatedAttribute(node) == null)
+            var attributes = node.AttributeLists.SelectMany(l => l.Attributes);
+            if(!attributes.Any(a => a.Name.ToString().Contains("Templated")))
                 return node;
 
             // Rewritting the method body to switch out all FromNamespace members with ToNamespace members

@@ -8,13 +8,18 @@ namespace OleVanSanten.TestTools.Tasks
 {
     public class TemplateUnitTest : Task
     {
-        [Output]
-        public string ConfigPath { get; set; }
-
         public override bool Execute()
         {
-            Log.LogMessage("Hello world");
-            return true;
+            try
+            {
+                UnitTestTemplator.TemplateUnitTests("", "");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex.Message);
+                return false;
+            }
         }
     }
 }

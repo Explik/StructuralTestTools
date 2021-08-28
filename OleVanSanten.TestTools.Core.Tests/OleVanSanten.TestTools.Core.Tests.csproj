@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.11.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.1.2" />
     <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
@@ -19,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OleVanSanten.TestTools.Task\OleVanSanten.TestTools.Task.csproj" />
-    <ProjectReference Include="..\OleVanSanten.TestTools\OleVanSanten.TestTools.csproj" />
+    <ProjectReference Include="..\OleVanSanten.TestTools.MSBuild\OleVanSanten.TestTools.MSBuild.csproj" />
   </ItemGroup>
 
 </Project>
