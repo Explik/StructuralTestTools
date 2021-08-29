@@ -14,7 +14,7 @@ namespace TestTools_Tests
         {
             string solutionPath = "..\\..\\..\\..\\OleVanSanten.TestTools.PracticalTests/OleVanSanten.TestTools.PracticalTests.sln";
             string configPath = "..\\..\\..\\..\\OleVanSanten.TestTools.PracticalTests/TestToolsConfig.xml";
-            UnitTestTemplator.TemplateUnitTests(solutionPath, configPath);
+            UnitTestTemplator.TemplateUnitTests(solutionPath, "OleVanSanten.TestTools.PracticalTests",configPath);
         }
     }
 }

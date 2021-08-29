@@ -17,46 +17,60 @@ namespace OleVanSanten.TestTools
 {
     public static class UnitTestTemplator
     {
-        public static void TemplateUnitTests(string solutionPath, string configPath)
+        public static void TemplateUnitTests(string solutionPath, string projectName, string configPath)
         {
             var instance = MSBuildLocator.RegisterDefaults();
-            RunTemplateUnitTests(solutionPath, configPath);
+            RunTemplateUnitTests(solutionPath, projectName, configPath);
         }
 
-        private static void RunTemplateUnitTests(string solutionPath, string configPath)
+        private static void RunTemplateUnitTests(string solutionPath, string projectName, string configPath)
+        {
+            var solutionFile = new FileInfo(solutionPath);
+            var solutionDirectory = solutionFile.Directory;
+
+            var solution = GetSolution(solutionPath);
+            var project = GetProject(solution, projectName);
+            var compilation = CompileProject(project);
+
+            var configuration = GetConfiguration(configPath);
+            configuration.GlobalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
+            
+            var syntaxResolver = new CompileTimeDescriptionResolver(compilation);
+            var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
+            var typeRewriter = new TypeRewriter(syntaxResolver, structureService);
+            var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
+            var nodes = compilation.SyntaxTrees.SelectMany(t => RetreiveClassDeclarations(t));
+            foreach (var node in nodes)
+            {
+                if (!HasTemplatedAttribute(node))
+                    continue;
+
+                var fileName = $"{node.Identifier}.g.cs";
+                var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
+                var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
+                File.WriteAllText(solutionDirectory + "\\" + fileName, source.ToString());
+            }
+        }
+
+        private static Solution GetSolution(string solutionPath)
         {
             var workspace = MSBuildWorkspace.Create();
             workspace.WorkspaceFailed += (sender, args) => Console.WriteLine(args.Diagnostic.Message);
-            var solution = workspace.OpenSolutionAsync(solutionPath).Result;
+            
+            return workspace.OpenSolutionAsync(solutionPath).Result;
+        }
+
+        private static Project GetProject(Solution solution, string projectName)
+        {
             var projectGraph = solution.GetProjectDependencyGraph();
             var projectIds = projectGraph.GetTopologicallySortedProjects();
             var projects = projectIds.Select(projectId => solution.GetProject(projectId));
-            projects = projects.Where(p => p.Name.Contains("Practical"));
+            var project = projects.SingleOrDefault(p => p.Name == projectName);
 
-            var compilations = projects.Select(project => CompileProject(project));
+            if (project == null)
+                throw new ArgumentException("Solution does not contain project with name: " + projectName);
 
-            foreach (var compilation in compilations)
-            {
-                var configuration = new XMLConfiguration(File.ReadAllText(configPath));
-                configuration.GlobalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
-
-                var syntaxResolver = new CompileTimeDescriptionResolver(compilation);
-                var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
-                var typeRewriter = new TypeRewriter(syntaxResolver, structureService);
-                var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
-
-                var nodes = compilation.SyntaxTrees.SelectMany(t => RetreiveClassDeclarations(t));
-                foreach (var node in nodes)
-                {
-                    if (!HasTemplatedAttribute(node))
-                        continue;
-
-                    var fileName = $"{node.Identifier}.g.cs";
-                    var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
-                    var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
-                    File.WriteAllText(fileName, source.ToString());
-                }
-            }
+            return project;
         }
 
         private static Compilation CompileProject(Project project)
@@ -73,6 +87,12 @@ namespace OleVanSanten.TestTools
                 }
             }
             return project.GetCompilationAsync().Result;
+        }
+
+        private static XMLConfiguration GetConfiguration(string configPath)
+        {
+            var content = File.ReadAllText(configPath);
+            return new XMLConfiguration(content);
         }
 
         private static IEnumerable<ClassDeclarationSyntax> RetreiveClassDeclarations(SyntaxTree syntaxTree)
