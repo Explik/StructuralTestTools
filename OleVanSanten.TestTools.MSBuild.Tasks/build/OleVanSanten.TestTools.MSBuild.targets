@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="BeforeBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 	<PropertyGroup>
 		<GenerateAssemblyVersionInfo Condition=" '$(GenerateAssemblyVersionInfo)' == '' and '$(TargetExt)' != '.dll' and '$(TargetExt)' != '.exe'">false</GenerateAssemblyVersionInfo>
 		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
@@ -12,7 +12,10 @@
 	</PropertyGroup>
 	<UsingTask AssemblyFile="$(OleVanSantenTestToolsTasksPath)OleVanSanten.TestTools.MSBuild.Tasks.dll" TaskName="OleVanSanten.TestTools.Tasks.TemplateUnitTest"/>
 
-	<Target Name="TemplateUnitTests" DependsOnTargets="Build">
-		<OleVanSanten.TestTools.Tasks.TemplateUnitTest />
+	<Target Name="TemplateUnitTests" DependsOnTargets="BeforeBuild">
+		<OleVanSanten.TestTools.Tasks.TemplateUnitTest
+			ConfigPath="Hello there"
+			ProjectName="$(MSBuildProjectName)"
+			SolutionPath="$(SolutionPath)"/>
 	</Target>
 </Project>

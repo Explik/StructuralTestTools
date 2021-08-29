@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>OleVanSanten.TestTools.MSBuild</id>
-		<version>1.0.0</version>
+		<version>1.0.6</version>
 		<title>OleVanSanten.TestTools.MSBuild</title>
 		<authors>Ole van Santen</authors>
 		<owners>olevansanten</owners>
@@ -20,16 +20,17 @@
 	</metadata>
 	
 	<files>
-		<file src="$outputPath$net472\OleVanSanten.TestTools.MSBuild.dll" target="build\MSBuildFull\OleVanSanten.TestTools.dll" />
-		<file src="$outputPath$net472\OleVanSanten.TestTools.MSBuild.Tasks.dll" target="build\MSBuildFull\OleVanSanten.TestTools.Tasks.dll" />
+		<file src="$outputPath$net472\OleVanSanten.TestTools.MSBuild.dll" target="build\MSBuildFull\OleVanSanten.TestTools.MSBuild.dll" />
+		<file src="$outputPath$net472\OleVanSanten.TestTools.MSBuild.Tasks.dll" target="build\MSBuildFull\OleVanSanten.TestTools.MSBuild.Tasks.dll" />
 		<file src="$outputPath$net472\Microsoft.CodeAnalysis.dll" target="build\MSBuildFull\Microsoft.CodeAnalysis.dll" />
-		<!--<file src="$outputPath$net472\Microsoft.CodeAnalysis.CSharp.dll" target="build\MSBuildFull\Microsoft.CodeAnalysis.CSharp.dll" />-->
-		<file src="$outputPath$net472\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" target="build\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" />
-		
-		<file src="$outputPath$netcoreapp2.0\OleVanSanten.TestTools.MSBuild.dll" target="build\MSBuildCore\OleVanSanten.TestTools.dll" />
-		<file src="$outputPath$netcoreapp2.0\OleVanSanten.TestTools.MSBuild.Tasks.dll" target="build\MSBuildCore\OleVanSanten.TestTools.Tasks.dll" />
-		<!--<file src="$outputPath$netcoreapp2.0\Microsoft.CodeAnalysis.dll" target="build\MSBuildCore\Microsoft.CodeAnalysis.dll" />-->
-		<!--<file src="$outputPath$netcoreapp2.0\Microsoft.CodeAnalysis.CSharp.dll" target="build\MSBuildCore\Microsoft.CodeAnalysis.CSharp.dll" />-->
+		<file src="$outputPath$net472\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" target="build\MSBuildFull\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" />
+		<file src="$outputPath$net472\Microsoft.Build.Locator.dll" target="build\MSBuildFull\Microsoft.Build.Locator.dll" />
+
+		<file src="$outputPath$netcoreapp3.1\OleVanSanten.TestTools.MSBuild.dll" target="build\MSBuildCore\OleVanSanten.TestTools.MSBuild.dll" />
+		<file src="$outputPath$netcoreapp3.1\OleVanSanten.TestTools.MSBuild.Tasks.dll" target="build\MSBuildCore\OleVanSanten.TestTools.MSBuild.Tasks.dll" />
+		<file src="$outputPath$netcoreapp3.1\Microsoft.CodeAnalysis.dll" target="build\MSBuildCore\Microsoft.CodeAnalysis.dll" />
+		<!--<file src="$outputPath$netcoreapp3.1\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" target="build\MSBuildCore\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" />-->
+		<file src="$outputPath$netcoreapp3.1\Microsoft.Build.Locator.dll" target="build\MSBuildCore\Microsoft.Build.Locator.dll" />
 
 		<file src="build\OleVanSanten.TestTools.MSBuild.targets" target="build\OleVanSanten.TestTools.MSBuild.targets" />
 		<file src="buildCrossTargeting\OleVanSanten.TestTools.MSBuild.targets" target="buildCrossTargeting\OleVanSanten.TestTools.MSBuild.targets" />

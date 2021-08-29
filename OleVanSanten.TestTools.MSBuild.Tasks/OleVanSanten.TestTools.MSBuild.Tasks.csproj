@@ -24,7 +24,7 @@
 
 	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
 		<PropertyGroup>
-			<BuildSubDir Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">MSBuildCore\</BuildSubDir>
+			<BuildSubDir Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">MSBuildCore\</BuildSubDir>
 			<BuildSubDir Condition=" '$(TargetFramework)' == 'net472' ">MSBuildFull\</BuildSubDir>
 		</PropertyGroup>
 		<Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' " />
@@ -60,6 +60,9 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.11.0"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OleVanSanten.TestTools.MSBuild\OleVanSanten.TestTools.MSBuild.csproj" />

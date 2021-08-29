@@ -8,11 +8,24 @@ namespace OleVanSanten.TestTools.Tasks
 {
     public class TemplateUnitTest : Task
     {
+        [Required]
+        public string ConfigPath { get; set; }
+
+        [Required]
+        public string ProjectName { get; set; }
+
+        [Required]
+        public string SolutionPath { get; set; }
+
         public override bool Execute()
         {
+            Log.LogMessage(MessageImportance.High, ConfigPath);
+            Log.LogMessage(MessageImportance.High, ProjectName);
+            Log.LogMessage(MessageImportance.High, SolutionPath);
+
             try
             {
-                UnitTestTemplator.TemplateUnitTests("", "");
+                UnitTestTemplator.TemplateUnitTests(SolutionPath, ProjectName, ConfigPath);
                 return true;
             }
             catch (Exception ex)
