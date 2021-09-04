@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 using System.Linq.Expressions;
 using System.Reflection;
 using static TestTools_Tests.TestHelper;

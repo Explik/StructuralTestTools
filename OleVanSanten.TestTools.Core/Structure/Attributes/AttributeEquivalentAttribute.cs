@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public class AttributeEquivalentAttribute : Attribute
     {

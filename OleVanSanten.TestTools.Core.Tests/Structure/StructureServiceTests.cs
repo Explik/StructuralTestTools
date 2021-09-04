@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.Text;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 using OleVanSanten.TestTools.TypeSystem;
 
 namespace TestTools_Tests.Structure

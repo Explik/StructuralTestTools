@@ -7,7 +7,7 @@ using System.Linq;
 using OleVanSanten.TestTools.Helpers;
 using OleVanSanten.TestTools.TypeSystem;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public class TypeVisitor : ExpressionVisitor
     {

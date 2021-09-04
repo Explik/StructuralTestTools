@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public interface IMemberVerifierService
     {

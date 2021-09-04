@@ -4,7 +4,7 @@ using System.Text;
 using OleVanSanten.TestTools.Helpers;
 using OleVanSanten.TestTools.TypeSystem;
 
-namespace OleVanSanten.TestTools.Structure.Attributes
+namespace OleVanSanten.TestTools
 {
     public class ReadonlyPropertyAttribute : Attribute, IMemberVerifier
     {

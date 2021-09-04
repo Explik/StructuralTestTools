@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Linq;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public static class StructureTestExtensions
     {

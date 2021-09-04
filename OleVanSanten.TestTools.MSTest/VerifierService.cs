@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OleVanSanten.TestTools.Helpers;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 
 namespace OleVanSanten.TestTools.MSTest
 {

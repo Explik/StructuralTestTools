@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using OleVanSanten.TestTools.TypeSystem;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public class AlternateNameTypeTranslator : ITypeTranslator
     {

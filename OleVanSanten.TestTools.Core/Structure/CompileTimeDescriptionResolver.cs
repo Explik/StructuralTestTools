@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public class CompileTimeDescriptionResolver : ICompileTimeDescriptionResolver
     {

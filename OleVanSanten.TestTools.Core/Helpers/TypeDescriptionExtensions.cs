@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.Helpers

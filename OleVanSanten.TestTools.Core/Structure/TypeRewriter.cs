@@ -8,7 +8,7 @@ using System.Reflection;
 using OleVanSanten.TestTools.Helpers;
 using OleVanSanten.TestTools.TypeSystem;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     // Source Generator of TypeVisitor
     // TypeRewriter translates and verifies statements

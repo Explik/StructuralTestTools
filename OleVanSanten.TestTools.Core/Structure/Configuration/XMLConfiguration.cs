@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public class XMLConfiguration : IConfiguration
     {

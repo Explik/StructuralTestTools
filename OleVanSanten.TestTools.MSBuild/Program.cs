@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.Text;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools

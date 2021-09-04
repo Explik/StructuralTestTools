@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools.MSTest
@@ -15,11 +15,6 @@ namespace OleVanSanten.TestTools.MSTest
 
         private TestFactory()
         {
-        }
-
-        public UnitTest CreateTest()
-        {
-            return new UnitTest(StructureService) { TypeVisitor = TypeVisitor };
         }
 
         public StructureTest CreateStructureTest()

@@ -4,7 +4,7 @@ using System.Text;
 using System.Linq;
 using OleVanSanten.TestTools.TypeSystem;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public class AlternateNamesAttribute : Attribute, ITypeTranslator, IMemberTranslator
     {

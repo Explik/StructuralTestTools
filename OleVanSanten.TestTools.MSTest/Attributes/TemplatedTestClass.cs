@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 
 namespace OleVanSanten.TestTools.MSTest
 {

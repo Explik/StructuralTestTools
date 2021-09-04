@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     // Platform independent implementation of VerifierServiceBase used by Source Generators
     public class VerifierService : VerifierServiceBase

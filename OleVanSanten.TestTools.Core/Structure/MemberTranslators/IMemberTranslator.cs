@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using OleVanSanten.TestTools.TypeSystem;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     public interface IMemberTranslator
     {

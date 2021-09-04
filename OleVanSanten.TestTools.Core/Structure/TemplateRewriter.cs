@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools;
 
-namespace OleVanSanten.TestTools.Structure
+namespace OleVanSanten.TestTools
 {
     // TemplateRewriter translates and verifies templated classes
     public class TemplateRewriter : CSharpSyntaxRewriter
