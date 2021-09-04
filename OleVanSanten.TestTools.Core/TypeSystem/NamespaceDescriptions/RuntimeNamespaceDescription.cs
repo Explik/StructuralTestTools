@@ -10,9 +10,6 @@ namespace OleVanSanten.TestTools.TypeSystem
     {
         public RuntimeNamespaceDescription(string @namespace)
         {
-            if (string.IsNullOrEmpty(@namespace))
-                throw new ArgumentException("Global namespaces are not supported");
-
             Name = @namespace;
         }
 
@@ -21,8 +18,8 @@ namespace OleVanSanten.TestTools.TypeSystem
             get
             {
                 if (!Name.Contains("."))
-                    throw new NotImplementedException("Global namespace is not yet supported");
-
+                    return null;
+                
                 string baseNamespace = Name.Substring(0, Name.LastIndexOf(".") - 1);
                 return new RuntimeNamespaceDescription(baseNamespace);
             }
@@ -32,23 +29,40 @@ namespace OleVanSanten.TestTools.TypeSystem
 
         public override NamespaceDescription[] GetNamespaces()
         {
-            var allTypesInAllSubnamespaces = GetTypes(t => t.Namespace == null || t.Namespace.StartsWith(Name) || string.IsNullOrEmpty(Name)); 
-            var allSubnamespaces = allTypesInAllSubnamespaces.Select(t => t.Namespace).Distinct();
-            var directSubnamespaces = allSubnamespaces.Where(s => CountPeriods(s) + 1 == CountPeriods(Name));
+            TypeDescription[] allTypesInAllSubnamespaces;
+            IEnumerable<string> allSubnamespaces;
+            IEnumerable<string> directSubnamespaces;
 
+            if (string.IsNullOrEmpty(Name))
+            {
+                allTypesInAllSubnamespaces = GetTypes(t => true);
+                allSubnamespaces = allTypesInAllSubnamespaces.Select(t => t.Namespace).Distinct();
+                directSubnamespaces = allSubnamespaces.Where(s => s != null && CountPeriods(s) == 0);
+            }
+            else
+            {
+                allTypesInAllSubnamespaces = GetTypes(t => t.Namespace != null || t.Namespace.StartsWith(Name));
+                allSubnamespaces = allTypesInAllSubnamespaces.Select(t => t.Namespace).Distinct();
+                directSubnamespaces = allSubnamespaces.Where(s => CountPeriods(s) + 1 == CountPeriods(Name));
+            }
             return directSubnamespaces.Select(t => new RuntimeNamespaceDescription(t)).ToArray();
         }
 
         private int CountPeriods(string str)
         {
             if (str == null)
+            {
                 return 0;
-
+            }
             return str.Count(c => c == '.');
         }
 
         public override TypeDescription[] GetTypes()
         {
+            if (string.IsNullOrEmpty(Name))
+            {
+                return GetTypes(t => string.IsNullOrEmpty(t.Namespace));
+            }
             return GetTypes(t => t.Namespace == Name);
         }
 
