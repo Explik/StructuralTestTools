@@ -15,49 +15,60 @@ using OleVanSanten.TestTools.TypeSystem;
 
 namespace OleVanSanten.TestTools
 {
-    public static class UnitTestTemplator
+    public class Program
     {
-        public static void TemplateUnitTests(string solutionPath, string projectName, string configPath)
+        public static void Main(string[] args)
         {
-            var instance = MSBuildLocator.RegisterDefaults();
-            RunTemplateUnitTests(solutionPath, projectName, configPath);
+            if (args.Length != 3)
+                throw new ArgumentException();
+
+            TemplateUnitTests(args[0], args[1], args[2]);
         }
 
+        public static void TemplateUnitTests(string solutionPath, string projectName, string configPath)
+        {
+            try
+            {
+                MSBuildLocator.RegisterDefaults();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            RunTemplateUnitTests(solutionPath, projectName, configPath);
+        }
+        
         private static void RunTemplateUnitTests(string solutionPath, string projectName, string configPath)
         {
             var solutionFile = new FileInfo(solutionPath);
             var solutionDirectory = solutionFile.Directory;
 
-            var solution = GetSolution(solutionPath);
-            var project = GetProject(solution, projectName);
-            var compilation = CompileProject(project);
-
-            var configuration = GetConfiguration(configPath);
-            configuration.GlobalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
-            
-            var syntaxResolver = new CompileTimeDescriptionResolver(compilation);
-            var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
-            var typeRewriter = new TypeRewriter(syntaxResolver, structureService);
-            var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
-            var nodes = compilation.SyntaxTrees.SelectMany(t => RetreiveClassDeclarations(t));
-            foreach (var node in nodes)
+            using (var workspace = MSBuildWorkspace.Create())
             {
-                if (!HasTemplatedAttribute(node))
-                    continue;
+                workspace.WorkspaceFailed += (sender, args) => Console.WriteLine(args.Diagnostic.Message);
+                var solution = workspace.OpenSolutionAsync(solutionPath).Result;
+                var project = GetProject(solution, projectName);
+                var compilation = CompileProject(project);
 
-                var fileName = $"{node.Identifier}.g.cs";
-                var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
-                var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
-                File.WriteAllText(solutionDirectory + "\\" + fileName, source.ToString());
+                var configuration = GetConfiguration(configPath);
+                configuration.GlobalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
+
+                var syntaxResolver = new CompileTimeDescriptionResolver(compilation);
+                var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
+                var typeRewriter = new TypeRewriter(syntaxResolver, structureService);
+                var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
+                var nodes = compilation.SyntaxTrees.SelectMany(t => RetreiveClassDeclarations(t));
+                foreach (var node in nodes)
+                {
+                    if (!HasTemplatedAttribute(node))
+                        continue;
+
+                    var fileName = $"{node.Identifier}.g.cs";
+                    var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
+                    var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
+                    File.WriteAllText(solutionDirectory + "\\" + fileName, source.ToString());
+                }
             }
-        }
-
-        private static Solution GetSolution(string solutionPath)
-        {
-            var workspace = MSBuildWorkspace.Create();
-            workspace.WorkspaceFailed += (sender, args) => Console.WriteLine(args.Diagnostic.Message);
-            
-            return workspace.OpenSolutionAsync(solutionPath).Result;
         }
 
         private static Project GetProject(Solution solution, string projectName)

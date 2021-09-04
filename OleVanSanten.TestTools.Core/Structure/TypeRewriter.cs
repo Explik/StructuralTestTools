@@ -181,7 +181,7 @@ namespace OleVanSanten.TestTools.Structure
                 var elementType = GetTypeSyntax(typeDescription.GetElementType());
                 SyntaxFactory.ArrayType(elementType);
             }
-            return SyntaxFactory.ParseTypeName(typeDescription.Name);
+            return SyntaxFactory.ParseTypeName(typeDescription.FullName);
         }
     }
 }

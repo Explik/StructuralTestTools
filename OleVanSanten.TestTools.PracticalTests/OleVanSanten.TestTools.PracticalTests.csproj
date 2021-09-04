@@ -14,7 +14,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OleVanSanten.TestTools.MSBuild" Version="1.0.6">
+    <PackageReference Include="OleVanSanten.TestTools.MSBuild" Version="1.0.17">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -25,8 +25,7 @@
     <ProjectReference Include="..\OleVanSanten.TestTools.MSTest\OleVanSanten.TestTools.MSTest.csproj" />
   </ItemGroup>
 	
-  <Target Name="CreateUnitTests">
-	  <Message Text="Unit tests created" />
-  </Target>
-
+  <Target Name="CreateUnitTests" DependsOnTargets="TemplateUnitTests" />
+  <!--<Target Name="CreateUnitTests" />-->
+	
 </Project>

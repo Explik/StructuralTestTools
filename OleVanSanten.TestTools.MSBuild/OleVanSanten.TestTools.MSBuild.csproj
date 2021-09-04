@@ -4,6 +4,9 @@
 	<DebugType>Full</DebugType>
 	<IsPackable>false</IsPackable>
 	<PackageId>OleVanSanten.TestTools.MSBuild</PackageId>
+	<ApplicationIcon />
+	<OutputType>Exe</OutputType>
+	<StartupObject />
   </PropertyGroup>
 	
   <ItemGroup>

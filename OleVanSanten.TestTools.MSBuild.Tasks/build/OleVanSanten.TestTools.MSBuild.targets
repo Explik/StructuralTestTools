@@ -6,16 +6,17 @@
 		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
 		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
 
-		<_OVSTT_PlatformSuffix Condition=" '$(_OVSTT_PlatformSuffix)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">MSBuildCore/</_OVSTT_PlatformSuffix>
-		<_OVSTT_PlatformSuffix Condition=" '$(_OVSTT_PlatformSuffix)' == '' ">MSBuildFull/</_OVSTT_PlatformSuffix>
-		<OleVanSantenTestToolsTasksPath Condition=" '$(OleVanSantenTestToolsTasksPath)' == '' ">$(MSBuildThisFileDirectory)$(_OVSTT_PlatformSuffix)</OleVanSantenTestToolsTasksPath>
+		<ExePath>$(MSBuildThisFileDirectory)OleVanSanten.TestTools.MSBuild.exe</ExePath>
+		<ConfigPath>$(SolutionDir)TestToolsConfig.xml</ConfigPath>
 	</PropertyGroup>
-	<UsingTask AssemblyFile="$(OleVanSantenTestToolsTasksPath)OleVanSanten.TestTools.MSBuild.Tasks.dll" TaskName="OleVanSanten.TestTools.Tasks.TemplateUnitTest"/>
 
 	<Target Name="TemplateUnitTests" DependsOnTargets="BeforeBuild">
-		<OleVanSanten.TestTools.Tasks.TemplateUnitTest
-			ConfigPath="Hello there"
-			ProjectName="$(MSBuildProjectName)"
-			SolutionPath="$(SolutionPath)"/>
+		<Message Importance="high" Text="ExePath = $(ExePath)"/>
+		<Message Importance="high" Text="SolutionPath = $(SolutionPath)"/>
+		<Message Importance="high" Text="MSBuildProjectName = $(MSBuildProjectName)"/>
+		<Message Importance="high" Text="ConfigPath = $(ConfigPath)"/>
+		<Message Importance="high" Text='Command= "$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"'/>
+		
+		<Exec Command='"$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' ConsoleToMSBuild="true" />
 	</Target>
 </Project>

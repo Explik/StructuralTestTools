@@ -55,14 +55,13 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net472' ">
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />
+	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+    <!--<PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />-->
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />
+    <!--<PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />-->
+	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.11.0"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OleVanSanten.TestTools.MSBuild\OleVanSanten.TestTools.MSBuild.csproj" />
