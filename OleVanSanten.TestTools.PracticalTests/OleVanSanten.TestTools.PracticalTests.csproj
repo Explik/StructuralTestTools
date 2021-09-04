@@ -1,36 +1,31 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="CreateUnitTests">
+	
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Lecture_1_Tests</RootNamespace>
-
-    <IsPackable>false</IsPackable>
-    <UseNETCoreGenerator>true</UseNETCoreGenerator>
-    <IncludeBuildOutput>true</IncludeBuildOutput>
-
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+    <RootNamespace>Lecture_2_Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
-    <PackageReference Include="coverlet.collector" Version="3.0.3">
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.6" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.6" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Runtime" Version="4.3.1" />
-  </ItemGroup>
-
-  <!-- Adds TestTools as source generator -->
-  <ItemGroup>
-    <ProjectReference Include="..\OleVanSanten.TestTools.Generator\OleVanSanten.TestTools.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <AdditionalFiles Include="TestToolsConfig.xml" UnitTestGenerator_IsConfig="true" />
+    <PackageReference Include="OleVanSanten.TestTools.MSBuild" Version="1.0.17">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OleVanSanten.TestTools.Core\OleVanSanten.TestTools.Core.csproj" />
     <ProjectReference Include="..\OleVanSanten.TestTools.MSTest\OleVanSanten.TestTools.MSTest.csproj" />
-    <ProjectReference Include="..\OleVanSanten.TestTools\OleVanSanten.TestTools.csproj" />
   </ItemGroup>
+	
+  <Target Name="CreateUnitTests" DependsOnTargets="TemplateUnitTests" />
+  <!--<Target Name="CreateUnitTests" />-->
+	
 </Project>

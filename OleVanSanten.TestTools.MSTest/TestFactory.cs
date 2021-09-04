@@ -31,6 +31,7 @@ namespace OleVanSanten.TestTools.MSTest
         {
             string configFileContent = File.ReadAllText(pathToConfigFile);
             var configuration = new XMLConfiguration(configFileContent);
+            configuration.GlobalNamespace = new RuntimeNamespaceDescription("");
             var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
             var typeVisitor = new TypeVisitor(structureService);
 
