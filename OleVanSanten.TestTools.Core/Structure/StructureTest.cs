@@ -80,7 +80,15 @@ namespace OleVanSanten.TestTools.Structure
 
         public void Execute()
         {
-            _executeAction?.Invoke();
+            // Rethrowing the exception to erase the stack trace as it probably confuses more than it helps.
+            try
+            {
+                _executeAction?.Invoke();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
