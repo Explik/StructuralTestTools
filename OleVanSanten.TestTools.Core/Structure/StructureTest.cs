@@ -14,9 +14,9 @@ namespace OleVanSanten.TestTools
     {
         Action _executeAction;
         IStructureService _structureService;
-        VerifierServiceBase _verifierService;
+        VerifierService _verifierService;
 
-        public StructureTest(IStructureService structureService, VerifierServiceBase verifierService) 
+        public StructureTest(IStructureService structureService, VerifierService verifierService) 
         {
             _structureService = structureService;
             _verifierService = verifierService;

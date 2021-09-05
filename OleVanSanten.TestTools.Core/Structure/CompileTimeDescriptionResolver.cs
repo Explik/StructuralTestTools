@@ -70,7 +70,7 @@ namespace OleVanSanten.TestTools
         }
 
         // Returns TemplatedAttribute object if attribute class is marked with [TemplatedAttribute]
-        public AttributeEquivalentAttribute GetTemplatedAttribute(AttributeSyntax node)
+        public EquivalentAttributeAttribute GetEquivalentAttribute(AttributeSyntax node)
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var attributeSymbol = semanticModel.GetSymbolInfo(node).Symbol;
@@ -78,27 +78,35 @@ namespace OleVanSanten.TestTools
             var attributeDescription = new CompileTimeTypeDescription(_compilation, attributeClass);
 
             // Check if it contains any TemplateEquivalentAttribute at all
-            var targetAttribute = new RuntimeTypeDescription(typeof(AttributeEquivalentAttribute));
+            var targetAttribute = new RuntimeTypeDescription(typeof(EquivalentAttributeAttribute));
             if (!attributeDescription.GetCustomAttributeTypes().Contains(targetAttribute))
                 return null;
 
-            return attributeDescription.GetCustomAttributes().OfType<AttributeEquivalentAttribute>().FirstOrDefault();
+            return attributeDescription.GetCustomAttributes().OfType<EquivalentAttributeAttribute>().FirstOrDefault();
         }
 
-        public AttributeEquivalentAttribute GetTemplatedAttribute(ClassDeclarationSyntax node)
+        public EquivalentAttributeAttribute GetEquivalentAttribute(ClassDeclarationSyntax node)
         {
             var type = GetTypeDescription(node);
             var attributesOfAttributes = type.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
 
-            return attributesOfAttributes.OfType<AttributeEquivalentAttribute>().FirstOrDefault();
+            return attributesOfAttributes.OfType<EquivalentAttributeAttribute>().FirstOrDefault();
         }
 
-        public AttributeEquivalentAttribute GetTemplatedAttribute(MethodDeclarationSyntax node)
+        public EquivalentAttributeAttribute GetEquivalentAttribute(MethodDeclarationSyntax node)
         {
             var method = GetMethodDescription(node);
             var attributesOfAttributes = method.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
 
-            return attributesOfAttributes.OfType<AttributeEquivalentAttribute>().FirstOrDefault();
+            return attributesOfAttributes.OfType<EquivalentAttributeAttribute>().FirstOrDefault();
+        }
+
+        public EquivalentExceptionAttribute GetEquivalentException(MethodDeclarationSyntax node)
+        {
+            var method = GetMethodDescription(node);
+            var attributesOfAttributes = method.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
+
+            return attributesOfAttributes.OfType<EquivalentExceptionAttribute>().FirstOrDefault();
         }
 
         public TypeDescription GetTypeDescription(TypeDeclarationSyntax node)

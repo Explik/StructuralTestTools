@@ -8,7 +8,7 @@ namespace OleVanSanten.TestTools
 {
     public class ReadonlyPropertyAttribute : Attribute, IMemberVerifier
     {
-        public VerifierServiceBase Verifier { get; set; }
+        public VerifierService Verifier { get; set; }
 
         public IStructureService Service { get; set; }
 

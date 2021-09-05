@@ -5,8 +5,8 @@ using OleVanSanten.TestTools;
 
 namespace OleVanSanten.TestTools.MSTest
 {
-    [AttributeEquivalent("Microsoft.VisualStudio.TestTools.UnitTesting.TestClass")]
-    public class TemplatedTestClass : Attribute
+    [EquivalentAttribute("Microsoft.VisualStudio.TestTools.UnitTesting.TestClass")]
+    public class TemplatedTestClassAttribute : Attribute
     {
     }
 }

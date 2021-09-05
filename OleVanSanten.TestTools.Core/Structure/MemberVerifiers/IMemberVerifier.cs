@@ -15,7 +15,7 @@ namespace OleVanSanten.TestTools
 
     public struct MemberVerifierArgs
     {
-        public VerifierServiceBase Verifier { get; set; }
+        public VerifierService Verifier { get; set; }
         public ITypeTranslatorService TypeTranslatorService { get; set; }
         public ITypeVerifierService TypeVerifierService { get; set; }
         public IMemberTranslatorService MemberTranslatorService { get; set; }

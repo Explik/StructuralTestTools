@@ -47,20 +47,21 @@ namespace OleVanSanten.TestTools
 
         public override SyntaxNode VisitAttribute(AttributeSyntax node)
         {
-            var name = node.Name.ToString();
-            if (!name.Contains("Templated"))
+            var templatedAttribute = _resolver.GetEquivalentAttribute(node);
+
+            if (templatedAttribute == null)
                 return node;
 
-            var newName = node.Name.ToString().Replace("Templated", "");
-            var newNameSyntax = SyntaxFactory.ParseName(newName);
-            return node.WithName(newNameSyntax);
+            // Rewritting templated-attribute type to non-templated-attribute type
+            var newName = SyntaxFactory.IdentifierName(templatedAttribute.EquavilentAttribute);
+
+            return node.WithName(newName);
         }
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             // Only methods marked with an attritubes that are marked with TemplatedAttribute should be rewritten
-            var attributes = node.AttributeLists.SelectMany(l => l.Attributes);
-            if(!attributes.Any(a => a.Name.ToString().Contains("Templated")))
+            if (_resolver.GetEquivalentAttribute(node) == null)
                 return node;
 
             // Rewritting the method body to switch out all FromNamespace members with ToNamespace members
@@ -77,8 +78,9 @@ namespace OleVanSanten.TestTools
             }
             catch (VerifierServiceException ex)
             {
-                var exceptionType = $"Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException";
-                var throwStatement = $"throw new {exceptionType}(\"{ex.Message} (AUTO)\");";
+                var exceptionAttribute = _resolver.GetEquivalentException(node);
+                var exceptionType = exceptionAttribute?.EquavilentException ?? "Exception";
+                var throwStatement = $"throw new {exceptionType}(\"{ex.Message}\");";
                 newBody = (BlockSyntax)SyntaxFactory.ParseStatement("{" + throwStatement + "}");
             }
 

@@ -19,15 +19,25 @@ namespace OleVanSanten.TestTools.MSTest
 
         public StructureTest CreateStructureTest()
         {
-            return new StructureTest(StructureService, new VerifierService());
+            VerifierService verifierService = new VerifierService()
+            {
+                ExceptionType = RuntimeTypeDescription.Create("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException").Type
+            };
+            return new StructureTest(StructureService, verifierService);
         }
 
         public static TestFactory CreateFromConfigurationFile(string pathToConfigFile)
         {
             string configFileContent = File.ReadAllText(pathToConfigFile);
-            var configuration = new XMLConfiguration(configFileContent);
-            configuration.GlobalNamespace = new RuntimeNamespaceDescription("");
-            var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
+            var configuration = new XMLConfiguration(configFileContent)
+            {
+                GlobalNamespace = new RuntimeNamespaceDescription("")
+            };
+            VerifierService verifierService = new VerifierService()
+            {
+                ExceptionType = RuntimeTypeDescription.Create("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException").Type
+            };
+            var structureService = new StructureService(configuration) { StructureVerifier = verifierService };
             var typeVisitor = new TypeVisitor(structureService);
 
             return new TestFactory()

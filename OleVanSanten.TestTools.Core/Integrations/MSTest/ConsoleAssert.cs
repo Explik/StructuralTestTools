@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using OleVanSanten.TestTools.Helpers;
+using OleVanSanten.TestTools.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,7 +31,9 @@ namespace OleVanSanten.TestTools.MSTest
                 Console.WriteLine("# Actual (Console.Out): ");
                 Console.WriteLine(!string.IsNullOrEmpty(actualWriteout) ? actualWriteout.TrimEnd() : "no output");
 
-                throw new AssertFailedException("Expected and actual output(might) differ");
+                Type exceptionType = RuntimeTypeDescription.Create("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException").Type;
+                Exception exception = (Exception)Activator.CreateInstance(exceptionType, "Expected and actual output (might) differ");
+                throw exception;
             }
         }
 
@@ -55,11 +58,13 @@ namespace OleVanSanten.TestTools.MSTest
                 Console.WriteLine("# Actual (Console.Err): ");
                 Console.WriteLine(!string.IsNullOrEmpty(actualWriteout) ? actualWriteout.TrimEnd() : "no output");
 
-                throw new AssertFailedException("Expected and actual output(might) differ");
+                Type exceptionType = RuntimeTypeDescription.Create("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException").Type;
+                Exception exception = (Exception)Activator.CreateInstance(exceptionType, "Expected and actual output (might) differ");
+                throw exception;
             }
         }
 
-        // An string comparison method that does not look much on whitespace
+        // A string comparison method that does not look much on whitespace
         private static bool AreStringsApproximatelyEqual(string expected, string actual)
         {
             string[] splitIntoLines(string input) => input.Trim().Split('\n').Select(l => l.Trim()).ToArray();

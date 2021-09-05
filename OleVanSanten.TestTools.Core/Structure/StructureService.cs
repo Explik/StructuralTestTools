@@ -38,7 +38,7 @@ namespace OleVanSanten.TestTools
             _memberVerificationOrder = configuration.MemberVerificationOrder.Select(i => i).ToArray();
         }
 
-        public VerifierServiceBase StructureVerifier { get; set; }
+        public VerifierService StructureVerifier { get; set; }
 
         public TypeDescription TranslateType(TypeDescription type)
         {

@@ -3,22 +3,22 @@
   <FromNamespace>Lecture_2_Solutions</FromNamespace>
   <ToNamespace>Lecture_2</ToNamespace>
   
-  <TypeTranslator Type="OleVanSanten.TestTools.Structure.SameNameTypeTranslator"/>
-  <MemberTranslator Type="OleVanSanten.TestTools.Structure.SameNameMemberTranslator"/>
+  <TypeTranslator Type="OleVanSanten.TestTools.SameNameTypeTranslator"/>
+  <MemberTranslator Type="OleVanSanten.TestTools.SameNameMemberTranslator"/>
 
   <TypeVerifiers>
-    <TypeVerifier Type="OleVanSanten.TestTools.Structure.UnchangedTypeAccessLevelVerifier"/>
-    <TypeVerifier Type="OleVanSanten.TestTools.Structure.UnchangedTypeIsAbstractVerifier"/>
-    <TypeVerifier Type="OleVanSanten.TestTools.Structure.UnchangedTypeIsStaticVerifier"/>
+    <TypeVerifier Type="OleVanSanten.TestTools.UnchangedTypeAccessLevelVerifier"/>
+    <TypeVerifier Type="OleVanSanten.TestTools.UnchangedTypeIsAbstractVerifier"/>
+    <TypeVerifier Type="OleVanSanten.TestTools.UnchangedTypeIsStaticVerifier"/>
   </TypeVerifiers>
 
   <MemberVerifiers>
-    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedFieldTypeVerifier"/>
-    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberAccessLevelVerifier"/>
-    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberDeclaringType"/>
-    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberIsStaticVerifier"/>
-    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberIsVirtualVerifier"/>
-    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedMemberTypeVerifier"/>
-    <MemberVerifier Type="OleVanSanten.TestTools.Structure.UnchangedPropertyTypeVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.UnchangedFieldTypeVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.UnchangedMemberAccessLevelVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.UnchangedMemberDeclaringType"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.UnchangedMemberIsStaticVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.UnchangedMemberIsVirtualVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.UnchangedMemberTypeVerifier"/>
+    <MemberVerifier Type="OleVanSanten.TestTools.UnchangedPropertyTypeVerifier"/>
   </MemberVerifiers>
 </Config>

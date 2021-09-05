@@ -130,5 +130,15 @@ namespace OleVanSanten.TestTools.TypeSystem
             }
             throw new InvalidOperationException("MakeGenericType cannot be performed on non-generic type");
         }
+
+        public static RuntimeTypeDescription Create(string fullTypeName)
+        {
+            string[] fullTypeNameParts = fullTypeName.Split('.');
+            string namespaceName = string.Join(".", fullTypeNameParts.Take(fullTypeNameParts.Length - 1));
+            string typeName = fullTypeNameParts.Last();
+
+            RuntimeNamespaceDescription @namespace = new RuntimeNamespaceDescription(namespaceName);
+            return (RuntimeTypeDescription) @namespace.GetType(typeName); 
+        }
     }
 }

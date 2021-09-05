@@ -4,9 +4,9 @@ using System.Text;
 
 namespace OleVanSanten.TestTools
 {
-    public class AttributeEquivalentAttribute : Attribute
+    public class EquivalentAttributeAttribute : Attribute
     {
-        public AttributeEquivalentAttribute(string equvilentAttribute)
+        public EquivalentAttributeAttribute(string equvilentAttribute)
         {
             EquavilentAttribute = equvilentAttribute;
         }

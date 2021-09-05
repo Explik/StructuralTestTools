@@ -14,7 +14,6 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <Folder Include="Integrations\MSTest\" />
     <Folder Include="Integrations\Xunit\" />
     <Folder Include="Integrations\NUnit\" />
   </ItemGroup>

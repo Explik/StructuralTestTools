@@ -7,7 +7,7 @@ namespace OleVanSanten.TestTools.MSTest
 {
     public static class ConsoleInputter
     {
-        static BufferedReader InternalReader = new BufferedReader();
+        private static BufferedReader _internalReader = new BufferedReader();
 
         public static void Write()
         {
@@ -16,10 +16,10 @@ namespace OleVanSanten.TestTools.MSTest
 
         public static void Write(string input)
         {
-            if (!InternalReader.HasCapturedConsoleIn)
-                InternalReader.CaptureConsoleIn();
+            if (!_internalReader.HasCapturedConsoleIn)
+                _internalReader.CaptureConsoleIn();
 
-            InternalReader.Buffer += input;
+            _internalReader.Buffer += input;
         }
 
         public static void WriteLine()
@@ -42,8 +42,8 @@ namespace OleVanSanten.TestTools.MSTest
 
             /* Console.KeyAvailable does not work for BufferedReader, so this has 
              * to be cleared separately */
-            if (InternalReader.HasCapturedConsoleIn)
-                InternalReader.Buffer = "";
+            if (_internalReader.HasCapturedConsoleIn)
+                _internalReader.Buffer = "";
         }
 
         private class BufferedReader : TextReader

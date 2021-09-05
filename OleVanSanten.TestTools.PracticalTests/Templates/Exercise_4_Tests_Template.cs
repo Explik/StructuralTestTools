@@ -1,9 +1,8 @@
 ﻿using Lecture_2_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OleVanSanten.TestTools.Expressions;
+using OleVanSanten.TestTools;
 using OleVanSanten.TestTools.MSTest;
 using static Lecture_2_Tests.TestHelper;
-using static OleVanSanten.TestTools.Expressions.TestExpression;
 
 namespace Lecture_2_Tests
 {

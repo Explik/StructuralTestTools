@@ -12,7 +12,7 @@ namespace OleVanSanten.TestTools
 
     public struct TypeTranslateArgs
     {
-        public VerifierServiceBase Verifier { get; set; }
+        public VerifierService Verifier { get; set; }
         public NamespaceDescription TargetNamespace { get; set; }
         public TypeDescription OriginalType { get; set; }
     }
