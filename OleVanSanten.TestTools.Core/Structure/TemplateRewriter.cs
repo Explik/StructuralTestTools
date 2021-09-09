@@ -47,13 +47,12 @@ namespace OleVanSanten.TestTools
 
         public override SyntaxNode VisitAttribute(AttributeSyntax node)
         {
-            var templatedAttribute = _resolver.GetEquivalentAttribute(node);
-
-            if (templatedAttribute == null)
+            if (!_resolver.IsTemplatedAttribute(node))
                 return node;
 
             // Rewritting templated-attribute type to non-templated-attribute type
-            var newName = SyntaxFactory.IdentifierName(templatedAttribute.EquavilentAttribute);
+            var attributeTypeName = _resolver.GetAssociatedAttributeType(node);
+            var newName = SyntaxFactory.IdentifierName(attributeTypeName);
 
             return node.WithName(newName);
         }
@@ -61,7 +60,7 @@ namespace OleVanSanten.TestTools
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             // Only methods marked with an attritubes that are marked with TemplatedAttribute should be rewritten
-            if (_resolver.GetEquivalentAttribute(node) == null)
+            if (!_resolver.HasTemplatedAttribute(node))
                 return node;
 
             // Rewritting the method body to switch out all FromNamespace members with ToNamespace members
@@ -78,12 +77,11 @@ namespace OleVanSanten.TestTools
             }
             catch (VerifierServiceException ex)
             {
-                var exceptionAttribute = _resolver.GetEquivalentException(node);
-                var exceptionType = exceptionAttribute?.EquavilentException ?? "Exception";
-                var throwStatement = $"throw new {exceptionType}(\"{ex.Message}\");";
+                var templatedAttribute = node.AttributeLists.SelectMany(l => l.Attributes).First(_resolver.IsTemplatedAttribute);
+                var exceptionTypeName = _resolver.GetAssociatedExceptionType(templatedAttribute);
+                var throwStatement = $"throw new {exceptionTypeName}(\"{ex.Message}\");";
                 newBody = (BlockSyntax)SyntaxFactory.ParseStatement("{" + throwStatement + "}");
             }
-
             return node.WithBody(newBody).WithAttributeLists(newAttributeLists);
         }
     }

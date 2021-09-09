@@ -19,16 +19,20 @@ namespace OleVanSanten.TestTools
 
         MethodDescription GetMethodDescription(MethodDeclarationSyntax node);
 
-        EquivalentAttributeAttribute GetEquivalentAttribute(AttributeSyntax node);
+        bool IsTemplatedAttribute(AttributeSyntax node);
 
-        EquivalentAttributeAttribute GetEquivalentAttribute(ClassDeclarationSyntax node);
+        bool HasTemplatedAttribute(ClassDeclarationSyntax node);
 
-        EquivalentAttributeAttribute GetEquivalentAttribute(MethodDeclarationSyntax node);
+        bool HasTemplatedAttribute(MethodDeclarationSyntax node);
 
-        EquivalentExceptionAttribute GetEquivalentException(MethodDeclarationSyntax node);
+        string GetAssociatedAttributeType(AttributeSyntax node);
+
+        string GetAssociatedExceptionType(AttributeSyntax node);
 
         TypeDescription GetTypeDescription(TypeDeclarationSyntax node);
 
         TypeDescription GetTypeDescription(VariableDeclarationSyntax node);
+
+        TypeDescription GetTypeDescription(AttributeSyntax node);
     }
 }

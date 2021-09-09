@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="BeforeBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project InitialTargets="BeforeCompile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 	<PropertyGroup>
 		<GenerateAssemblyVersionInfo Condition=" '$(GenerateAssemblyVersionInfo)' == '' and '$(TargetExt)' != '.dll' and '$(TargetExt)' != '.exe'">false</GenerateAssemblyVersionInfo>
 		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
@@ -10,7 +10,7 @@
 		<ConfigPath>$(SolutionDir)TestToolsConfig.xml</ConfigPath>
 	</PropertyGroup>
 
-	<Target Name="TemplateUnitTests" DependsOnTargets="BeforeBuild">
+	<Target Name="BeforeCompile">
 		<Message Importance="high" Text="ExePath = $(ExePath)"/>
 		<Message Importance="high" Text="SolutionPath = $(SolutionPath)"/>
 		<Message Importance="high" Text="MSBuildProjectName = $(MSBuildProjectName)"/>

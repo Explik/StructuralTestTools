@@ -69,44 +69,32 @@ namespace OleVanSanten.TestTools
             return new CompileTimeMethodDescription(_compilation, methodSymbol);
         }
 
-        // Returns TemplatedAttribute object if attribute class is marked with [TemplatedAttribute]
-        public EquivalentAttributeAttribute GetEquivalentAttribute(AttributeSyntax node)
+        public bool IsTemplatedAttribute(AttributeSyntax node)
         {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var attributeSymbol = semanticModel.GetSymbolInfo(node).Symbol;
-            var attributeClass = attributeSymbol.ContainingType;
-            var attributeDescription = new CompileTimeTypeDescription(_compilation, attributeClass);
-
-            // Check if it contains any TemplateEquivalentAttribute at all
-            var targetAttribute = new RuntimeTypeDescription(typeof(EquivalentAttributeAttribute));
-            if (!attributeDescription.GetCustomAttributeTypes().Contains(targetAttribute))
-                return null;
-
-            return attributeDescription.GetCustomAttributes().OfType<EquivalentAttributeAttribute>().FirstOrDefault();
+            var attributeType = GetTypeDescription(node);
+            return TemplatedAttributes.IsTemplatedAttribute(attributeType);
         }
 
-        public EquivalentAttributeAttribute GetEquivalentAttribute(ClassDeclarationSyntax node)
+        public bool HasTemplatedAttribute(ClassDeclarationSyntax node)
         {
-            var type = GetTypeDescription(node);
-            var attributesOfAttributes = type.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
-
-            return attributesOfAttributes.OfType<EquivalentAttributeAttribute>().FirstOrDefault();
+            return node.AttributeLists.Any(l => l.Attributes.Any(IsTemplatedAttribute));
         }
 
-        public EquivalentAttributeAttribute GetEquivalentAttribute(MethodDeclarationSyntax node)
+        public bool HasTemplatedAttribute(MethodDeclarationSyntax node)
         {
-            var method = GetMethodDescription(node);
-            var attributesOfAttributes = method.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
-
-            return attributesOfAttributes.OfType<EquivalentAttributeAttribute>().FirstOrDefault();
+            return node.AttributeLists.Any(l => l.Attributes.Any(IsTemplatedAttribute));
         }
 
-        public EquivalentExceptionAttribute GetEquivalentException(MethodDeclarationSyntax node)
+        public string GetAssociatedAttributeType(AttributeSyntax node)
         {
-            var method = GetMethodDescription(node);
-            var attributesOfAttributes = method.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
+            var attributeType = GetTypeDescription(node);
+            return TemplatedAttributes.GetAssociatedAttributeTypeName(attributeType);
+        }
 
-            return attributesOfAttributes.OfType<EquivalentExceptionAttribute>().FirstOrDefault();
+        public string GetAssociatedExceptionType(AttributeSyntax node)
+        {
+            var attributeType = GetTypeDescription(node);
+            return TemplatedAttributes.GetAssociatedExceptionTypeName(attributeType);
         }
 
         public TypeDescription GetTypeDescription(TypeDeclarationSyntax node)
@@ -123,6 +111,15 @@ namespace OleVanSanten.TestTools
             var typeSymbol = semanticModel.GetTypeInfo(node.Type).Type;
 
             return new CompileTimeTypeDescription(_compilation, typeSymbol);
+        }
+
+        public TypeDescription GetTypeDescription(AttributeSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var attributeSymbolInfo = semanticModel.GetSymbolInfo(node);
+            var attributeSymbol = attributeSymbolInfo.Symbol ?? attributeSymbolInfo.CandidateSymbols.First();
+            
+            return new CompileTimeTypeDescription(_compilation, attributeSymbol.ContainingType);
         }
     }
 }

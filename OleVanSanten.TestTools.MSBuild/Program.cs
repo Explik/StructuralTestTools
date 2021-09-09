@@ -47,8 +47,7 @@ namespace OleVanSanten.TestTools
             {
                 workspace.WorkspaceFailed += (sender, args) => Console.WriteLine(args.Diagnostic.Message);
                 var solution = workspace.OpenSolutionAsync(solutionPath).Result;
-                var project = GetProject(solution, projectName);
-                var compilation = CompileProject(project);
+                var compilation = CompileProject(solution, projectName);
 
                 var configuration = GetConfiguration(configPath);
                 configuration.GlobalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
@@ -60,7 +59,7 @@ namespace OleVanSanten.TestTools
                 var nodes = compilation.SyntaxTrees.SelectMany(t => RetreiveClassDeclarations(t));
                 foreach (var node in nodes)
                 {
-                    if (!HasTemplatedAttribute(node))
+                    if (!syntaxResolver.HasTemplatedAttribute(node))
                         continue;
 
                     var fileName = $"{node.Identifier}.g.cs";
@@ -71,17 +70,22 @@ namespace OleVanSanten.TestTools
             }
         }
 
-        private static Project GetProject(Solution solution, string projectName)
+        private static Compilation CompileProject(Solution solution, string projectName)
         {
-            var projectGraph = solution.GetProjectDependencyGraph();
-            var projectIds = projectGraph.GetTopologicallySortedProjects();
-            var projects = projectIds.Select(projectId => solution.GetProject(projectId));
-            var project = projects.SingleOrDefault(p => p.Name == projectName);
+            Compilation compilation = null;
 
-            if (project == null)
+            var projectTree = solution.GetProjectDependencyGraph();
+            foreach(var projectId in projectTree.GetTopologicallySortedProjects())
+            {
+                var project = solution.GetProject(projectId);
+                var projectCompilation = CompileProject(project);
+                if (project.Name == projectName) compilation = projectCompilation;
+            }
+
+            if (compilation == null)
                 throw new ArgumentException("Solution does not contain project with name: " + projectName);
 
-            return project;
+            return compilation;
         }
 
         private static Compilation CompileProject(Project project)
@@ -97,7 +101,18 @@ namespace OleVanSanten.TestTools
                     project = project.AddDocument(csFile.FullName, File.ReadAllText(csFile.FullName)).Project;
                 }
             }
-            return project.GetCompilationAsync().Result;
+
+            // Compile project
+            var compilation = project.GetCompilationAsync().Result;
+            var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error);
+
+            if(errors.Any())
+            {
+                Console.WriteLine("COMPILATION ERROR: {0}: {1} compilation errors:");
+                foreach (var error in errors)
+                    Console.WriteLine(error.ToString());
+            }
+            return compilation;
         }
 
         private static XMLConfiguration GetConfiguration(string configPath)
