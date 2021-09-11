@@ -8,13 +8,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.6" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.6" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
     <PackageReference Include="coverlet.collector" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OleVanSanten.TestTools.MSBuild" Version="1.0.30">
+    <PackageReference Include="OleVanSanten.TestTools.MSBuild" Version="1.0.35">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -23,8 +23,5 @@
   <ItemGroup>
     <ProjectReference Include="..\OleVanSanten.TestTools.Core\OleVanSanten.TestTools.Core.csproj" />
   </ItemGroup>
-	
-  <!--<Target Name="CreateUnitTests" DependsOnTargets="TemplateUnitTests" />-->
-  <!--<Target Name="CreateUnitTests" />-->
 	
 </Project>

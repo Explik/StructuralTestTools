@@ -17,6 +17,6 @@
 		<Message Importance="high" Text="ConfigPath = $(ConfigPath)"/>
 		<Message Importance="high" Text='Command= "$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"'/>
 		
-		<Exec Command='"$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' ConsoleToMSBuild="true" />
+		<Exec Condition="'$(SolutionPath)' != ''" Command='"$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' ConsoleToMSBuild="true" />
 	</Target>
 </Project>
