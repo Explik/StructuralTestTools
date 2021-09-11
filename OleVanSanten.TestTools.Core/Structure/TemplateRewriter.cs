@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OleVanSanten.TestTools;
+using Microsoft.CodeAnalysis.Text;
+using System.IO;
 
 namespace OleVanSanten.TestTools
 {
@@ -77,12 +79,45 @@ namespace OleVanSanten.TestTools
             }
             catch (VerifierServiceException ex)
             {
-                var templatedAttribute = node.AttributeLists.SelectMany(l => l.Attributes).First(_resolver.IsTemplatedAttribute);
-                var exceptionTypeName = _resolver.GetAssociatedExceptionType(templatedAttribute);
-                var throwStatement = $"throw new {exceptionTypeName}(\"{ex.Message}\");";
-                newBody = (BlockSyntax)SyntaxFactory.ParseStatement("{" + throwStatement + "}");
+                var newBodySource = string.Join(
+                    Environment.NewLine,
+                    "{",
+                    "// == Failed To Compile ==",
+                    CreateComments(node),
+                    CreateThrowStatement(node, ex),
+                    "}");
+                newBody = (BlockSyntax)SyntaxFactory.ParseStatement(newBodySource);
             }
             return node.WithBody(newBody).WithAttributeLists(newAttributeLists);
+        }
+
+        private string CreateComments(MethodDeclarationSyntax node)
+        {
+            return string.Join(Environment.NewLine, node.Body.Statements.Select(CreateComment));
+        }
+
+        private string CreateComment(SyntaxNode node)
+        {
+            var builder = new StringBuilder();
+            var source = SourceText.From(node.NormalizeWhitespace().ToFullString(), Encoding.UTF8).ToString();
+            
+            using(StringReader sr = new StringReader(source))
+            {
+                string line;
+                while((line = sr.ReadLine()) != null)
+                {
+                    builder.Append("// " + line + Environment.NewLine);
+                }
+            }
+            return builder.ToString();
+        }
+
+        private string CreateThrowStatement(MethodDeclarationSyntax node, VerifierServiceException ex)
+        {
+            var templatedAttribute = node.AttributeLists.SelectMany(l => l.Attributes).First(_resolver.IsTemplatedAttribute);
+            var exceptionTypeName = _resolver.GetAssociatedExceptionType(templatedAttribute);
+            var throwStatement = $"throw new {exceptionTypeName}(\"{ex.Message}\");";
+            return throwStatement;
         }
     }
 }
