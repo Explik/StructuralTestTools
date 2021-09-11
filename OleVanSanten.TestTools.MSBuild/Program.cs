@@ -78,7 +78,7 @@ namespace OleVanSanten.TestTools
             foreach(var projectId in projectTree.GetTopologicallySortedProjects())
             {
                 var project = solution.GetProject(projectId);
-                var projectCompilation = CompileProject(project);
+                var projectCompilation = CompileProject(project, project.Name == projectName);
                 if (project.Name == projectName) compilation = projectCompilation;
             }
 
@@ -88,7 +88,7 @@ namespace OleVanSanten.TestTools
             return compilation;
         }
 
-        private static Compilation CompileProject(Project project)
+        private static Compilation CompileProject(Project project, bool skipGeneratedFiles)
         {
             // Some project formats do not include files to compile, so the .cs files contained in the project
             // directory are included by default.
@@ -96,9 +96,21 @@ namespace OleVanSanten.TestTools
             {
                 var projectFile = new FileInfo(project.FilePath);
                 var csFiles = projectFile.Directory.GetFiles("*.cs", SearchOption.AllDirectories);
+                
                 foreach(var csFile in csFiles)
                 {
                     project = project.AddDocument(csFile.FullName, File.ReadAllText(csFile.FullName)).Project;
+                }
+            }
+
+            // Removing generated files from earlier run as these might cause the compilation to fail.
+            if (skipGeneratedFiles)
+            {
+                var generatedDocuments = project.Documents.Where(d => d.Name.EndsWith(".g.cs"));
+
+                foreach (var document in generatedDocuments)
+                {
+                    project = project.RemoveDocument(document.Id);
                 }
             }
 
