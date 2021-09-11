@@ -63,9 +63,12 @@ namespace OleVanSanten.TestTools
                         continue;
 
                     var fileName = $"{node.Identifier}.g.cs";
+                    var filePath = solutionDirectory + "\\" + fileName;
                     var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
                     var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
-                    File.WriteAllText(solutionDirectory + "\\" + fileName, source.ToString());
+                    File.SetAttributes(filePath, FileAttributes.Normal);
+                    File.WriteAllText(filePath, source.ToString());
+                    File.SetAttributes(filePath, FileAttributes.ReadOnly);
                 }
             }
         }
