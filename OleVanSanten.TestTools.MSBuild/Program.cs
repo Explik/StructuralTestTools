@@ -62,12 +62,14 @@ namespace OleVanSanten.TestTools
                     if (!syntaxResolver.HasTemplatedAttribute(node))
                         continue;
 
-                    var fileName = $"{node.Identifier}.g.cs";
-                    var filePath = configDirectory + "\\" + fileName;
                     var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
-                    var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
+                    var rewrittenClassName = RetreiveClassDeclarations(rewrittenNode.SyntaxTree).First().Identifier;
+                    var rewrittenSource = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
+
+                    var fileName = $"{rewrittenClassName}.g.cs";
+                    var filePath = configDirectory + "\\" + fileName; 
                     if(File.Exists(filePath)) File.SetAttributes(filePath, FileAttributes.Normal);
-                    File.WriteAllText(filePath, source.ToString());
+                    File.WriteAllText(filePath, rewrittenSource.ToString());
                     File.SetAttributes(filePath, FileAttributes.ReadOnly);
                 }
             }

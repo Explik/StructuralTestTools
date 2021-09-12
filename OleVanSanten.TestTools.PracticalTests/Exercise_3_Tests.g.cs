@@ -1,14 +1,12 @@
 using Lecture_2_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OleVanSanten.TestTools.Expressions;
+using OleVanSanten.TestTools;
 using OleVanSanten.TestTools.MSTest;
-using OleVanSanten.TestTools.Structure;
 using static Lecture_2_Tests.TestHelper;
-using static OleVanSanten.TestTools.Expressions.TestExpression;
 
 namespace Lecture_2_Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public class Exercise_3_Tests
     {
 #region Exercise 3A
@@ -32,10 +30,13 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ImmutableNumber constructor with int as argument sets value property"), TestCategory("Exercise 3B")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("b. ImmutableNumber constructor with int as argument sets value property"), TestCategory("Exercise 3B")]
         public void ImmutableNumberConstructorWithIntAsArgumentSetsValueProperty()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public (AUTO)");
+            // == Failed To Compile ==
+            // ImmutableNumber number = new ImmutableNumber(2);
+            // Assert.AreEqual(2, number.Value);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public");
         }
 
 #endregion
@@ -49,10 +50,15 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ImmutableNumber.Add performs 1 + 2 = 3"), TestCategory("Exercise 3C")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("b. ImmutableNumber.Add performs 1 + 2 = 3"), TestCategory("Exercise 3C")]
         public void AddProducesExpectedResult()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public (AUTO)");
+            // == Failed To Compile ==
+            // ImmutableNumber number1 = new ImmutableNumber(1);
+            // ImmutableNumber number2 = new ImmutableNumber(2);
+            // ImmutableNumber number3 = number1.Add(number2);
+            // Assert.AreEqual(3, number3.Value);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public");
         }
 
         [TestMethod("c. ImmutableNumber.Subtract takes ImmutableNumber as argument and returns ImmutableNumber"), TestCategory("Exercise 3C")]
@@ -64,10 +70,15 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("d. ImmutableNumber.Subtract performs 8 - 3 = 5"), TestCategory("Exercise 3C")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("d. ImmutableNumber.Subtract performs 8 - 3 = 5"), TestCategory("Exercise 3C")]
         public void SubstractProducesExpectedResult()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public (AUTO)");
+            // == Failed To Compile ==
+            // ImmutableNumber number1 = new ImmutableNumber(8);
+            // ImmutableNumber number2 = new ImmutableNumber(3);
+            // ImmutableNumber number3 = number1.Subtract(number2);
+            // Assert.AreEqual(5, number3.Value);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public");
         }
 
         [TestMethod("e. ImmutableNumber.Multiply takes ImmutableNumber as argument and returns ImmutableNumber"), TestCategory("Exercise 3C")]
@@ -79,10 +90,15 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("f. ImmutableNumber.Multiply performs 2 * 3 = 6"), TestCategory("Exercise 3C")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("f. ImmutableNumber.Multiply performs 2 * 3 = 6"), TestCategory("Exercise 3C")]
         public void MultiplyProducesExpectedResult()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public (AUTO)");
+            // == Failed To Compile ==
+            // ImmutableNumber number1 = new ImmutableNumber(2);
+            // ImmutableNumber number2 = new ImmutableNumber(3);
+            // ImmutableNumber number3 = number1.Multiply(number2);
+            // Assert.AreEqual(6, number3.Value);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("ImmutableNumber is not public");
         }
 #endregion
     }

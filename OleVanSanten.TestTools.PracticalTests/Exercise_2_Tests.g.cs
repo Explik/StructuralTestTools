@@ -1,14 +1,12 @@
 using Lecture_2_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OleVanSanten.TestTools.Expressions;
+using OleVanSanten.TestTools;
 using OleVanSanten.TestTools.MSTest;
-using OleVanSanten.TestTools.Structure;
 using static Lecture_2_Tests.TestHelper;
-using static OleVanSanten.TestTools.Expressions.TestExpression;
 
 namespace Lecture_2_Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public class Exercise_2_Tests
     {
 #region Exercise 2A
@@ -32,10 +30,13 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("b. Number constructor with int as argument sets value property"), TestCategory("Exercise 2B")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("b. Number constructor with int as argument sets value property"), TestCategory("Exercise 2B")]
         public void NumberConstructorWithIntAsArgumentSetsValueProperty()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public (AUTO)");
+            // == Failed To Compile ==
+            // Number number = new Number(2);
+            // Assert.AreEqual(number.Value, 2);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public");
         }
 
 #endregion
@@ -49,10 +50,15 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("b. Number.Add performs 1 + 2 = 3"), TestCategory("Exercise 2C")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("b. Number.Add performs 1 + 2 = 3"), TestCategory("Exercise 2C")]
         public void AddProducesExpectedResult()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public (AUTO)");
+            // == Failed To Compile ==
+            // Number number1 = new Number(1);
+            // Number number2 = new Number(2);
+            // number1.Add(number2);
+            // Assert.AreEqual(3, number1.Value);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public");
         }
 
         [TestMethod("c. Number.Subtract takes Number as argument and returns nothing"), TestCategory("Exercise 2C")]
@@ -64,10 +70,15 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("d. Number.Subtract performs 8 - 3 = 5"), TestCategory("Exercise 2C")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("d. Number.Subtract performs 8 - 3 = 5"), TestCategory("Exercise 2C")]
         public void SubtractProducesExpectedResult()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public (AUTO)");
+            // == Failed To Compile ==
+            // Number number1 = new Number(8);
+            // Number number2 = new Number(3);
+            // number1.Subtract(number2);
+            // Assert.AreEqual(5, number1.Value);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public");
         }
 
         [TestMethod("e. Number.Multiply takes Number as argument and returns nothing"), TestCategory("Exercise 2C")]
@@ -79,10 +90,15 @@ namespace Lecture_2_Tests
             test.Execute();
         }
 
-        [TestMethod("f. Number.Multiply performs 2 * 3 = 6"), TestCategory("Exercise 2C")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("f. Number.Multiply performs 2 * 3 = 6"), TestCategory("Exercise 2C")]
         public void MultiplyProducesExpectedResult()
         {
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public (AUTO)");
+            // == Failed To Compile ==
+            // Number number1 = new Number(2);
+            // Number number2 = new Number(3);
+            // number1.Multiply(number2);
+            // Assert.AreEqual(6, number1.Value);
+            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Number is not public");
         }
 #endregion
     }

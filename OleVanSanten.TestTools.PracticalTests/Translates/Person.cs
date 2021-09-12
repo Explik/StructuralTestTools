@@ -8,6 +8,6 @@ namespace Lecture_2
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        int Age;
+        //public int Age { get; set; }
     }
 }
