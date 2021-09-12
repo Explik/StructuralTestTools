@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>OleVanSanten.TestTools.MSBuild</id>
-		<version>1.0.54</version>
+		<version>1.0.58</version>
 		<title>OleVanSanten.TestTools.MSBuild</title>
 		<authors>Ole van Santen</authors>
 		<owners>olevansanten</owners>
@@ -15,7 +15,7 @@
 			members might be missing or in other ways be invalid. This ensures that if the user's code compiles the test code
 			will as well.
 		</description>
-		<tags>unit-tests</tags>
+		<tags>testing</tags>
 		<repository type="git" url="https://github.com/OleVanSanten/structural-testtool.git"/>
 	</metadata>
 	

@@ -33,19 +33,19 @@ namespace OleVanSanten.TestTools
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex);
+                Log(ex.Message);
             }
             RunTemplateUnitTests(solutionPath, projectName, configPath);
         }
         
         private static void RunTemplateUnitTests(string solutionPath, string projectName, string configPath)
         {
-            var solutionFile = new FileInfo(solutionPath);
-            var solutionDirectory = solutionFile.Directory;
+            var configFile = new FileInfo(configPath);
+            var configDirectory = configFile.Directory;
 
             using (var workspace = MSBuildWorkspace.Create())
             {
-                workspace.WorkspaceFailed += (sender, args) => Console.WriteLine(args.Diagnostic.Message);
+                workspace.WorkspaceFailed += (sender, args) => Log(args.Diagnostic.Message);
                 var solution = workspace.OpenSolutionAsync(solutionPath).Result;
                 var compilation = CompileProject(solution, projectName);
 
@@ -63,10 +63,10 @@ namespace OleVanSanten.TestTools
                         continue;
 
                     var fileName = $"{node.Identifier}.g.cs";
-                    var filePath = solutionDirectory + "\\" + fileName;
+                    var filePath = configDirectory + "\\" + fileName;
                     var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
                     var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
-                    File.SetAttributes(filePath, FileAttributes.Normal);
+                    if(File.Exists(filePath)) File.SetAttributes(filePath, FileAttributes.Normal);
                     File.WriteAllText(filePath, source.ToString());
                     File.SetAttributes(filePath, FileAttributes.ReadOnly);
                 }
@@ -123,9 +123,9 @@ namespace OleVanSanten.TestTools
 
             if(errors.Any())
             {
-                Console.WriteLine("COMPILATION ERROR: {0}: {1} compilation errors:");
+                Log("COMPILATION ERROR: {0}: {1} compilation errors:");
                 foreach (var error in errors)
-                    Console.WriteLine(error.ToString());
+                    Log(error.ToString());
             }
             return compilation;
         }
@@ -144,10 +144,12 @@ namespace OleVanSanten.TestTools
             return visitor.Classes;
         }
 
-        private static bool HasTemplatedAttribute(ClassDeclarationSyntax node)
+        // Only logs lines in debug mode, so it does not show up when using the OleVanSanten.TestTools.MSBuild package. 
+        private static void Log(string message)
         {
-            var attributes = node.AttributeLists.SelectMany(l => l.Attributes);
-            return attributes.Any(a => a.Name.ToString().Contains("Templated"));
+#if DEBUG
+            Console.WriteLine(message);
+#endif
         }
 
         class ClassVirtualizationVisitor : CSharpSyntaxRewriter
