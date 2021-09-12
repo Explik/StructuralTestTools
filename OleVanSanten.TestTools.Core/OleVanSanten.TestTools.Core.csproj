@@ -1,11 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-	<DebugType>Full</DebugType>
-	<IsPackable>false</IsPackable>
-	<PackageId>OleVanSanten.TestTools.Core</PackageId>
-	<NuSpecFile>OleVanSanten.TestTools.Core.nuspec</NuSpecFile>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Authors>OleVanSanten</Authors>
+	<Description>OleVanSanten TestTools Core</Description>
+	<Version>1.0.0</Version>
   </PropertyGroup>
 	
   <ItemGroup>
