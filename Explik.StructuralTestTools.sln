@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Explik.StructuralTestTools.Core", "Explik.StructuralTestTools.Core\Explik.StructuralTestTools.Core.csproj", "{963613A7-3970-489C-B58D-1CC484A7715C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Explik.StructuralTestTools.MSBuild", "Explik.StructuralTestTools.MSBuild\Explik.StructuralTestTools.MSBuild.csproj", "{83D6515D-4EA2-4572-B019-925C57B3FD00}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Explik.StructuralTestTools.MSBuild.Tasks", "Explik.StructuralTestTools.MSBuild.Tasks\Explik.StructuralTestTools.MSBuild.Tasks.csproj", "{7C86148A-1F54-461B-818F-48C89121A3D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Explik.StructuralTestTools.Core.Tests", "Explik.StructuralTestTools.Core.Tests\Explik.StructuralTestTools.Core.Tests.csproj", "{40A86E24-DC26-45C6-819E-DFB1F3142103}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{963613A7-3970-489C-B58D-1CC484A7715C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{963613A7-3970-489C-B58D-1CC484A7715C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{963613A7-3970-489C-B58D-1CC484A7715C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{963613A7-3970-489C-B58D-1CC484A7715C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D6515D-4EA2-4572-B019-925C57B3FD00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D6515D-4EA2-4572-B019-925C57B3FD00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D6515D-4EA2-4572-B019-925C57B3FD00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D6515D-4EA2-4572-B019-925C57B3FD00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C86148A-1F54-461B-818F-48C89121A3D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C86148A-1F54-461B-818F-48C89121A3D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C86148A-1F54-461B-818F-48C89121A3D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C86148A-1F54-461B-818F-48C89121A3D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40A86E24-DC26-45C6-819E-DFB1F3142103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40A86E24-DC26-45C6-819E-DFB1F3142103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40A86E24-DC26-45C6-819E-DFB1F3142103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40A86E24-DC26-45C6-819E-DFB1F3142103}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D2FDAA01-FB85-464B-9AFD-F5C897D3585A}
+	EndGlobalSection
+EndGlobal

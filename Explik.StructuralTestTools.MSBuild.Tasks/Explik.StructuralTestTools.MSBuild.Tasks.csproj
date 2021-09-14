@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<NuSpecFile>Explik.StructuralTestTools.MSBuild.nuspec</NuSpecFile>
+
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+
+		<!-- Note that https://github.com/NuGet/Home/issues/4694 prevents this from actually working. -->
+		<developmentDependency>true</developmentDependency>
+
+		<!-- We're going to include it by virtue of sending the whole bin dir to the build folder. -->
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+	
+	<Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec">
+		<PropertyGroup>
+			<NuspecProperties>$(NuspecProperties);outputPath=$(OutputPath)</NuspecProperties>
+		</PropertyGroup>
+	</Target>
+
+	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+		<PropertyGroup>
+			<BuildSubDir Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">MSBuildCore\</BuildSubDir>
+			<BuildSubDir Condition=" '$(TargetFramework)' == 'net472' ">MSBuildFull\</BuildSubDir>
+		</PropertyGroup>
+		<Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' " />
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(OutputPath)**\*.dll">
+				<PackagePath>build\$(BuildSubDir)</PackagePath>
+			</TfmSpecificPackageFile>
+		</ItemGroup>
+	</Target>
+	
+  <ItemGroup>
+    <None Include="build\**">
+      <Pack>true</Pack>
+      <PackagePath>build\</PackagePath>
+    </None>
+    <None Include="buildCrossTargeting\**">
+      <Pack>true</Pack>
+      <PackagePath>buildCrossTargeting\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <PackageReference>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <ProjectReference>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472' ">
+	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+    <!--<PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />-->
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <!--<PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />-->
+	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Explik.StructuralTestTools.MSBuild\Explik.StructuralTestTools.MSBuild.csproj" />
+  </ItemGroup>
+</Project>

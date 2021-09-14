@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <FromNamespace>Lecture_2_Solutions</FromNamespace>
+  <ToNamespace>Lecture_2</ToNamespace>
+  
+  <TypeTranslator Type="Explik.StructuralTestTools.SameNameTypeTranslator"/>
+  <MemberTranslator Type="Explik.StructuralTestTools.SameNameMemberTranslator"/>
+
+  <TypeVerifiers>
+    <TypeVerifier Type="Explik.StructuralTestTools.UnchangedTypeAccessLevelVerifier"/>
+    <TypeVerifier Type="Explik.StructuralTestTools.UnchangedTypeIsAbstractVerifier"/>
+    <TypeVerifier Type="Explik.StructuralTestTools.UnchangedTypeIsStaticVerifier"/>
+  </TypeVerifiers>
+
+  <MemberVerifiers>
+    <MemberVerifier Type="Explik.StructuralTestTools.UnchangedFieldTypeVerifier"/>
+    <MemberVerifier Type="Explik.StructuralTestTools.UnchangedMemberAccessLevelVerifier"/>
+    <MemberVerifier Type="Explik.StructuralTestTools.UnchangedMemberDeclaringType"/>
+    <MemberVerifier Type="Explik.StructuralTestTools.UnchangedMemberIsStaticVerifier"/>
+    <MemberVerifier Type="Explik.StructuralTestTools.UnchangedMemberIsVirtualVerifier"/>
+    <MemberVerifier Type="Explik.StructuralTestTools.UnchangedMemberTypeVerifier"/>
+    <MemberVerifier Type="Explik.StructuralTestTools.UnchangedPropertyTypeVerifier"/>
+  </MemberVerifiers>
+</Config>

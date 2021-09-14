@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+	<metadata>
+		<id>Explik.StructuralTestTools.MSBuild</id>
+		<version>1.0.0</version>
+		<title>Explik.StructuralTestTools.MSBuild</title>
+		<authors>Ole van Santen</authors>
+		<owners>olevansanten</owners>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<developmentDependency>true</developmentDependency>
+		<license type="expression">NONE</license>
+		<projectUrl>https://github.com/OleVanSanten/structural-testtool</projectUrl>
+		<description>
+			Structural TestTools is a unit test rewriter for C#. It allows for testing of user-implemented types, even though 
+			members might be missing or in other ways be invalid. This ensures that if the user's code compiles the test code
+			will as well.
+		</description>
+		<tags>testing</tags>
+		<repository type="git" url="https://github.com/OleVanSanten/structural-testtool.git"/>
+	</metadata>
+	
+	<files>
+		<!--<file src="$outputPath$net472\Explik.StructuralTestTools.MSBuild.dll" target="build\MSBuildFull\Explik.StructuralTestTools.MSBuild.dll" />
+		<file src="$outputPath$net472\Explik.StructuralTestTools.MSBuild.Tasks.dll" target="build\MSBuildFull\Explik.StructuralTestTools.MSBuild.Tasks.dll" />
+		<file src="$outputPath$net472\Microsoft.CodeAnalysis.dll" target="build\MSBuildFull\Microsoft.CodeAnalysis.dll" />
+		<file src="$outputPath$net472\Microsoft.CodeAnalysis.Workspaces.dll" target="build\MSBuildFull\Microsoft.CodeAnalysis.Workspaces.dll" />
+		<file src="$outputPath$net472\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" target="build\MSBuildFull\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" />
+		<file src="$outputPath$net472\Microsoft.Build.Locator.dll" target="build\MSBuildFull\Microsoft.Build.Locator.dll" />
+
+		<file src="$outputPath$netcoreapp3.1\Explik.StructuralTestTools.MSBuild.dll" target="build\MSBuildCore\Explik.StructuralTestTools.MSBuild.dll" />
+		<file src="$outputPath$netcoreapp3.1\Explik.StructuralTestTools.MSBuild.Tasks.dll" target="build\MSBuildCore\Explik.StructuralTestTools.MSBuild.Tasks.dll" />
+		<file src="$outputPath$netcoreapp3.1\Microsoft.CodeAnalysis.dll" target="build\MSBuildCore\Microsoft.CodeAnalysis.dll" />
+		<file src="$outputPath$netcoreapp3.1\Microsoft.CodeAnalysis.Workspaces.dll" target="build\MSBuildCore\Microsoft.CodeAnalysis.Workspaces.dll" />
+		<file src="$outputPath$netcoreapp3.1\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" target="build\MSBuildCore\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" />
+		<file src="$outputPath$netcoreapp3.1\Microsoft.Build.Locator.dll" target="build\MSBuildCore\Microsoft.Build.Locator.dll" />-->
+
+		<file src="$outputPath$netcoreapp3.1\**\*" target="build\" />
+		
+		<file src="build\Explik.StructuralTestTools.MSBuild.targets" target="build\Explik.StructuralTestTools.MSBuild.targets" />
+		<file src="buildCrossTargeting\Explik.StructuralTestTools.MSBuild.targets" target="buildCrossTargeting\Explik.StructuralTestTools.MSBuild.targets" />
+	</files>
+</package>
