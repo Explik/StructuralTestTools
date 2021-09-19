@@ -49,9 +49,7 @@ namespace Explik.StructuralTestTools
                 var solution = workspace.OpenSolutionAsync(solutionPath).Result;
                 var compilation = CompileProject(solution, projectName);
 
-                var configContent = File.ReadAllText(configPath);
-                var globalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
-                var configuration = Configuration.CreateFromXMLWithDefaults(globalNamespace, configContent);
+                var configuration = CreateConfiguration(configPath, compilation);
 
                 var syntaxResolver = new CompileTimeDescriptionResolver(compilation);
                 var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
@@ -68,12 +66,24 @@ namespace Explik.StructuralTestTools
                     var rewrittenSource = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
 
                     var fileName = $"{rewrittenClassName}.g.cs";
-                    var filePath = configDirectory + "\\" + fileName; 
-                    if(File.Exists(filePath)) File.SetAttributes(filePath, FileAttributes.Normal);
+                    var filePath = configDirectory + "\\" + fileName;
+                    if (File.Exists(filePath)) File.SetAttributes(filePath, FileAttributes.Normal);
                     File.WriteAllText(filePath, rewrittenSource.ToString());
                     File.SetAttributes(filePath, FileAttributes.ReadOnly);
                 }
             }
+        }
+
+        private static IConfiguration CreateConfiguration(string configPath, Compilation compilation)
+        {
+            var globalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
+            
+            if (File.Exists(configPath))
+            {
+                var configContent = File.ReadAllText(configPath);
+                return Configuration.CreateFromXMLWithDefaults(globalNamespace, configContent);
+            }
+            else return Configuration.CreateDefault(globalNamespace);
         }
 
         private static Compilation CompileProject(Solution solution, string projectName)
