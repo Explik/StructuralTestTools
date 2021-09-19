@@ -21,6 +21,9 @@
 		<Message Importance="low" Text="ConfigPath = $(ConfigPath)" />
 		<Message Importance="low" Text='Command = "$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' />
 
-		<Exec Condition="$(ShouldRun)" Command='"$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' ConsoleToMSBuild="true" />
+		<Exec Condition="$(ShouldRun)" 
+			  Command='"$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' 
+			  ConsoleToMSBuild="true" 
+			  ContinueOnError="true"/>
 	</Target>
 </Project>
