@@ -91,6 +91,10 @@ public class Customer {}
 ```
 
 The project-wide TypeVerifier can be overwritten in the same way as TypeTranslator. 
+```C#
+[StaticClass]
+public class ArrayHelper {}
+```
 
 The project-wide MemberTranslator can be overwritten for a single member, if the member is associated with an attribute implemeting <code>IMemberTranslator</code>. The following shows how the default member translation approach can be overwritten. The default approach is to translate the member CalculateSalary to CalculateSalary on the translated type. The new approach is to translate CalculateSalary to either CalculateSalary or CalculateYearlySalary on the translated type.
 ```C#
