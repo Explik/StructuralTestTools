@@ -28,12 +28,9 @@ namespace Explik.StructuralTestTools.MSTest
 
         public static TestFactory CreateFromConfigurationFile(string pathToConfigFile)
         {
-            string configFileContent = File.ReadAllText(pathToConfigFile);
-            var configuration = new XMLConfiguration(configFileContent)
-            {
-                GlobalNamespace = new RuntimeNamespaceDescription("")
-            };
-            VerifierService verifierService = new VerifierService()
+            var configFileContent = File.ReadAllText(pathToConfigFile);
+            var configuration = Configuration.CreateFromXMLWithDefaults(new RuntimeNamespaceDescription(""), configFileContent);
+            var verifierService = new VerifierService()
             {
                 ExceptionType = RuntimeTypeDescription.Create("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException").Type
             };
@@ -46,5 +43,7 @@ namespace Explik.StructuralTestTools.MSTest
                 TypeVisitor = typeVisitor
             };
         }
+
+        
     }
 }

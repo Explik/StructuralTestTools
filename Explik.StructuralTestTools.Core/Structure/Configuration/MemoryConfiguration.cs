@@ -19,12 +19,12 @@ namespace Explik.StructuralTestTools
         public IMemberTranslator MemberTranslator { get; set; }
 
 
-        public ITypeVerifier[] TypeVerifiers { get; set; } = new ITypeVerifier[0];
+        public ITypeVerifier[] TypeVerifiers { get; set; }
 
-        public TypeVerificationAspect[] TypeVerificationOrder { get; set; } = new TypeVerificationAspect[0];
+        public TypeVerificationAspect[] TypeVerificationOrder { get; set; }
 
-        public IMemberVerifier[] MemberVerifiers { get; set; } = new IMemberVerifier[0];
+        public IMemberVerifier[] MemberVerifiers { get; set; }
 
-        public MemberVerificationAspect[] MemberVerificationOrder { get; set; } = new MemberVerificationAspect[0];
+        public MemberVerificationAspect[] MemberVerificationOrder { get; set; }
     }
 }

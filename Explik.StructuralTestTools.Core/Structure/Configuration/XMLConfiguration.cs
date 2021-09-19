@@ -84,7 +84,7 @@ namespace Explik.StructuralTestTools
             {
                 List<ITypeVerifier> output = new List<ITypeVerifier>();
                 var typeVerifiersElement = root.Element("TypeVerifiers");
-                var typeVerifierElements = typeVerifiersElement.Elements("TypeVerifier");
+                var typeVerifierElements = typeVerifiersElement?.Elements("TypeVerifier");
 
                 if (typeVerifiersElement == null)
                     return null;
@@ -106,16 +106,7 @@ namespace Explik.StructuralTestTools
             }
         }
 
-        public TypeVerificationAspect[] TypeVerificationOrder { get; } = new[]
-        {
-            TypeVerificationAspect.IsInterface,
-            TypeVerificationAspect.IsDelegate,
-            TypeVerificationAspect.IsSubclassOf,
-            TypeVerificationAspect.DelegateSignature,
-            TypeVerificationAspect.IsStatic,
-            TypeVerificationAspect.IsAbstract,
-            TypeVerificationAspect.AccessLevel
-        };
+        public TypeVerificationAspect[] TypeVerificationOrder { get; } = null;
         
         public IMemberVerifier[] MemberVerifiers
         {
@@ -123,7 +114,7 @@ namespace Explik.StructuralTestTools
             {
                 List<IMemberVerifier> output = new List<IMemberVerifier>();
                 var memberVerifiersElement = root.Element("MemberVerifiers");
-                var memberVerifierElements = memberVerifiersElement.Elements("MemberVerifier");
+                var memberVerifierElements = memberVerifiersElement?.Elements("MemberVerifier");
 
                 if (memberVerifiersElement == null)
                     return null;
@@ -145,28 +136,7 @@ namespace Explik.StructuralTestTools
             }
         }
 
-        public MemberVerificationAspect[] MemberVerificationOrder { get; } = new[]
-        {
-            MemberVerificationAspect.MemberType,
-            MemberVerificationAspect.FieldType,
-            MemberVerificationAspect.FieldAccessLevel,
-            MemberVerificationAspect.FieldWriteability,
-            MemberVerificationAspect.PropertyType,
-            MemberVerificationAspect.PropertyIsStatic,
-            MemberVerificationAspect.PropertyGetIsAbstract,
-            MemberVerificationAspect.PropertyGetIsVirtual,
-            MemberVerificationAspect.PropertyGetDeclaringType,
-            MemberVerificationAspect.PropertyGetAccessLevel,
-            MemberVerificationAspect.PropertySetIsAbstract,
-            MemberVerificationAspect.PropertySetIsVirtual,
-            MemberVerificationAspect.PropertySetDeclaringType,
-            MemberVerificationAspect.PropertySetAccessLevel,
-            MemberVerificationAspect.MethodReturnType,
-            MemberVerificationAspect.MethodIsAbstract,
-            MemberVerificationAspect.MethodIsVirtual,
-            MemberVerificationAspect.MethodDeclaringType,
-            MemberVerificationAspect.MethodAccessLevel
-        };
+        public MemberVerificationAspect[] MemberVerificationOrder { get; } = null;
         
         private object CreateInstance(string fullTypename)
         {

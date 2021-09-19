@@ -49,8 +49,9 @@ namespace Explik.StructuralTestTools
                 var solution = workspace.OpenSolutionAsync(solutionPath).Result;
                 var compilation = CompileProject(solution, projectName);
 
-                var configuration = GetConfiguration(configPath);
-                configuration.GlobalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
+                var configContent = File.ReadAllText(configPath);
+                var globalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
+                var configuration = Configuration.CreateFromXMLWithDefaults(globalNamespace, configContent);
 
                 var syntaxResolver = new CompileTimeDescriptionResolver(compilation);
                 var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
@@ -130,12 +131,6 @@ namespace Explik.StructuralTestTools
                     Log(error.ToString());
             }
             return compilation;
-        }
-
-        private static XMLConfiguration GetConfiguration(string configPath)
-        {
-            var content = File.ReadAllText(configPath);
-            return new XMLConfiguration(content);
         }
 
         private static IEnumerable<ClassDeclarationSyntax> RetreiveClassDeclarations(SyntaxTree syntaxTree)

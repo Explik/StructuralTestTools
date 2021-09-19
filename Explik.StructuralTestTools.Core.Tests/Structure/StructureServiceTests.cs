@@ -37,6 +37,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = Substitute.For<ITypeTranslator>(),
+                MemberTranslator = Substitute.For<IMemberTranslator>(),
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
@@ -58,6 +63,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = translator,
+                MemberTranslator = Substitute.For<IMemberTranslator>(),
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
@@ -79,6 +89,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = translator,
+                MemberTranslator = Substitute.For<IMemberTranslator>(),
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
@@ -100,6 +115,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = translator,
+                MemberTranslator = Substitute.For<IMemberTranslator>(),
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
@@ -120,6 +140,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = Substitute.For<ITypeTranslator>(),
+                MemberTranslator = Substitute.For<IMemberTranslator>(),
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
@@ -142,7 +167,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = Substitute.For<ITypeTranslator>(),
-                MemberTranslator = Substitute.For<IMemberTranslator>()
+                MemberTranslator = Substitute.For<IMemberTranslator>(),
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             var service = new StructureService(configuration);
 
@@ -167,7 +196,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = typeTranslator,
-                MemberTranslator = memberTranslator
+                MemberTranslator = memberTranslator,
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
@@ -187,7 +220,12 @@ namespace TestTools_Tests.Structure
             {
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
-                MemberTranslator = memberTranslator
+                TypeTranslator = Substitute.For<ITypeTranslator>(),
+                MemberTranslator = memberTranslator,
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
@@ -212,7 +250,11 @@ namespace TestTools_Tests.Structure
                 FromNamespace = @namespace,
                 ToNamespace = @namespace,
                 TypeTranslator = typeTranslator,
-                MemberTranslator = memberTranslator
+                MemberTranslator = memberTranslator,
+                TypeVerifiers = new ITypeVerifier[0],
+                TypeVerificationOrder = new TypeVerificationAspect[0],
+                MemberVerifiers = new IMemberVerifier[0],
+                MemberVerificationOrder = new MemberVerificationAspect[0]
             };
             StructureService service = new StructureService(configuration);
 
