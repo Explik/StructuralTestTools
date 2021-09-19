@@ -90,7 +90,7 @@ The project-wide TypeTranslator can be overwritten for a single type, if the typ
 public class Customer {}
 ```
 
-The project-wide TypeVerifier can be overwritten in the same way as TypeTranslator. 
+The project-wide TypeVerifier can be overwritten in the same way as TypeTranslator. The following shows how the default type verification approach can be overwritten. The default approach is not to verify that classes are marked with static, but this can be overwritten with the <code>StaticClassAttribute</code>
 ```C#
 [StaticClass]
 public class ArrayHelper {}
