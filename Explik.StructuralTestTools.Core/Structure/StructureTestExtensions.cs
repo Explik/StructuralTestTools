@@ -124,7 +124,8 @@ namespace Explik.StructuralTestTools
         {
             MemberExpression newExpression = (MemberExpression)locator.Body;
             FieldInfo fieldInfo = (FieldInfo)newExpression.Member;
-            test.AssertMember(fieldInfo, verifiers);
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new FieldTypeVerifier(typeof(TField)) }).ToArray();
+            test.AssertMember(fieldInfo, allVerifiers);
         }
 
         public static void AssertPublicField<TInstance, TField>(this StructureTest test, Expression<Func<TInstance, TField>> locator)
@@ -147,7 +148,8 @@ namespace Explik.StructuralTestTools
         {
             MemberExpression newExpression = (MemberExpression)locator.Body;
             PropertyInfo propertyInfo = (PropertyInfo)newExpression.Member;
-            test.AssertProperty(propertyInfo, verifiers);
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new PropertyTypeVerifier(typeof(TProperty)) }).ToArray();
+            test.AssertProperty(propertyInfo, allVerifiers);
         }
 
         public static void AssertPublicProperty<TInstance, TProperty>(this StructureTest test, PropertyInfo propertyInfo)
@@ -184,19 +186,22 @@ namespace Explik.StructuralTestTools
         public static void AssertMethod<TInstance, TReturn>(this StructureTest test, Expression<Func<TInstance, TReturn>> locator, params IMemberVerifier[] verifiers)
         {
             MethodCallExpression methodCallExpression = (MethodCallExpression)locator.Body;
-            test.AssertMethod(methodCallExpression.Method, verifiers);
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MethodReturnTypeVerifier(typeof(TReturn)) }).ToArray();
+            test.AssertMethod(methodCallExpression.Method, allVerifiers);
         }
 
         public static void AssertMethod<TInstance, TPar1, TReturn>(this StructureTest test, Expression<Func<TInstance, TPar1, TReturn>> locator, params IMemberVerifier[] verifiers)
         {
             MethodCallExpression methodCallExpression = (MethodCallExpression)locator.Body;
-            test.AssertMethod(methodCallExpression.Method, verifiers);
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MethodReturnTypeVerifier(typeof(TReturn)) }).ToArray();
+            test.AssertMethod(methodCallExpression.Method, allVerifiers);
         }
 
         public static void AssertMethod<TInstance, TPar1, TPar2, TReturn>(this StructureTest test, Expression<Func<TInstance, TPar1, TPar2, TReturn>> locator, params IMemberVerifier[] verifiers)
         {
             MethodCallExpression methodCallExpression = (MethodCallExpression)locator.Body;
-            test.AssertMethod(methodCallExpression.Method, verifiers);
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MethodReturnTypeVerifier(typeof(TReturn)) }).ToArray();
+            test.AssertMethod(methodCallExpression.Method, allVerifiers);
         }
 
         public static void AssertMethod<TInstance>(this StructureTest test, Expression<Action<TInstance>> locator, params IMemberVerifier[] verifiers)
@@ -249,21 +254,36 @@ namespace Explik.StructuralTestTools
 
         public static void AssertStaticMethod<TReturn>(this StructureTest test, Expression<Func<TReturn>> locator, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberIsStaticVerifier() }).ToArray();
+            IMemberVerifier[] additionalVerifiers = new IMemberVerifier[] 
+            { 
+                new MemberIsStaticVerifier(), 
+                new MethodReturnTypeVerifier(typeof(TReturn)) 
+            };
+            IMemberVerifier[] allVerifiers = verifiers.Union(additionalVerifiers).ToArray();
             MethodCallExpression methodCallExpression = (MethodCallExpression)locator.Body;
             test.AssertMethod(methodCallExpression.Method, allVerifiers);
         }
 
         public static void AssertStaticMethod<TPar1, TReturn>(this StructureTest test, Expression<Func<TPar1, TReturn>> locator, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberIsStaticVerifier() }).ToArray();
+            IMemberVerifier[] additionalVerifiers = new IMemberVerifier[]
+           {
+                new MemberIsStaticVerifier(),
+                new MethodReturnTypeVerifier(typeof(TReturn))
+           };
+            IMemberVerifier[] allVerifiers = verifiers.Union(additionalVerifiers).ToArray();
             MethodCallExpression methodCallExpression = (MethodCallExpression)locator.Body;
             test.AssertMethod(methodCallExpression.Method, allVerifiers);
         }
 
         public static void AssertStaticMethod<TPar1, TPar2, TReturn>(this StructureTest test, Expression<Func<TPar1, TPar2, TReturn>> locator, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberIsStaticVerifier() }).ToArray();
+            IMemberVerifier[] additionalVerifiers = new IMemberVerifier[]
+           {
+                new MemberIsStaticVerifier(),
+                new MethodReturnTypeVerifier(typeof(TReturn))
+           };
+            IMemberVerifier[] allVerifiers = verifiers.Union(additionalVerifiers).ToArray();
             MethodCallExpression methodCallExpression = (MethodCallExpression)locator.Body;
             test.AssertMethod(methodCallExpression.Method, allVerifiers);
         }

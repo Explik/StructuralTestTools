@@ -573,6 +573,20 @@ namespace Explik.StructuralTestTools
             Fail(message);
         }
 
+        public virtual void VerifyReturnType(MethodDescription methodInfo, TypeDescription type)
+        {
+            if (methodInfo.ReturnType == type)
+                return;
+
+            string message = string.Format(
+                "{0}.{1} is not of type {2}",
+                FormatHelper.FormatType(methodInfo.DeclaringType),
+                FormatHelper.FormatMethod(methodInfo),
+                FormatHelper.FormatType(type));
+
+            Fail(message);
+        }
+
         public virtual void VerifyCanRead(PropertyDescription propertyInfo, bool canRead)
         {
             if (propertyInfo.CanRead == canRead)
