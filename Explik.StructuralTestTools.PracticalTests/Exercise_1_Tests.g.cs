@@ -111,20 +111,16 @@ namespace Lecture_2_Tests
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("l. Person.Age is initialized as 0"), TestCategory("Exercise 1A")]
         public void AgeIsInitilizedAs0()
         {
-            // == Failed To Compile ==
-            // Person person = new Person();
-            // Assert.AreEqual(0, person.Age);
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Person.Age is not of type Int32");
+            Lecture_2.Person person = new Lecture_2.Person();
+            Assert.AreEqual(0, person.Age);
         }
 
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod("m. Person.Age ignores assigment of -1"), TestCategory("Exercise 1A")]
         public void AgeIgnoresAssignmentOfMinusOne()
         {
-            // == Failed To Compile ==
-            // Person person = new Person();
-            // person.Age = -1;
-            // Assert.AreEqual(0, person.Age);
-            throw new Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException("Person.Age is not of type Int32");
+            Lecture_2.Person person = new Lecture_2.Person();
+            person.Age = -1;
+            Assert.AreEqual(0, person.Age);
         }
 
 #endregion
