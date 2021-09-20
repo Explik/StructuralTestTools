@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>Explik.StructuralTestTools.MSBuild</id>
-		<version>1.0.5</version>
+		<version>1.0.0</version>
 		<title>Explik.StructuralTestTools.MSBuild</title>
 		<authors>Ole van Santen</authors>
 		<owners>olevansanten</owners>
@@ -11,9 +11,7 @@
 		<license type="expression">NONE</license>
 		<projectUrl>https://github.com/OleVanSanten/structural-testtool</projectUrl>
 		<description>
-			Structural TestTools is a unit test rewriter for C#. It allows for testing of user-implemented types, even though 
-			members might be missing or in other ways be invalid. This ensures that if the user's code compiles the test code
-			will as well.
+			Structural TestTools is a unit test rewriter that reduces would-be compilation errors to simple runtime errors. It allows for testing of types even though members missing or otherwise invalid.
 		</description>
 		<tags>testing</tags>
 		<repository type="git" url="https://github.com/OleVanSanten/structural-testtool.git"/>
