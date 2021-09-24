@@ -19,22 +19,19 @@ namespace Explik.StructuralTestTools
     {
         public static void Main(string[] args)
         {
-            if (args.Length != 3)
+            if (args.Length != 4)
                 throw new ArgumentException();
 
-            TemplateUnitTests(args[0], args[1], args[2]);
+            TemplateUnitTests(args[0], args[1], args[2], args[3]);
         }
 
-        public static void TemplateUnitTests(string solutionPath, string projectName, string configPath)
+        public static void TemplateUnitTests(string solutionPath, string projectName, string msbuildVersion, string configPath)
         {
-            try
-            {
-                MSBuildLocator.RegisterDefaults();
-            }
-            catch(Exception ex)
-            {
-                Log(ex.Message);
-            }
+            // Registers the latest MSBuild.exe 
+            var instances = MSBuildLocator.QueryVisualStudioInstances().ToArray();
+            var instance = instances.OrderByDescending(i => i.Version).First() ;
+            MSBuildLocator.RegisterInstance(instance);
+
             RunTemplateUnitTests(solutionPath, projectName, configPath);
         }
         

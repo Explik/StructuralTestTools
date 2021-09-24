@@ -12,9 +12,10 @@ namespace TestTools_Tests
         [TestMethod]
         public void UnitTestTemplator_Debug()
         {
+            string msbuildPath = "3.1.412";
             string solutionPath = "..\\..\\..\\..\\Explik.StructuralTestTools.PracticalTests/Explik.StructuralTestTools.PracticalTests.sln";
             string configPath = "..\\..\\..\\..\\Explik.StructuralTestTools.PracticalTests/TestToolsConfig.xml";
-            Program.TemplateUnitTests(solutionPath, "Explik.StructuralTestTools.PracticalTests",configPath);
+            Program.TemplateUnitTests(solutionPath, "Explik.StructuralTestTools.PracticalTests", msbuildPath, configPath);
         }
     }
 }
