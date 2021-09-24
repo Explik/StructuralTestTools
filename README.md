@@ -1,4 +1,4 @@
-# Structural TestTools
+# Structural test tools
 ![alt text](https://img.shields.io/nuget/v/Explik.StructuralTestTools.Core?label=Explik.StructuralTestTools.Core "Explik.StructuralTestTools")
 ![alt text](https://img.shields.io/nuget/v/Explik.StructuralTestTools.MSBuild?label=Explik.StructuralTestTools.MSBuild "Explik.StructuralTestTools.MSBuild")
 
