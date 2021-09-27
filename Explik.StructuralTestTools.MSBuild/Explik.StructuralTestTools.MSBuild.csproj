@@ -10,7 +10,7 @@
   </PropertyGroup>
 	
   <ItemGroup>
-	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+	<!--<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />-->
 	<PackageReference Include="Microsoft.CodeAnalysis" Version="3.11.0" PrivateAssets="all" />
 	<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.11.0" />
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" PrivateAssets="all" />
@@ -23,5 +23,6 @@
 	
   <ItemGroup>
     <ProjectReference Include="..\Explik.StructuralTestTools.Core\Explik.StructuralTestTools.Core.csproj" />
+    <ProjectReference Include="..\Microsoft.Build.Locator\src\MSBuildLocator\Microsoft.Build.Locator.csproj" />
   </ItemGroup>
 </Project>
