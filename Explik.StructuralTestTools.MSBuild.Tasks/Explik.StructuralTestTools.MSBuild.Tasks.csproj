@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+		<TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<NuSpecFile>Explik.StructuralTestTools.MSBuild.nuspec</NuSpecFile>
@@ -15,22 +15,33 @@
 		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
-	
-	<Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec">
+  
+  <!-- Sets up package variables -->
+  <Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec">
 		<PropertyGroup>
 			<NuspecProperties>$(NuspecProperties);outputPath=$(OutputPath)</NuspecProperties>
 		</PropertyGroup>
 	</Target>
 
-	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-		<PropertyGroup>
-			<BuildSubDir Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">MSBuildCore\</BuildSubDir>
-			<BuildSubDir Condition=" '$(TargetFramework)' == 'net472' ">MSBuildFull\</BuildSubDir>
-		</PropertyGroup>
-		<Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' " />
-		<ItemGroup>
+  <!-- Builds Explik.StructuralTestTools.MSBuild project, like ProjectReference, but without referencing it directly -->
+  <Target Name="GenerateBuildOutputs">
+    <PropertyGroup>
+      <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</SolutionDir>
+      <ProjectFile>$(SolutionDir)\Explik.StructuralTestTools.MSBuild\Explik.StructuralTestTools.MSBuild.csproj</ProjectFile>
+    </PropertyGroup>
+    <ItemGroup>
+       <ProjectOutputFiles Include="$(SolutionDir)\Explik.StructuralTestTools.MSBuild\bin\$(Configuration)\net5.0\**\*.*" />
+    </ItemGroup>
+
+    <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; &quot;$(ProjectFile)&quot;" />    
+    <Copy SourceFiles="@(ProjectOutputFiles)" DestinationFolder="$(OutputPath)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Packs Explik.StructuralTestTools.Build output into nuget package -->
+	<Target Name="PackBuildOutputs" DependsOnTargets="GenerateBuildOutputs;SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup;">
+    <ItemGroup>
 			<TfmSpecificPackageFile Include="$(OutputPath)**\*.dll">
-				<PackagePath>build\$(BuildSubDir)</PackagePath>
+				<PackagePath>build\</PackagePath>
 			</TfmSpecificPackageFile>
 		</ItemGroup>
 	</Target>
@@ -54,16 +65,4 @@
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
   </ItemDefinitionGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net472' ">
-	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
-    <!--<PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />-->
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <!--<PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />-->
-	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Explik.StructuralTestTools.MSBuild\Explik.StructuralTestTools.MSBuild.csproj" />
-  </ItemGroup>
 </Project>
