@@ -7,9 +7,13 @@ namespace Explik.StructuralTestTools
 {
     public class PropertyTypeVerifier : IMemberVerifier
     {
-        private readonly Type _propertyType;
+        private readonly TypeDescription _propertyType;
 
-        public PropertyTypeVerifier(Type propertyType)
+        public PropertyTypeVerifier(Type propertyType) : this(new RuntimeTypeDescription(propertyType))
+        {
+        }
+
+        public PropertyTypeVerifier(TypeDescription propertyType)
         {
             _propertyType = propertyType;
         }
@@ -22,11 +26,13 @@ namespace Explik.StructuralTestTools
 
         public void Verify(MemberVerifierArgs args)
         {
+            TypeDescription translatedPropertyType = args.TypeTranslatorService.TranslateType(_propertyType);
+
             args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
 
             if (args.TranslatedMember is PropertyDescription propertyDescription)
             {
-                args.Verifier.VerifyPropertyType(propertyDescription, new RuntimeTypeDescription(_propertyType));
+                args.Verifier.VerifyPropertyType(propertyDescription, translatedPropertyType);
             }
             else throw new NotImplementedException();
         }
