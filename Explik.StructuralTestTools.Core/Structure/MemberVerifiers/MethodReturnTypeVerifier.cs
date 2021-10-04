@@ -7,9 +7,13 @@ namespace Explik.StructuralTestTools
 {
     public class MethodReturnTypeVerifier : IMemberVerifier
     {
-        private readonly Type _returnType;
+        private readonly TypeDescription _returnType;
 
-        public MethodReturnTypeVerifier(Type returnType)
+        public MethodReturnTypeVerifier(Type returnType) : this(new RuntimeTypeDescription(returnType))
+        {
+        }
+
+        public MethodReturnTypeVerifier(TypeDescription returnType)
         {
             _returnType = returnType;
         }
@@ -22,11 +26,13 @@ namespace Explik.StructuralTestTools
 
         public void Verify(MemberVerifierArgs args)
         {
+            TypeDescription translatedReturnType = args.TypeTranslatorService.TranslateType(_returnType);
+
             args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Method });
 
             if (args.TranslatedMember is MethodDescription methodDescription)
             {
-                args.Verifier.VerifyReturnType(methodDescription, new RuntimeTypeDescription(_returnType));
+                args.Verifier.VerifyReturnType(methodDescription, translatedReturnType);
             }
             else throw new NotImplementedException();
         }
