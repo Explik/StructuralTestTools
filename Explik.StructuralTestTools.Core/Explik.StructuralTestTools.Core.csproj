@@ -4,7 +4,8 @@
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Authors>OleVanSanten</Authors>
 	<Description>OleVanSanten TestTools Core</Description>
-	<Version>1.0.0</Version>
+	<Version>1.0.1</Version>
+	<PackageReleaseNotes>Fixing bugs for translated property types and initializer syntax</PackageReleaseNotes>
   </PropertyGroup>
 	
   <ItemGroup>

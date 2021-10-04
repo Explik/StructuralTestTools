@@ -38,8 +38,17 @@ namespace Explik.StructuralTestTools
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
+            // Potentially rewritting type
             var newType = SyntaxFactory.ParseTypeName(translatedType.FullName);
-            return node.WithType(newType);
+
+            // Potentially rewritting method arguments
+            var newArguments = SyntaxFactory.SeparatedList(node.ArgumentList.Arguments.Select(Visit).OfType<ArgumentSyntax>());
+            var newArgumentList = node.ArgumentList.WithArguments(newArguments);
+
+            // Potentially rewritting object initializer
+            var newInitializer = (InitializerExpressionSyntax)this.Visit(node.Initializer);
+
+            return node.WithType(newType).WithArgumentList(newArgumentList).WithInitializer(newInitializer);
         }
 
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
