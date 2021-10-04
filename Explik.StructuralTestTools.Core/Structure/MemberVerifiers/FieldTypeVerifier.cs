@@ -7,9 +7,13 @@ namespace Explik.StructuralTestTools
 {
     public class FieldTypeVerifier : IMemberVerifier
     {
-        private readonly Type _fieldType;
+        private readonly TypeDescription _fieldType;
 
-        public FieldTypeVerifier(Type fieldType)
+        public FieldTypeVerifier(Type fieldType) : this(new RuntimeTypeDescription(fieldType))
+        {
+        }
+
+        public FieldTypeVerifier(TypeDescription fieldType)
         {
             _fieldType = fieldType;
         }
@@ -22,11 +26,13 @@ namespace Explik.StructuralTestTools
 
         public void Verify(MemberVerifierArgs args)
         {
+            TypeDescription translatedFieldType = args.TypeTranslatorService.TranslateType(_fieldType);
+
             args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Field });
 
             if (args.TranslatedMember is FieldDescription fieldDescription)
             {
-                args.Verifier.VerifyFieldType(fieldDescription, new RuntimeTypeDescription(_fieldType));
+                args.Verifier.VerifyFieldType(fieldDescription, translatedFieldType);
             }
             else throw new NotImplementedException();
         } 

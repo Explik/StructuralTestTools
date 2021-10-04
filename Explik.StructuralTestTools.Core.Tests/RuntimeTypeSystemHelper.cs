@@ -12,6 +12,12 @@ namespace Explik.StructuralTestTools
     /// </summary>
     public static class RuntimeTypeSystemHelper
     {
+        public class ConstantFieldClass { }
+
+        public class OriginalFieldClass { }
+
+        public class TranslatedFieldClass { }
+
         public class ConstantPropertyClass { }
 
         public class OriginalPropertyClass { }
@@ -20,6 +26,12 @@ namespace Explik.StructuralTestTools
 
         public class OriginalClass
         {
+            public object Field;
+
+            public ConstantFieldClass FieldWithConstantType;
+
+            public OriginalFieldClass FieldWithVariableType;
+
             public object Property { get; set; }
 
             public ConstantPropertyClass PropertyWithConstantType { get; set; }
@@ -29,6 +41,12 @@ namespace Explik.StructuralTestTools
 
         public class TranslatedClass
         {
+            public object Field;
+
+            public ConstantFieldClass FieldWithConstantType;
+
+            public TranslatedFieldClass FieldWithVariableType;
+
             public object Property { get; set; }
 
             public ConstantPropertyClass PropertyWithConstantType { get; set; }
@@ -39,9 +57,20 @@ namespace Explik.StructuralTestTools
         public static readonly RuntimeTypeDescription OriginalType = new RuntimeTypeDescription(typeof(OriginalClass));
         public static readonly RuntimeTypeDescription TranslatedType = new RuntimeTypeDescription(typeof(TranslatedClass));
 
+        public static readonly RuntimeTypeDescription ConstantFieldType = new RuntimeTypeDescription(typeof(ConstantFieldClass));
+        public static readonly RuntimeTypeDescription OriginalFieldType = new RuntimeTypeDescription(typeof(OriginalFieldClass));
+        public static readonly RuntimeTypeDescription TranslatedFieldType = new RuntimeTypeDescription(typeof(TranslatedFieldClass));
+
         public static readonly RuntimeTypeDescription ConstantPropertyType = new RuntimeTypeDescription(typeof(ConstantPropertyClass));
         public static readonly RuntimeTypeDescription OriginalPropertyType = new RuntimeTypeDescription(typeof(OriginalPropertyClass));
         public static readonly RuntimeTypeDescription TranslatedPropertyType = new RuntimeTypeDescription(typeof(TranslatedPropertyClass));
+
+        public static readonly RuntimeFieldDescription OriginalField = new RuntimeFieldDescription(typeof(OriginalClass).GetField("Field"));
+        public static readonly RuntimeFieldDescription OriginalFieldWithConstantType = new RuntimeFieldDescription(typeof(OriginalClass).GetField("FieldWithConstantType"));
+        public static readonly RuntimeFieldDescription OriginalFieldWithVariableType = new RuntimeFieldDescription(typeof(OriginalClass).GetField("FieldWithVariableType"));
+        public static readonly RuntimeFieldDescription TranslatedField = new RuntimeFieldDescription(typeof(TranslatedClass).GetField("Field"));
+        public static readonly RuntimeFieldDescription TranslatedFieldWithConstantType = new RuntimeFieldDescription(typeof(TranslatedClass).GetField("FieldWithConstantType"));
+        public static readonly RuntimeFieldDescription TranslatedFieldWithVariableType = new RuntimeFieldDescription(typeof(TranslatedClass).GetField("FieldWithVariableType"));
 
         public static readonly RuntimePropertyDescription OriginalProperty = new RuntimePropertyDescription(typeof(OriginalClass).GetProperty("Property"));
         public static readonly RuntimePropertyDescription OriginalPropertyWithConstantType = new RuntimePropertyDescription(typeof(OriginalClass).GetProperty("PropertyWithConstantType"));
