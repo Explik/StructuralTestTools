@@ -164,17 +164,17 @@ namespace Explik.StructuralTestTools
 
         public static void AssertPublicReadonlyProperty(this StructureTest test, PropertyInfo propertyInfo)
         {
-            test.AssertProperty(propertyInfo, new PropertyIsReadonlyVerifier());
+            test.AssertProperty(propertyInfo, new PropertyIsReadonlyVerifier(AccessLevels.Public));
         }
 
         public static void AssertPublicReadonlyProperty<TInstance, TProperty>(this StructureTest test, Expression<Func<TInstance, TProperty>> locator)
         {
-            test.AssertProperty(locator, new PropertyIsReadonlyVerifier());
+            test.AssertProperty(locator, new PropertyIsReadonlyVerifier(AccessLevels.Public));
         }
 
         public static void AssertPublicWriteonlyProperty<TInstance, TProperty>(this StructureTest test, Expression<Func<TInstance, TProperty>> locator)
         {
-            test.AssertProperty(locator, new MemberAccessLevelVerifier(AccessLevels.Public), new PropertyIsWriteonlyVerifier());
+            test.AssertProperty(locator, new PropertyIsWriteonlyVerifier());
         }
 
         public static void AssertMethod(this StructureTest test, MethodInfo methodInfo, params IMemberVerifier[] verifiers)
