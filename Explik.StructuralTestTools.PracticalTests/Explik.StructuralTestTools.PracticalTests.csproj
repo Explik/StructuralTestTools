@@ -7,7 +7,7 @@
 
   <ItemGroup>
 	<PackageReference Include="Explik.StructuralTestTools.Core" Version="1.0.2" />
-	<PackageReference Include="Explik.StructuralTestTools.MSBuild" Version="1.0.6">
+	<PackageReference Include="Explik.StructuralTestTools.MSBuild" Version="1.0.7">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
