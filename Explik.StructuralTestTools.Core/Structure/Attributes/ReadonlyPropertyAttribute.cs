@@ -8,10 +8,6 @@ namespace Explik.StructuralTestTools
 {
     public class ReadonlyPropertyAttribute : Attribute, IMemberVerifier
     {
-        public VerifierService Verifier { get; set; }
-
-        public IStructureService Service { get; set; }
-
         public MemberVerificationAspect[] Aspects => new[] {  
             MemberVerificationAspect.MemberType,
             MemberVerificationAspect.PropertyGetAccessLevel 
@@ -19,11 +15,11 @@ namespace Explik.StructuralTestTools
 
         public void Verify(MemberVerifierArgs args)
         {
-            Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
+            args.Verifier.VerifyMemberType(args.TranslatedMember, new[] { MemberTypes.Property });
 
             var originalProperty = (PropertyDescription)args.OriginalMember;
             var translatedProperty = (PropertyDescription)args.TranslatedMember;
-            Verifier.VerifyIsReadonly(translatedProperty, DescriptionHelper.GetAccessLevel(originalProperty.GetMethod));
+            args.Verifier.VerifyIsReadonly(translatedProperty, DescriptionHelper.GetAccessLevel(originalProperty.GetMethod));
         }
     }
 }
