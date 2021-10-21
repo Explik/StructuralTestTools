@@ -22,6 +22,6 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <ProjectReference Include="..\Explik.StructuralTestTools.Core\Explik.StructuralTestTools.Core.csproj" />
+    <ProjectReference Include="..\Explik.StructuralTestTools.Roslyn\Explik.StructuralTestTools.Roslyn.csproj" />
   </ItemGroup>
 </Project>

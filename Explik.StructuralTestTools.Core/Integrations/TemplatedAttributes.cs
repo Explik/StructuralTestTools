@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Explik.StructuralTestTools
 {
-    internal static class TemplatedAttributes
+    public static class TemplatedAttributes
     {
         private class Entry
         {
