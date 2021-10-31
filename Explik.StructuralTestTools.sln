@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Explik.StructuralTestTools.Roslyn", "Explik.StructuralTestTools.Roslyn\Explik.StructuralTestTools.Roslyn.csproj", "{C079AA7F-77C9-4E3F-8B86-29DEFF6821F1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Explik.StructuralTestTools.Roslyn.Tests", "Explik.StructuralTestTools.Roslyn.Tests\Explik.StructuralTestTools.Roslyn.Tests.csproj", "{1399FC67-FD0F-47C2-BA1C-080643F2AF99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{C079AA7F-77C9-4E3F-8B86-29DEFF6821F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C079AA7F-77C9-4E3F-8B86-29DEFF6821F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C079AA7F-77C9-4E3F-8B86-29DEFF6821F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1399FC67-FD0F-47C2-BA1C-080643F2AF99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1399FC67-FD0F-47C2-BA1C-080643F2AF99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1399FC67-FD0F-47C2-BA1C-080643F2AF99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1399FC67-FD0F-47C2-BA1C-080643F2AF99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

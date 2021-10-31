@@ -13,11 +13,14 @@ namespace Explik.StructuralTestTools
 
         ConstructorDescription GetConstructorDescription(ConstructorDeclarationSyntax node);
 
-        MemberDescription GetMemberDescription(MemberAccessExpressionSyntax node);
+        object GetDescription(MemberAccessExpressionSyntax node);
 
         MethodDescription GetMethodDescription(InvocationExpressionSyntax node);
 
         MethodDescription GetMethodDescription(MethodDeclarationSyntax node);
+
+        PropertyDescription GetPropertyDescription(ElementAccessExpressionSyntax node);
+
 
         bool IsTemplatedAttribute(AttributeSyntax node);
 
@@ -29,7 +32,15 @@ namespace Explik.StructuralTestTools
 
         string GetAssociatedExceptionType(AttributeSyntax node);
 
+        TypeDescription GetTypeDescription(ArrayTypeSyntax node);
+
+        TypeDescription GetTypeDescription(CastExpressionSyntax node);
+
+        TypeDescription GetTypeDescription(DefaultExpressionSyntax node);
+
         TypeDescription GetTypeDescription(TypeDeclarationSyntax node);
+        
+        TypeDescription GetTypeDescription(TypeOfExpressionSyntax node);
 
         TypeDescription GetTypeDescription(VariableDeclarationSyntax node);
 

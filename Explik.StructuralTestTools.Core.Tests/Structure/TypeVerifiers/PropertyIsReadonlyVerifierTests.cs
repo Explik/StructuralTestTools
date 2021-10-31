@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using System;
 using System.Linq;
-using static Explik.StructuralTestTools.RuntimeTypeSystemHelper;
+using static Explik.StructuralTestTools.RuntimeTestTypes;
 
 namespace Explik.StructuralTestTools
 {

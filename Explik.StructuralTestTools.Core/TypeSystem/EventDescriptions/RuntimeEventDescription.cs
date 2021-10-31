@@ -10,6 +10,9 @@ namespace Explik.StructuralTestTools.TypeSystem
     {
         public RuntimeEventDescription(EventInfo eventInfo)
         {
+            if (eventInfo == null)
+                throw new ArgumentNullException(nameof(eventInfo));
+
             EventInfo = eventInfo;
         }
 

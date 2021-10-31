@@ -23,6 +23,79 @@ namespace Explik.StructuralTestTools
             _structureService = structureService;
         }
 
+        public override SyntaxNode VisitArrayType(ArrayTypeSyntax node)
+        {
+            var originalType = _resolver.GetTypeDescription(node);
+            var translatedType = _structureService.TranslateType(originalType);
+
+            if (originalType == translatedType)
+                return base.VisitArrayType(node);
+
+            _structureService.VerifyType(originalType);
+
+            // Potentially rewritting type
+            var innerMostType = translatedType;
+            while (innerMostType.IsArray)
+                innerMostType = innerMostType.GetElementType();
+            var formattedTranslatedType = FormatHelper.FormatFullTypeName(innerMostType);
+            var newElementType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+
+            return node.WithElementType(newElementType);
+        }
+
+        public override SyntaxNode VisitCastExpression(CastExpressionSyntax node)
+        {
+            var originalType = _resolver.GetTypeDescription(node);
+            var translatedType = _structureService.TranslateType(originalType);
+
+            if (originalType == translatedType)
+                return base.VisitCastExpression(node);
+
+            _structureService.VerifyType(originalType);
+
+            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
+            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+
+            return node.WithType(newType);
+        }
+
+        public override SyntaxNode VisitDefaultExpression(DefaultExpressionSyntax node)
+        {
+            var originalType = _resolver.GetTypeDescription(node);
+            var translatedType = _structureService.TranslateType(originalType);
+
+            if (originalType == translatedType)
+                return base.VisitDefaultExpression(node);
+
+            _structureService.VerifyType(originalType);
+
+            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
+            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+
+            return node.WithType(newType);
+        }
+
+        public override SyntaxNode VisitElementAccessExpression(ElementAccessExpressionSyntax node)
+        {
+            var originalMember = _resolver.GetPropertyDescription(node);
+            var originalType = originalMember.DeclaringType;
+            var translatedMember = _structureService.TranslateMember(originalMember);
+
+            if (originalMember != translatedMember)
+            {
+                _structureService.VerifyType(originalType);
+                _structureService.VerifyMember(
+                       originalMember,
+                       MemberVerificationAspect.PropertyType,
+                       MemberVerificationAspect.PropertyIsStatic,
+                       MemberVerificationAspect.PropertySetDeclaringType,
+                       MemberVerificationAspect.PropertySetIsAbstract,
+                       MemberVerificationAspect.PropertySetIsVirtual,
+                       MemberVerificationAspect.PropertySetAccessLevel);
+            }
+            return base.VisitElementAccessExpression(node);
+        }
+
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
             var originalConstructor = _resolver.GetConstructorDescription(node);
@@ -39,7 +112,8 @@ namespace Explik.StructuralTestTools
                 MemberVerificationAspect.ConstructorAccessLevel);
 
             // Potentially rewritting type
-            var newType = SyntaxFactory.ParseTypeName(translatedType.FullName);
+            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
+            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
 
             // Potentially rewritting method arguments
             var newArguments = SyntaxFactory.SeparatedList(node.ArgumentList.Arguments.Select(Visit).OfType<ArgumentSyntax>());
@@ -51,75 +125,60 @@ namespace Explik.StructuralTestTools
             return node.WithType(newType).WithArgumentList(newArgumentList).WithInitializer(newInitializer);
         }
 
-        public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
-        {
-            var memberExpression = node.Expression as MemberAccessExpressionSyntax;
-
-            if (memberExpression == null)
-                return node;
-
-            var originalMethod = _resolver.GetMethodDescription(node);
-            var originalType = originalMethod.DeclaringType;
-            var translatedMethod = _structureService.TranslateMember(originalMethod);
-
-            if (originalMethod == translatedMethod)
-                return base.VisitInvocationExpression(node);
-
-            _structureService.VerifyType(originalType);
-            _structureService.VerifyMember(
-                originalMethod,
-                MemberVerificationAspect.MemberType,
-                MemberVerificationAspect.MethodDeclaringType,
-                MemberVerificationAspect.MethodReturnType,
-                MemberVerificationAspect.MethodIsStatic,
-                MemberVerificationAspect.MethodIsAbstract,
-                MemberVerificationAspect.MethodIsVirtual,
-                MemberVerificationAspect.MethodAccessLevel);
-
-            // Potentially rewritting expression and method name 
-            var newName = GetNameSyntax((MethodDescription)translatedMethod);
-            var newMemberExpression = (MemberAccessExpressionSyntax)Visit(memberExpression);
-            var newExpression = newMemberExpression.WithName(newName);
-
-            // Potentially rewritting method arguments
-            var newArguments = SyntaxFactory.SeparatedList(node.ArgumentList.Arguments.Select(Visit).OfType<ArgumentSyntax>());
-            var newArgumentList = node.ArgumentList.WithArguments(newArguments);
-            
-            return node.WithExpression(newExpression).WithArgumentList(newArgumentList);
-        }
-
-        
         public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
-            var originalMember = _resolver.GetMemberDescription(node);
-            var originalType = originalMember.DeclaringType;
-            var translatedMember = _structureService.TranslateMember(originalMember);
+            object originalMember = _resolver.GetDescription(node);
+            object translatedMember;
+            if (originalMember is TypeDescription typeDescription1)
+            {
+                translatedMember = _structureService.TranslateType(typeDescription1);
+            }
+            else if (originalMember is MemberDescription memberDescription1)
+            {
+                translatedMember = _structureService.TranslateMember(memberDescription1);
+            }
+            else throw new NotImplementedException("originalMember is not a TypeDescription or MemberDescription instance");
 
             if (originalMember == translatedMember)
                 return base.VisitMemberAccessExpression(node);
 
-            _structureService.VerifyType(originalType);
-            if (originalMember is EventDescription)
+            if (originalMember is EventDescription eventDescription1)
             {
+                _structureService.VerifyType(eventDescription1.DeclaringType);
                 _structureService.VerifyMember(
-                    originalMember,
+                    eventDescription1,
                     MemberVerificationAspect.EventHandlerType,
                     MemberVerificationAspect.EventAddAccessLevel,
                     MemberVerificationAspect.EventRemoveAccessLevel);
             }
-            else if (originalMember is FieldDescription)
+            else if (originalMember is FieldDescription fieldDescription2)
             {
+                _structureService.VerifyType(fieldDescription2.DeclaringType);
                 _structureService.VerifyMember(
-                    originalMember,
+                    fieldDescription2,
                     MemberVerificationAspect.FieldType,
                     MemberVerificationAspect.FieldIsStatic,
                     MemberVerificationAspect.FieldWriteability,
                     MemberVerificationAspect.FieldAccessLevel);
             }
-            else if (originalMember is PropertyDescription)
+            else if (originalMember is MethodDescription methodDescription2)
             {
+                _structureService.VerifyType(methodDescription2.DeclaringType);
                 _structureService.VerifyMember(
-                       originalMember,
+                    methodDescription2,
+                    MemberVerificationAspect.MemberType,
+                    MemberVerificationAspect.MethodDeclaringType,
+                    MemberVerificationAspect.MethodReturnType,
+                    MemberVerificationAspect.MethodIsStatic,
+                    MemberVerificationAspect.MethodIsAbstract,
+                    MemberVerificationAspect.MethodIsVirtual,
+                    MemberVerificationAspect.MethodAccessLevel);
+            }
+            else if (originalMember is PropertyDescription propertyDescription2)
+            {
+                _structureService.VerifyType(propertyDescription2.DeclaringType);
+                _structureService.VerifyMember(
+                       propertyDescription2,
                        MemberVerificationAspect.PropertyType,
                        MemberVerificationAspect.PropertyIsStatic,
                        MemberVerificationAspect.PropertySetDeclaringType,
@@ -129,12 +188,72 @@ namespace Explik.StructuralTestTools
             }
 
             // Potentially rewritting member name
-            var newName = SyntaxFactory.IdentifierName(translatedMember.Name);
+            SimpleNameSyntax newName;
+            if (translatedMember is TypeDescription typeDescription2 && typeDescription2.IsGenericType)
+            {
+                var name = typeDescription2.Name.Substring(0, typeDescription2.Name.IndexOf('`'));
+                var identifier = SyntaxFactory.Identifier(name); 
+                var typeArguments = typeDescription2.GetGenericArguments().Select(typeArgument =>
+                {
+                    var formattedTypeArgumentName = FormatHelper.FormatFullTypeName(typeArgument);
+                    return SyntaxFactory.ParseTypeName(formattedTypeArgumentName);
+                });
+                var typeArgumentList = SyntaxFactory.TypeArgumentList(SyntaxFactory.SeparatedList(typeArguments));
+                newName = SyntaxFactory.GenericName(identifier, typeArgumentList);
+            }
+            else if (translatedMember is TypeDescription typeDescription3)
+            {
+                newName = SyntaxFactory.IdentifierName(typeDescription3.Name);
+            }
+            else if (translatedMember is EventDescription eventDescription2)
+            {
+                newName = SyntaxFactory.IdentifierName(eventDescription2.Name);
+            }
+            else if (translatedMember is FieldDescription fieldDescription2)
+            {
+                newName = SyntaxFactory.IdentifierName(fieldDescription2.Name);
+            }
+            else if (translatedMember is MethodDescription methodDescription2 && methodDescription2.IsGenericMethod)
+            {
+                var identifier = SyntaxFactory.Identifier(methodDescription2.Name);
+                var typeArguments = methodDescription2.GetGenericArguments().Select(typeArgument =>
+                {
+                    var formattedTypeArgumentName = FormatHelper.FormatFullTypeName(typeArgument);
+                    return SyntaxFactory.ParseTypeName(formattedTypeArgumentName);
+                });
+                var typeArgumentList = SyntaxFactory.TypeArgumentList(SyntaxFactory.SeparatedList(typeArguments));
+                newName = SyntaxFactory.GenericName(identifier, typeArgumentList);
+            }
+            else if (translatedMember is MethodDescription methodDescription3)
+            {
+                newName = SyntaxFactory.IdentifierName(methodDescription3.Name);
+            }
+            else if (translatedMember is PropertyDescription propertyDescription2)
+            {
+                newName = SyntaxFactory.IdentifierName(propertyDescription2.Name);
+            }
+            else throw new NotImplementedException("originalMember is not a TypeDescription, EventDescription, FieldDescription, MethodDescription or PropertyDescription instance");
 
             // Potentially rewritting expression
-            var newExpression = (ExpressionSyntax)Visit(node.Expression);
+            ExpressionSyntax newExpression = newExpression = (ExpressionSyntax)Visit(node.Expression);
 
             return node.WithName(newName).WithExpression(newExpression);
+        }
+
+        public override SyntaxNode VisitTypeOfExpression(TypeOfExpressionSyntax node)
+        {
+            var originalType = _resolver.GetTypeDescription(node);
+            var translatedType = _structureService.TranslateType(originalType);
+
+            if (originalType == translatedType)
+                return base.VisitTypeOfExpression(node);
+
+            _structureService.VerifyType(originalType);
+
+            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
+            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+
+            return node.WithType(newType);
         }
 
         public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
@@ -148,7 +267,8 @@ namespace Explik.StructuralTestTools
             _structureService.VerifyType(originalType);
 
             // Potentially rewritting type
-            var newType = GetTypeSyntax(translatedType);
+            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
+            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
 
             // Potentially rewritting variable declators
             var newVariables = SyntaxFactory.SeparatedList(node.Variables.Select(Visit).OfType<VariableDeclaratorSyntax>());

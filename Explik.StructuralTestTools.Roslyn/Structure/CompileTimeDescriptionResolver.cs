@@ -33,10 +33,13 @@ namespace Explik.StructuralTestTools
             return new CompileTimeConstructorDescription(_compilation, methodSymbol);
         }
 
-        public MemberDescription GetMemberDescription(MemberAccessExpressionSyntax node)
+        public object GetDescription(MemberAccessExpressionSyntax node)
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var memberSymbol = semanticModel.GetSymbolInfo(node).Symbol;
+
+            if (memberSymbol is ITypeSymbol typeSymbol)
+                return new CompileTimeTypeDescription(_compilation, typeSymbol);
 
             if (memberSymbol is IEventSymbol eventSymbol)
                 return new CompileTimeEventDescription(_compilation, eventSymbol);
@@ -50,7 +53,7 @@ namespace Explik.StructuralTestTools
             if (memberSymbol is IPropertySymbol propertySymbol)
                 return new CompileTimePropertyDescription(_compilation, propertySymbol);
 
-            throw new ArgumentException("Node cannot be converted to IEventSymbol, IFieldSymbol, IMethodSymbol, or IPropertySymbol");
+            throw new ArgumentException("Node cannot be converted to ITypeSymbol, IEventSymbol, IFieldSymbol, IMethodSymbol or IPropertySymbol");
         }
 
         public MethodDescription GetMethodDescription(InvocationExpressionSyntax node)
@@ -67,6 +70,11 @@ namespace Explik.StructuralTestTools
             var methodSymbol = semanticModel.GetDeclaredSymbol(node);
 
             return new CompileTimeMethodDescription(_compilation, methodSymbol);
+        }
+
+        public PropertyDescription GetPropertyDescription(ElementAccessExpressionSyntax node)
+        {
+            throw new NotImplementedException();
         }
 
         public bool IsTemplatedAttribute(AttributeSyntax node)
@@ -97,10 +105,42 @@ namespace Explik.StructuralTestTools
             return TemplatedAttributes.GetAssociatedExceptionTypeName(attributeType);
         }
 
+        public TypeDescription GetTypeDescription(ArrayTypeSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.ElementType.SyntaxTree, ignoreAccessibility: true);
+            var typeModel = semanticModel.GetTypeInfo(node.ElementType).Type;
+
+            return new CompileTimeTypeDescription(_compilation, typeModel);
+        }
+
+        public TypeDescription GetTypeDescription(CastExpressionSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var typeModel = semanticModel.GetTypeInfo(node.Type).Type;
+
+            return new CompileTimeTypeDescription(_compilation, typeModel);
+        }
+
+        public TypeDescription GetTypeDescription(DefaultExpressionSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var typeModel = semanticModel.GetTypeInfo(node.Type).Type;
+
+            return new CompileTimeTypeDescription(_compilation, typeModel);
+        }
+
         public TypeDescription GetTypeDescription(TypeDeclarationSyntax node)
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var typeModel = semanticModel.GetDeclaredSymbol(node);
+
+            return new CompileTimeTypeDescription(_compilation, typeModel);
+        }
+
+        public TypeDescription GetTypeDescription(TypeOfExpressionSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var typeModel = semanticModel.GetTypeInfo(node.Type).Type;
 
             return new CompileTimeTypeDescription(_compilation, typeModel);
         }

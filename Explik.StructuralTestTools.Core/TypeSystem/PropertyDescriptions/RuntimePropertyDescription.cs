@@ -10,6 +10,9 @@ namespace Explik.StructuralTestTools.TypeSystem
     {
         public RuntimePropertyDescription(PropertyInfo propertyInfo)
         {
+            //if (propertyInfo == null)
+            //    throw new ArgumentNullException(nameof(propertyInfo));
+
             PropertyInfo = propertyInfo;
         }
 
