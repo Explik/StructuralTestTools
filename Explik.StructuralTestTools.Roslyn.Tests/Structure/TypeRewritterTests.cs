@@ -18,7 +18,6 @@ namespace TestTools_Tests.Structure
     public class TypeRewritterTests
     {
         // TODO Add tests for verification aspects for field and proprety read/write.
-        // TODO Add tests for foreach syntax
 
         #region VisitArrayType
 
