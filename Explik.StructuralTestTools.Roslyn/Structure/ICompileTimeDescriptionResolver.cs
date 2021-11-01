@@ -21,7 +21,6 @@ namespace Explik.StructuralTestTools
 
         PropertyDescription GetPropertyDescription(ElementAccessExpressionSyntax node);
 
-
         bool IsTemplatedAttribute(AttributeSyntax node);
 
         bool HasTemplatedAttribute(ClassDeclarationSyntax node);

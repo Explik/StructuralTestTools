@@ -74,7 +74,10 @@ namespace Explik.StructuralTestTools
 
         public PropertyDescription GetPropertyDescription(ElementAccessExpressionSyntax node)
         {
-            throw new NotImplementedException();
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var propertySymbol = semanticModel.GetSymbolInfo(node).Symbol as IPropertySymbol;
+
+            return propertySymbol != null ? new CompileTimePropertyDescription(_compilation, propertySymbol) : null;
         }
 
         public bool IsTemplatedAttribute(AttributeSyntax node)

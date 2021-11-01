@@ -78,6 +78,10 @@ namespace Explik.StructuralTestTools
         public override SyntaxNode VisitElementAccessExpression(ElementAccessExpressionSyntax node)
         {
             var originalMember = _resolver.GetPropertyDescription(node);
+
+            // _resolver.GetPropertyDescription(node) returns null on array access. 
+            if (originalMember == null) return base.VisitElementAccessExpression(node);
+
             var originalType = originalMember.DeclaringType;
             var translatedMember = _structureService.TranslateMember(originalMember);
 

@@ -614,6 +614,22 @@ namespace TestTools_Tests.Structure
 
         #region VisitElementAccessExpressionSyntax
 
+        [TestMethod("VisitElementAccessExpressionSyntax does not translate array access")]
+        public void VisitElementAccessExpressionSyntax_DoesNotTranslateArrayAccess()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("(new int[] { 1, 2, 3 })[0]").GetRoot();
+            var node1 = root.AllDescendantNodes<ElementAccessExpressionSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetPropertyDescription(node1).Returns(null as PropertyDescription);
+            var structureService = Substitute.For<IStructureService>();
+            
+            var rewriter = new TypeRewriter(resolver, structureService);
+            rewriter.VisitElementAccessExpression(node1);
+
+            structureService.DidNotReceiveWithAnyArgs().TranslateMember(null);
+        }
+
         [TestMethod("VisitElementAccessExpressionSyntax does not verify non-translatable indexer")]
         public void VisitElementAccessExpressionSyntax_DoesNotVerifyNonTranslatableIndexer()
         {
