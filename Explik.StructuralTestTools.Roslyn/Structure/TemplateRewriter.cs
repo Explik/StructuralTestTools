@@ -28,6 +28,7 @@ namespace Explik.StructuralTestTools
             // Potentially rewritting the class name by removing _Templated from it
             var newClassName = node.Identifier.Text.Replace("_Template", "");
             var newIdentifier = SyntaxFactory.IdentifierName(newClassName).Identifier;
+            var newIdentifierWithTrivia = newIdentifier.WithTriviaFrom(node.Identifier);
 
             // Potentially rewritting the class members
             var newMembers = new SyntaxList<SyntaxNode>(node.Members.Select(Visit));
@@ -35,7 +36,7 @@ namespace Explik.StructuralTestTools
             // Potentially rewritting attributes
             var newAttributeLists = new SyntaxList<AttributeListSyntax>(node.AttributeLists.Select(Visit).OfType<AttributeListSyntax>());
 
-            return node.WithIdentifier(newIdentifier).WithMembers(newMembers).WithAttributeLists(newAttributeLists);
+            return node.WithIdentifier(newIdentifierWithTrivia).WithMembers(newMembers).WithAttributeLists(newAttributeLists);
         }
 
         public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
@@ -43,8 +44,9 @@ namespace Explik.StructuralTestTools
             // Potentially rewritting the class name by removing _Templated from it
             var newClassName = node.Identifier.Text.Replace("_Template", "");
             var newIdentifier = SyntaxFactory.IdentifierName(newClassName).Identifier;
+            var newIdentifierWithTrivia = newIdentifier.WithTriviaFrom(node.Identifier);
 
-            return node.WithIdentifier(newIdentifier);
+            return node.WithIdentifier(newIdentifierWithTrivia);
         }
 
         public override SyntaxNode VisitAttribute(AttributeSyntax node)
@@ -55,8 +57,9 @@ namespace Explik.StructuralTestTools
             // Rewritting templated-attribute type to non-templated-attribute type
             var attributeTypeName = _resolver.GetAssociatedAttributeType(node);
             var newName = SyntaxFactory.IdentifierName(attributeTypeName);
+            var newNameWithTrivia = newName.WithTriviaFrom(node);
 
-            return node.WithName(newName);
+            return node.WithName(newNameWithTrivia);
         }
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -69,55 +72,62 @@ namespace Explik.StructuralTestTools
             // If the rewrite is unsuccessful due to validation errors, the entire method body is replaced
             // with an exception 
             // and if the rewrite validation fails replacing the entire body with an exception
-            BlockSyntax newBody;
             var newAttributeLists = new SyntaxList<AttributeListSyntax>(node.AttributeLists.Select(Visit).OfType<AttributeListSyntax>());
 
+            BlockSyntax newBody;
             try
             {
-                var newStatements = new SyntaxList<StatementSyntax>(node.Body.Statements.Select(_statementRewriter.Visit).OfType<StatementSyntax>());
-                newBody = SyntaxFactory.Block(newStatements);
+                newBody = (BlockSyntax)_statementRewriter.VisitBlock(node.Body).WithTriviaFrom(node.Body);
             }
             catch (VerifierServiceException ex)
             {
                 var newBodySource = string.Join(
-                    Environment.NewLine,
-                    "{",
-                    "// == Failed To Compile ==",
-                    CreateComments(node),
-                    CreateThrowStatement(node, ex),
-                    "}");
+                    "",
+                    node.Body.OpenBraceToken.ToFullString(),
+                    CreateComment("// == Failed To Compile == ", node.Body.Statements.FirstOrDefault()),
+                    CreateCommentedBody(node).TrimEnd(),
+                    CreateThrowStatement(node, ex, node.Body.Statements.LastOrDefault()),
+                    node.Body.CloseBraceToken.ToFullString());
+
                 newBody = (BlockSyntax)SyntaxFactory.ParseStatement(newBodySource);
             }
-            return node.WithBody(newBody).WithAttributeLists(newAttributeLists);
+            return node.WithBody(newBody).WithAttributeLists(newAttributeLists).WithTriviaFrom(node);
         }
 
-        private string CreateComments(MethodDeclarationSyntax node)
+        private string CreateComment(string text, SyntaxNode triviaNode)
         {
-            return string.Join(Environment.NewLine, node.Body.Statements.Select(CreateComment));
+            var leadingTrivia = triviaNode?.GetLeadingTrivia().ToString() ?? "";
+            var traillingTrivia = triviaNode?.GetTrailingTrivia().First().ToString() ?? "";
+
+            return leadingTrivia + text + traillingTrivia;
         }
 
-        private string CreateComment(SyntaxNode node)
+        private string CreateCommentedBody(MethodDeclarationSyntax node)
         {
             var builder = new StringBuilder();
-            var source = SourceText.From(node.NormalizeWhitespace().ToFullString(), Encoding.UTF8).ToString();
-            
-            using(StringReader sr = new StringReader(source))
+
+            foreach(var statement in node.Body.Statements)
             {
-                string line;
-                while((line = sr.ReadLine()) != null)
-                {
-                    builder.Append("// " + line + Environment.NewLine);
-                }
+                var leadingTrivia = statement.GetLeadingTrivia().ToString();
+                var traillingTrivia = statement.GetTrailingTrivia().First().ToString();
+                 
+                builder.Append(leadingTrivia + "// " + statement.ToString() + traillingTrivia);
             }
             return builder.ToString();
         }
 
-        private string CreateThrowStatement(MethodDeclarationSyntax node, VerifierServiceException ex)
+        private string CreateThrowStatement(MethodDeclarationSyntax node, VerifierServiceException ex, SyntaxNode triviaNode)
         {
+            var leadingTrivia = triviaNode?.GetLeadingTrivia().ToString() ?? "";
+            var traillingTrivia = triviaNode?.GetTrailingTrivia().First().ToString() ?? "";
+            
+            if (leadingTrivia.Contains(Environment.NewLine))
+                leadingTrivia = Environment.NewLine + leadingTrivia.Split(new[] { Environment.NewLine }, StringSplitOptions.None).Last();
+
             var templatedAttribute = node.AttributeLists.SelectMany(l => l.Attributes).First(_resolver.IsTemplatedAttribute);
             var exceptionTypeName = _resolver.GetAssociatedExceptionType(templatedAttribute);
-            var throwStatement = $"throw new {exceptionTypeName}(\"{ex.Message}\");";
-            return throwStatement;
+            
+            return leadingTrivia + $"throw new {exceptionTypeName}(\"{ex.Message}\");" + traillingTrivia;
         }
     }
 }
