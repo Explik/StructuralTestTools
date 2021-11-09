@@ -77,7 +77,7 @@ namespace Explik.StructuralTestTools
             BlockSyntax newBody;
             try
             {
-                newBody = (BlockSyntax)_statementRewriter.VisitBlock(node.Body).WithTriviaFrom(node.Body);
+                newBody = (BlockSyntax)_statementRewriter.Visit(node.Body).WithTriviaFrom(node.Body);
             }
             catch (VerifierServiceException ex)
             {
