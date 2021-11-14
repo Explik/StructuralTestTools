@@ -18,7 +18,14 @@ namespace TestTools_Tests.Structure
     public class TypeRewritterTests
     {
         // TODO Add syntax preservation
-        // TODO Add tests for verification aspects for field and proprety read/write.
+        private ref MemberVerificationAspect[] CreateEquvilantArg(MemberVerificationAspect[] expected)
+        {
+            var orderedExpected = expected.OrderBy(a => a.ToString());
+
+            return ref Arg.Is<MemberVerificationAspect[]>(actual =>
+                actual.OrderBy(a => a.ToString()).SequenceEqual(orderedExpected)
+            );
+        }
 
         #region VisitArrayType
 
@@ -676,8 +683,56 @@ namespace TestTools_Tests.Structure
 
             rewriter.VisitElementAccessExpression(node1);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.PropertyIsStatic,
+                MemberVerificationAspect.PropertyGetAccessLevel,
+                MemberVerificationAspect.PropertyGetDeclaringType,
+                MemberVerificationAspect.PropertyGetIsAbstract,
+                MemberVerificationAspect.PropertyGetIsVirtual,
+                MemberVerificationAspect.PropertyType
+            };
             structureService.Received().VerifyType(OriginalType);
-            structureService.Received().VerifyMember(OriginalIndexer, Arg.Any<MemberVerificationAspect[]>());
+            structureService.Received().VerifyMember(
+                OriginalIndexer,
+                CreateEquvilantArg(expectedAspects));
+        }
+
+        [TestMethod("Visit verifies translatable indexer assignment")]
+        public void Visit_VerifiesTranslatableIndexerAssignment()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("TestTypes.OriginalClass[new TestTypes.OriginalArgumentClass()] = null").GetRoot();
+            var node1 = root.AllDescendantNodes<ElementAccessExpressionSyntax>().First();
+            var node2 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().First();
+            var node3 = root.AllDescendantNodes<ObjectCreationExpressionSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetPropertyDescription(node1).Returns(OriginalIndexer);
+            resolver.GetDescription(node2).Returns(OriginalType);
+            resolver.GetConstructorDescription(node3).Returns(OriginalArgumentConstructor);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateType(OriginalType).Returns(TranslatedType);
+            structureService.TranslateType(OriginalArgumentType).Returns(TranslatedArgumentType);
+            structureService.TranslateMember(OriginalIndexer).Returns(TranslatedIndexer);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            rewriter.VisitElementAccessExpression(node1);
+
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.PropertyIsStatic,
+                MemberVerificationAspect.PropertySetAccessLevel,
+                MemberVerificationAspect.PropertySetDeclaringType,
+                MemberVerificationAspect.PropertySetIsAbstract,
+                MemberVerificationAspect.PropertySetIsVirtual,
+                MemberVerificationAspect.PropertyType,
+            };
+            structureService.Received().VerifyType(OriginalType);
+            structureService.Received().VerifyMember(
+                OriginalIndexer,
+                CreateEquvilantArg(expectedAspects));
         }
 
         #endregion
@@ -1532,10 +1587,10 @@ namespace TestTools_Tests.Structure
             Assert.AreEqual("TestTypes.TranslatedClass.StaticGenericMethod<TestTypes.TranslatedTypeArgumentClass>", translatedNode.ToSource());
         }
 
-        [TestMethod("Visit verifies translatable event")]
-        public void Visit_VerifiesTranslatableEvent()
+        [TestMethod("Visit verifies translatable event subscription")]
+        public void Visit_VerifiesTranslatableEventSubscription()
         {
-            var root = SyntaxFactory.ParseSyntaxTree("instance.Event").GetRoot();
+            var root = SyntaxFactory.ParseSyntaxTree("instance.Event += null").GetRoot();
             var node1 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().First();
 
             var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
@@ -1546,16 +1601,22 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node1);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.EventAddAccessLevel,
+                MemberVerificationAspect.EventHandlerType,
+                MemberVerificationAspect.MemberType
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalEvent,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
         }
 
-        [TestMethod("Visit verifies translatable static event")]
-        public void Visit_VerifiesTranslatableStaticEvent()
+        [TestMethod("Visit verifies translatable static event subscription")]
+        public void Visit_VerifiesTranslatableStaticEventSubscription()
         {
-            var root = SyntaxFactory.ParseSyntaxTree("TestTypes.OriginalClass.StaticEvent").GetRoot();
+            var root = SyntaxFactory.ParseSyntaxTree("TestTypes.OriginalClass.StaticEvent += null").GetRoot();
             var node1 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(0);
             var node2 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(1);
 
@@ -1569,10 +1630,16 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node1);
 
+            var expectedAspects = new[]
+           {
+                MemberVerificationAspect.EventAddAccessLevel,
+                MemberVerificationAspect.EventHandlerType,
+                MemberVerificationAspect.MemberType
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalStaticEvent,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
         }
 
         [TestMethod("Visit verifies translatable field")]
@@ -1589,10 +1656,17 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.FieldAccessLevel,
+                MemberVerificationAspect.FieldIsStatic,
+                MemberVerificationAspect.FieldType,
+                MemberVerificationAspect.MemberType,
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalField,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
         }
 
         [TestMethod("Visit verifies translatable static field")]
@@ -1612,10 +1686,17 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node1);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.FieldAccessLevel,
+                MemberVerificationAspect.FieldIsStatic,
+                MemberVerificationAspect.FieldType,
+                MemberVerificationAspect.MemberType
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalStaticField,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
         }
 
         [TestMethod("Visit verifies translatable method")]
@@ -1632,10 +1713,20 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.MethodAccessLevel,
+                MemberVerificationAspect.MethodDeclaringType,
+                MemberVerificationAspect.MethodIsAbstract,
+                MemberVerificationAspect.MethodIsStatic,
+                MemberVerificationAspect.MethodIsVirtual,
+                MemberVerificationAspect.MethodReturnType
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalMethod,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
         }
 
         [TestMethod("Visit verifies translatable static method")]
@@ -1655,10 +1746,20 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node1);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.MethodAccessLevel,
+                MemberVerificationAspect.MethodDeclaringType,
+                MemberVerificationAspect.MethodIsAbstract,
+                MemberVerificationAspect.MethodIsStatic,
+                MemberVerificationAspect.MethodIsVirtual,
+                MemberVerificationAspect.MethodReturnType
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalStaticMethod,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
         }
 
         [TestMethod("Visit verifies translatable property")]
@@ -1675,10 +1776,20 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.PropertyIsStatic,
+                MemberVerificationAspect.PropertyGetAccessLevel,
+                MemberVerificationAspect.PropertyGetDeclaringType,
+                MemberVerificationAspect.PropertyGetIsAbstract,
+                MemberVerificationAspect.PropertyGetIsVirtual,
+                MemberVerificationAspect.PropertyType
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalProperty,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
         }
 
         [TestMethod("Visit verifies translatable static property")]
@@ -1698,10 +1809,197 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node1);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.PropertyGetAccessLevel,
+                MemberVerificationAspect.PropertyGetDeclaringType,
+                MemberVerificationAspect.PropertyGetIsAbstract,
+                MemberVerificationAspect.PropertyGetIsVirtual,
+                MemberVerificationAspect.PropertyIsStatic,
+                MemberVerificationAspect.PropertyType,
+            };
             structureService.Received().VerifyType(OriginalType);
             structureService.Received().VerifyMember(
                 OriginalStaticProperty,
-                Arg.Any<MemberVerificationAspect[]>());
+                CreateEquvilantArg(expectedAspects));
+        }
+
+        [TestMethod("Visit verifies translatable event unsubscription")]
+        public void Visit_VerifiesTranslatableEventUnsubscription()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("instance.Event -= null").GetRoot();
+            var node1 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetDescription(node1).Returns(OriginalEvent);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateMember(OriginalEvent).Returns(TranslatedEvent);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            rewriter.Visit(node1);
+
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.EventHandlerType,
+                MemberVerificationAspect.EventRemoveAccessLevel,
+                MemberVerificationAspect.MemberType
+            };
+            structureService.Received().VerifyType(OriginalType);
+            structureService.Received().VerifyMember(
+                OriginalEvent,
+                CreateEquvilantArg(expectedAspects));
+        }
+
+        [TestMethod("Visit verifies translatable static event unsubscription")]
+        public void Visit_VerifiesTranslatableStaticEventUnsubscription()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("TestTypes.OriginalClass.StaticEvent -= null").GetRoot();
+            var node1 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(0);
+            var node2 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(1);
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetDescription(node1).Returns(OriginalStaticEvent);
+            resolver.GetDescription(node2).Returns(OriginalType);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateType(OriginalType).Returns(TranslatedType);
+            structureService.TranslateMember(OriginalStaticEvent).Returns(TranslatedStaticEvent);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            rewriter.Visit(node1);
+
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.EventHandlerType,
+                MemberVerificationAspect.EventRemoveAccessLevel,
+                MemberVerificationAspect.MemberType
+            };
+            structureService.Received().VerifyType(OriginalType);
+            structureService.Received().VerifyMember(
+                OriginalStaticEvent,
+                CreateEquvilantArg(expectedAspects));
+        }
+
+        [TestMethod("Visit verifies translatable field assignment")]
+        public void Visit_VerifiesTranslatableFieldAssignment()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("instance.Field = null").GetRoot();
+            var node = root.AllDescendantNodes<MemberAccessExpressionSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetDescription(node).Returns(OriginalField);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateMember(OriginalField).Returns(TranslatedField);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            rewriter.Visit(node);
+
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.FieldAccessLevel,
+                MemberVerificationAspect.FieldIsStatic,
+                MemberVerificationAspect.FieldType,
+                MemberVerificationAspect.FieldWriteability,
+                MemberVerificationAspect.MemberType
+            };
+            structureService.Received().VerifyType(OriginalType);
+            structureService.Received().VerifyMember(
+                OriginalField,
+                CreateEquvilantArg(expectedAspects));
+        }
+
+        [TestMethod("Visit verifies translatable static field assignment")]
+        public void Visit_VerifiesTranslatableStaticFieldAssignment()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("TestTypes.OriginalClass.StaticField = null").GetRoot();
+            var node1 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(0);
+            var node2 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(1);
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetDescription(node1).Returns(OriginalStaticField);
+            resolver.GetDescription(node2).Returns(OriginalType);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateType(OriginalType).Returns(TranslatedType);
+            structureService.TranslateMember(OriginalStaticField).Returns(TranslatedStaticField);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            rewriter.Visit(node1);
+
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.FieldAccessLevel,
+                MemberVerificationAspect.FieldIsStatic,
+                MemberVerificationAspect.FieldType,
+                MemberVerificationAspect.FieldWriteability,
+                MemberVerificationAspect.MemberType
+            };
+            structureService.Received().VerifyType(OriginalType);
+            structureService.Received().VerifyMember(
+                OriginalStaticField,
+                CreateEquvilantArg(expectedAspects));
+        }
+
+        [TestMethod("Visit verifies translatable property assignment")]
+        public void Visit_VerifiesTranslatablePropertyAssignment()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("instance.Property = null").GetRoot();
+            var node = root.AllDescendantNodes<MemberAccessExpressionSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetDescription(node).Returns(OriginalProperty);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateMember(OriginalProperty).Returns(TranslatedProperty);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            rewriter.Visit(node);
+
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.PropertyIsStatic,
+                MemberVerificationAspect.PropertySetAccessLevel,
+                MemberVerificationAspect.PropertySetDeclaringType,
+                MemberVerificationAspect.PropertySetIsAbstract,
+                MemberVerificationAspect.PropertySetIsVirtual,
+                MemberVerificationAspect.PropertyType,
+            };
+            structureService.Received().VerifyType(OriginalType);
+            structureService.Received().VerifyMember(
+                OriginalProperty,
+                CreateEquvilantArg(expectedAspects));
+        }
+
+        [TestMethod("Visit verifies translatable static property assignment")]
+        public void Visit_VerifiesTranslatableStaticPropertyAssignment()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("TestTypes.OriginalClass.StaticProperty = null").GetRoot();
+            var node1 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(0);
+            var node2 = root.AllDescendantNodes<MemberAccessExpressionSyntax>().ElementAt(1);
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetDescription(node1).Returns(OriginalStaticProperty);
+            resolver.GetDescription(node2).Returns(OriginalType);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateType(OriginalType).Returns(TranslatedType);
+            structureService.TranslateMember(OriginalStaticProperty).Returns(TranslatedStaticProperty);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            rewriter.Visit(node1);
+
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.PropertyIsStatic,
+                MemberVerificationAspect.PropertySetAccessLevel,
+                MemberVerificationAspect.PropertySetDeclaringType,
+                MemberVerificationAspect.PropertySetIsAbstract,
+                MemberVerificationAspect.PropertySetIsVirtual,
+                MemberVerificationAspect.PropertyType
+            };
+            structureService.Received().VerifyType(OriginalType);
+            structureService.Received().VerifyMember(
+                OriginalStaticProperty,
+                CreateEquvilantArg(expectedAspects));
         }
 
         #endregion
@@ -1928,8 +2226,13 @@ namespace TestTools_Tests.Structure
 
             rewriter.Visit(node);
 
+            var expectedAspects = new[]
+            {
+                MemberVerificationAspect.ConstructorAccessLevel,
+                MemberVerificationAspect.MemberType
+            };
             structureService.VerifyType(OriginalType);
-            structureService.VerifyMember(OriginalDefaultConstructor);
+            structureService.VerifyMember(OriginalDefaultConstructor, expectedAspects);
         }
 
         #endregion

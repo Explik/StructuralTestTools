@@ -14,9 +14,67 @@ namespace Explik.StructuralTestTools
     // TypeRewriter translates and verifies statements
     public class TypeRewriter : CSharpSyntaxRewriter
     {
-        private ICompileTimeDescriptionResolver _resolver;
-        private IStructureService _structureService;
-        
+        private readonly ICompileTimeDescriptionResolver _resolver;
+        private readonly IStructureService _structureService;
+
+        private readonly MemberVerificationAspect[] _eventAddAspects = new[]
+        {
+            MemberVerificationAspect.EventAddAccessLevel,
+            MemberVerificationAspect.EventHandlerType,
+            MemberVerificationAspect.MemberType
+        };
+        private readonly MemberVerificationAspect[] _eventRemoveAspects = new[]
+        {
+            MemberVerificationAspect.EventHandlerType,
+            MemberVerificationAspect.EventRemoveAccessLevel,
+            MemberVerificationAspect.MemberType
+        };
+        private readonly MemberVerificationAspect[] _fieldGetAspects = new[]
+        {
+            MemberVerificationAspect.FieldAccessLevel,
+            MemberVerificationAspect.FieldIsStatic,
+            MemberVerificationAspect.FieldType,
+            MemberVerificationAspect.MemberType
+        };
+        private readonly MemberVerificationAspect[] _fieldSetAspects = new[]
+        {
+            MemberVerificationAspect.FieldAccessLevel,
+            MemberVerificationAspect.FieldIsStatic,
+            MemberVerificationAspect.FieldType,
+            MemberVerificationAspect.FieldWriteability,
+            MemberVerificationAspect.MemberType
+        };
+        private readonly MemberVerificationAspect[] _methodAspects = new[]
+        {
+            MemberVerificationAspect.MemberType,
+            MemberVerificationAspect.MethodAccessLevel,
+            MemberVerificationAspect.MethodDeclaringType,
+            MemberVerificationAspect.MethodIsAbstract,
+            MemberVerificationAspect.MethodIsStatic,
+            MemberVerificationAspect.MethodIsVirtual,
+            MemberVerificationAspect.MethodReturnType
+        };
+        private readonly MemberVerificationAspect[] _propertyGetAspects = new[]
+        {
+            MemberVerificationAspect.MemberType,
+            MemberVerificationAspect.PropertyIsStatic,
+            MemberVerificationAspect.PropertyGetAccessLevel,
+            MemberVerificationAspect.PropertyGetDeclaringType,
+            MemberVerificationAspect.PropertyGetIsAbstract,
+            MemberVerificationAspect.PropertyGetIsVirtual,
+            MemberVerificationAspect.PropertyType
+        };
+        private readonly MemberVerificationAspect[] _propertySetAspects = new[]
+        {
+            MemberVerificationAspect.MemberType,
+            MemberVerificationAspect.PropertyIsStatic,
+            MemberVerificationAspect.PropertySetAccessLevel,
+            MemberVerificationAspect.PropertySetDeclaringType,
+            MemberVerificationAspect.PropertySetIsAbstract,
+            MemberVerificationAspect.PropertySetIsVirtual,
+            MemberVerificationAspect.PropertyType
+        };
+
         public TypeRewriter(ICompileTimeDescriptionResolver resolver, IStructureService structureService)
         {
             _resolver = resolver;
@@ -87,15 +145,11 @@ namespace Explik.StructuralTestTools
 
             if (originalMember != translatedMember)
             {
+                var isAssignment = IsAssigment(node.Ancestors().First());
+                var aspects = !isAssignment ? _propertyGetAspects : _propertySetAspects;
+
                 _structureService.VerifyType(originalType);
-                _structureService.VerifyMember(
-                       originalMember,
-                       MemberVerificationAspect.PropertyType,
-                       MemberVerificationAspect.PropertyIsStatic,
-                       MemberVerificationAspect.PropertySetDeclaringType,
-                       MemberVerificationAspect.PropertySetIsAbstract,
-                       MemberVerificationAspect.PropertySetIsVirtual,
-                       MemberVerificationAspect.PropertySetAccessLevel);
+                _structureService.VerifyMember(originalMember, aspects);
             }
             return base.VisitElementAccessExpression(node);
         }
@@ -133,6 +187,7 @@ namespace Explik.StructuralTestTools
         {
             object originalMember = _resolver.GetDescription(node);
             object translatedMember;
+            
             if (originalMember is TypeDescription typeDescription1)
             {
                 translatedMember = _structureService.TranslateType(typeDescription1);
@@ -148,47 +203,32 @@ namespace Explik.StructuralTestTools
 
             if (originalMember is EventDescription eventDescription1)
             {
+                var isUnsubscription = node.Ancestors().First().IsKind(SyntaxKind.SubtractAssignmentExpression);
+                var aspects = !isUnsubscription ? _eventAddAspects : _eventRemoveAspects;
+
                 _structureService.VerifyType(eventDescription1.DeclaringType);
-                _structureService.VerifyMember(
-                    eventDescription1,
-                    MemberVerificationAspect.EventHandlerType,
-                    MemberVerificationAspect.EventAddAccessLevel,
-                    MemberVerificationAspect.EventRemoveAccessLevel);
+                _structureService.VerifyMember(eventDescription1, aspects);
             }
             else if (originalMember is FieldDescription fieldDescription2)
             {
+                var isAssignment = IsAssigment(node.Ancestors().First());
+                var aspects = !isAssignment ? _fieldGetAspects : _fieldSetAspects;
+
                 _structureService.VerifyType(fieldDescription2.DeclaringType);
-                _structureService.VerifyMember(
-                    fieldDescription2,
-                    MemberVerificationAspect.FieldType,
-                    MemberVerificationAspect.FieldIsStatic,
-                    MemberVerificationAspect.FieldWriteability,
-                    MemberVerificationAspect.FieldAccessLevel);
+                _structureService.VerifyMember(fieldDescription2, aspects);
             }
             else if (originalMember is MethodDescription methodDescription2)
             {
                 _structureService.VerifyType(methodDescription2.DeclaringType);
-                _structureService.VerifyMember(
-                    methodDescription2,
-                    MemberVerificationAspect.MemberType,
-                    MemberVerificationAspect.MethodDeclaringType,
-                    MemberVerificationAspect.MethodReturnType,
-                    MemberVerificationAspect.MethodIsStatic,
-                    MemberVerificationAspect.MethodIsAbstract,
-                    MemberVerificationAspect.MethodIsVirtual,
-                    MemberVerificationAspect.MethodAccessLevel);
+                _structureService.VerifyMember(methodDescription2, _methodAspects);
             }
             else if (originalMember is PropertyDescription propertyDescription2)
             {
+                var isAssignment = IsAssigment(node.Ancestors().First());
+                var aspects = !isAssignment ? _propertyGetAspects : _propertySetAspects;
+
                 _structureService.VerifyType(propertyDescription2.DeclaringType);
-                _structureService.VerifyMember(
-                       propertyDescription2,
-                       MemberVerificationAspect.PropertyType,
-                       MemberVerificationAspect.PropertyIsStatic,
-                       MemberVerificationAspect.PropertySetDeclaringType,
-                       MemberVerificationAspect.PropertySetIsAbstract,
-                       MemberVerificationAspect.PropertySetIsVirtual,
-                       MemberVerificationAspect.PropertySetAccessLevel);
+                _structureService.VerifyMember(propertyDescription2, aspects);
             }
 
             // Potentially rewritting member name
@@ -315,6 +355,26 @@ namespace Explik.StructuralTestTools
                 SyntaxFactory.ArrayType(elementType);
             }
             return SyntaxFactory.ParseTypeName(typeDescription.FullName);
+        }
+
+        private bool IsAssigment(SyntaxNode node)
+        {
+            var assignmentKinds = new[]
+            {
+                SyntaxKind.AddAssignmentExpression,
+                SyntaxKind.AndAssignmentExpression,
+                SyntaxKind.CoalesceAssignmentExpression,
+                SyntaxKind.DivideAssignmentExpression,
+                SyntaxKind.ExclusiveOrAssignmentExpression,
+                SyntaxKind.LeftShiftAssignmentExpression,
+                SyntaxKind.ModuloAssignmentExpression,
+                SyntaxKind.MultiplyAssignmentExpression,
+                SyntaxKind.OrAssignmentExpression,
+                SyntaxKind.RightShiftAssignmentExpression,
+                SyntaxKind.SimpleAssignmentExpression,
+                SyntaxKind.SubtractAssignmentExpression
+            };
+            return assignmentKinds.Contains(node.Kind());
         }
     }
 }
