@@ -151,7 +151,7 @@ namespace TestTools_Tests.Structure
             syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
             syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
             var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
-            statementRewriter.VisitBlock(node3).Returns(SyntaxFactory.ParseStatement(replacedSource));
+            statementRewriter.Visit(node3).Returns(SyntaxFactory.ParseStatement(replacedSource));
             var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
 
             var translatedNode = rewriter.Visit(node1);
