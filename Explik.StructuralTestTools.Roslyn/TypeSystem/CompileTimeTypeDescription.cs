@@ -41,7 +41,7 @@ namespace Explik.StructuralTestTools.TypeSystem
             }
         }
 
-        public override bool IsAbstract => TypeSymbol.IsAbstract;
+        public override bool IsAbstract => TypeSymbol.IsAbstract || TypeSymbol.IsStatic;
 
         public override bool IsArray => TypeSymbol.TypeKind == TypeKind.Array;
 
@@ -55,7 +55,7 @@ namespace Explik.StructuralTestTools.TypeSystem
 
         public override bool IsPublic => TypeSymbol.DeclaredAccessibility == Accessibility.Public;
 
-        public override bool IsSealed => TypeSymbol.IsSealed;
+        public override bool IsSealed => TypeSymbol.IsSealed || TypeSymbol.IsStatic;
 
         public override bool IsGenericType
         {
