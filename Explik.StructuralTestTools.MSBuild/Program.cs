@@ -15,6 +15,7 @@ using Explik.StructuralTestTools.TypeSystem;
 
 namespace Explik.StructuralTestTools
 {
+    // TODO Preserve whitespace
     public class Program
     {
         public static void Main(string[] args)
@@ -60,7 +61,7 @@ namespace Explik.StructuralTestTools
 
                     var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot());
                     var rewrittenClassName = RetreiveClassDeclarations(rewrittenNode.SyntaxTree).First().Identifier;
-                    var rewrittenSource = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
+                    var rewrittenSource = rewrittenNode.ToString();
 
                     var fileName = $"{rewrittenClassName}.g.cs";
                     var filePath = configDirectory + "\\" + fileName;
