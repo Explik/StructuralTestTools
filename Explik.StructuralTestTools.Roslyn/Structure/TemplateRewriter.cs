@@ -85,9 +85,21 @@ namespace Explik.StructuralTestTools
                     "",
                     node.Body.OpenBraceToken.ToFullString(),
                     CreateComment("// == Failed To Compile == ", node.Body.Statements.FirstOrDefault()),
-                    CreateCommentedBody(node).TrimEnd(),
-                    CreateThrowStatement(node, ex, node.Body.Statements.LastOrDefault()),
+                    CreateCommentedBody(node),
+                    CreateThrowStatement(node, ex, node.Body.Statements.FirstOrDefault()),
                     node.Body.CloseBraceToken.ToFullString());
+
+                if (node.Body.ToFullString().Count(c => c == '\n') == 1)
+                {
+                    var methodIndent = node.Modifiers.Any() ? node.Modifiers.FirstOrDefault().LeadingTrivia.ToFullString() : node.ReturnType.GetLeadingTrivia().ToFullString();
+                    newBodySource = string.Join(
+                        methodIndent,
+                        node.Body.OpenBraceToken.ToFullString() + Environment.NewLine,
+                        "  " + CreateComment("// == Failed To Compile == ", node.Body.Statements.FirstOrDefault()),
+                        "  " + CreateCommentedBody(node),
+                        "  " + CreateThrowStatement(node, ex, node.Body.Statements.FirstOrDefault()),
+                        node.Body.CloseBraceToken.ToFullString() + Environment.NewLine);
+                }
 
                 newBody = (BlockSyntax)SyntaxFactory.ParseStatement(newBodySource);
             }
@@ -97,21 +109,35 @@ namespace Explik.StructuralTestTools
         private string CreateComment(string text, SyntaxNode triviaNode)
         {
             var leadingTrivia = triviaNode?.GetLeadingTrivia().ToString() ?? "";
-            var traillingTrivia = triviaNode?.GetTrailingTrivia().First().ToString() ?? "";
-
-            return leadingTrivia + text + traillingTrivia;
+            return leadingTrivia + text + Environment.NewLine;
         }
 
         private string CreateCommentedBody(MethodDeclarationSyntax node)
         {
             var builder = new StringBuilder();
 
-            foreach(var statement in node.Body.Statements)
+            var indent = node.Body.Statements.FirstOrDefault()?.GetLeadingTrivia().ToString() ?? "";
+            var source = string.Join("", node.Body.Statements.Select(s => s.ToFullString()));
+            var lines = source.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach(var line in lines)
             {
-                var leadingTrivia = statement.GetLeadingTrivia().ToString();
-                var traillingTrivia = statement.GetTrailingTrivia().First().ToString();
-                 
-                builder.Append(leadingTrivia + "// " + statement.ToString() + traillingTrivia);
+                var isValid = line.Length >= indent.Length;
+                var lineWithoutIndent = isValid ? line.Substring(indent.Length) : "";
+
+                // If the statment starts prior to the indent, move the statement forward.
+                if(isValid  && !string.IsNullOrWhiteSpace(line.Substring(0, indent.Length)))
+                {
+                    var indexOfFirstNonWhitespace = line.Length - line.TrimStart().Length;
+                    lineWithoutIndent = line.Substring(indexOfFirstNonWhitespace);
+                }
+
+                // Leaves a gap in the comment if the line is empty, so it follows the "comment selection" feature in VS.  
+                if (!string.IsNullOrWhiteSpace(lineWithoutIndent))
+                {
+                    builder.AppendLine(indent + "// " + lineWithoutIndent);
+                }
+                else builder.AppendLine(indent);
             }
             return builder.ToString();
         }
@@ -119,15 +145,11 @@ namespace Explik.StructuralTestTools
         private string CreateThrowStatement(MethodDeclarationSyntax node, VerifierServiceException ex, SyntaxNode triviaNode)
         {
             var leadingTrivia = triviaNode?.GetLeadingTrivia().ToString() ?? "";
-            var traillingTrivia = triviaNode?.GetTrailingTrivia().First().ToString() ?? "";
-            
-            if (leadingTrivia.Contains(Environment.NewLine))
-                leadingTrivia = Environment.NewLine + leadingTrivia.Split(new[] { Environment.NewLine }, StringSplitOptions.None).Last();
 
             var templatedAttribute = node.AttributeLists.SelectMany(l => l.Attributes).First(_resolver.IsTemplatedAttribute);
             var exceptionTypeName = _resolver.GetAssociatedExceptionType(templatedAttribute);
             
-            return leadingTrivia + $"throw new {exceptionTypeName}(\"{ex.Message}\");" + traillingTrivia;
+            return leadingTrivia + $"throw new {exceptionTypeName}(\"{ex.Message}\");" + Environment.NewLine;
         }
     }
 }

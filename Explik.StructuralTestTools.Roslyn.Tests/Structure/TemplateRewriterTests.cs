@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using static TestTools_Tests.TestHelper;
 
 namespace TestTools_Tests.Structure
 {
@@ -27,7 +28,7 @@ namespace TestTools_Tests.Structure
             var translatedNode = rewriter.Visit(node);
 
             var expectedSource = "class ClassName { }";
-            Assert.AreEqual(expectedSource, translatedNode.ToString());
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
 
         [TestMethod("Visit removes _Template from constructor")]
@@ -43,7 +44,7 @@ namespace TestTools_Tests.Structure
             var translatedNode = rewriter.Visit(node);
 
             var expectedSource = "class ClassName { ClassName() { } }";
-            Assert.AreEqual(expectedSource, translatedNode.ToString());
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
 
         [TestMethod("Visit does not modify non-templated attributes")]
@@ -60,7 +61,7 @@ namespace TestTools_Tests.Structure
 
             var translatedNode = rewriter.Visit(node1);
 
-            Assert.AreEqual(source, translatedNode.ToString());
+            AssertAreEqualSource(source, translatedNode.ToString());
         }
 
         [TestMethod("Visit replace name of templated attributes on class")]
@@ -80,7 +81,7 @@ namespace TestTools_Tests.Structure
             var translatedNode = rewriter.Visit(node1);
 
             var expectedSource = "[TestClass] class ClassName { }";
-            Assert.AreEqual(expectedSource, translatedNode.ToString());
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
 
         [TestMethod("Visit replaces name of templated attributes on method")]
@@ -100,7 +101,7 @@ namespace TestTools_Tests.Structure
             var translatedNode = rewriter.Visit(node1);
 
             var expectedSource = "[TemplatedTestMethod] void MethodName() {}";
-            Assert.AreEqual(expectedSource, translatedNode.ToString());
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
 
         [TestMethod("Visit does not modify method body without templated attribute")]
@@ -118,7 +119,7 @@ namespace TestTools_Tests.Structure
             var translatedNode = rewriter.Visit(node1);
 
             var expectedSource = "[TestMethod] void MethodName() {}";
-            Assert.AreEqual(expectedSource, translatedNode.ToString());
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
 
         [TestMethod("Visit modifies body of method with templated attributes")]
@@ -164,12 +165,206 @@ namespace TestTools_Tests.Structure
                 "    ",
                 "    Console.WriteLine(\"translated line 2\");",
                 "  }");
-            Assert.AreEqual(expectedSource, translatedNode.ToString());
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
 
-        // String comparison is too strict
-        // [TestMethod("Visit replaces body of method with templated attributes on VerifierServiceException")]
-        public void Visit_ReplacesBodyOfMethodWithTemplatedAttributesOnVerifierServiceException()
+        [TestMethod("Visit replace body of method with templated attributes on VerifierServiceException (single line 1)")]
+        public void VisitReplaceBodyOfMethodWithTemplatedAttributesOnVerifyServiceExceptionSingleLine1()
+        {
+            var source = string.Join(
+                Environment.NewLine,
+                "class ClassName {",
+                "  [TemplatedTestMethod]",
+                "  void MethodName() { Assert.IsNull(Person.FirstName); }",
+                "}");
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node3 = root.AllDescendantNodes<BlockSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.HasTemplatedAttribute(node1).Returns(true);
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
+            syntaxResolver.GetAssociatedExceptionType(node2).Returns("AssertFailedException");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node3).Returns(x => throw new VerifierServiceException("message for user"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node1);
+
+            var expectedSource = string.Join(
+                Environment.NewLine,
+                "[TestMethod]",
+                "  void MethodName() {",
+                "    // == Failed To Compile ==",
+                "    // Assert.IsNull(Person.FirstName);",
+                "    throw new AssertFailedException(\"message for user\");",
+                "  }");
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
+        [TestMethod("Visit replace body of method with templated attributes on VerifierServiceException (single line 2)")]
+        public void VisitReplaceBodyOfMethodWithTemplatedAttributesOnVerifyServiceExceptionSingleLine2()
+        {
+            var source = string.Join(
+                Environment.NewLine,
+                "class ClassName {",
+                "  [TemplatedTestMethod]",
+                "  public void MethodName() { Assert.IsNull(Person.FirstName); }",
+                "}");
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node3 = root.AllDescendantNodes<BlockSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.HasTemplatedAttribute(node1).Returns(true);
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
+            syntaxResolver.GetAssociatedExceptionType(node2).Returns("AssertFailedException");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node3).Returns(x => throw new VerifierServiceException("message for user"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node1);
+
+            var expectedSource = string.Join(
+                Environment.NewLine,
+                "[TestMethod]",
+                "  public void MethodName() {",
+                "    // == Failed To Compile ==",
+                "    // Assert.IsNull(Person.FirstName);",
+                "    throw new AssertFailedException(\"message for user\");",
+                "  }");
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
+        [TestMethod("Visit replace body of method with templated attributes on VerifierServiceException (multi-line statement 1)")]
+        public void VisitReplaceBodyOfMethodWithTemplatedAttributesOnVerifyServiceExceptionMultilLineStatement1()
+        {
+            var source = string.Join(
+                Environment.NewLine,
+                "class ClassName {",
+                "  [TemplatedTestMethod]",
+                "  void MethodName() {",
+                "    Console.WriteLine(",
+                "      \"A long string\");",
+                "  }",
+                "}");
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node3 = root.AllDescendantNodes<BlockSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.HasTemplatedAttribute(node1).Returns(true);
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
+            syntaxResolver.GetAssociatedExceptionType(node2).Returns("AssertFailedException");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node3).Returns(x => throw new VerifierServiceException("message for user"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node1);
+
+            var expectedSource = string.Join(
+                Environment.NewLine,
+                "[TestMethod]",
+                "  void MethodName() {",
+                "    // == Failed To Compile ==",
+                "    // Console.WriteLine(",
+                "    //   \"A long string\");",
+                "    throw new AssertFailedException(\"message for user\")",
+                "  }");
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
+        [TestMethod("Visit replace body of method with templated attributes on VerifierServiceException (multi-line statement 2)")]
+        public void VisitReplaceBodyOfMethodWithTemplatedAttributesOnVerifyServiceExceptionMultilLineStatement2()
+        {
+            var source = string.Join(
+                Environment.NewLine,
+                "class ClassName {",
+                "  [TemplatedTestMethod]",
+                "  void MethodName() {",
+                "    new Person() {",
+                "      Age = 38",
+                "    }",
+                "  }",
+                "}");
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node3 = root.AllDescendantNodes<BlockSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.HasTemplatedAttribute(node1).Returns(true);
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
+            syntaxResolver.GetAssociatedExceptionType(node2).Returns("AssertFailedException");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node3).Returns(x => throw new VerifierServiceException("message for user"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node1);
+
+            var expectedSource = string.Join(
+                Environment.NewLine,
+                "[TestMethod]",
+                "  void MethodName() {",
+                "    // == Failed To Compile ==",
+                "    // new Person() {",
+                "    //   Age = 38",
+                "    // }",
+                "    throw new AssertFailedException(\"message for user\");",
+                "  }");
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
+        [TestMethod("Visit replaces body of method with templated attributes on VerifierServiceException (multiple statements 1)")]
+        public void Visit_ReplacesBodyOfMethodWithTemplatedAttributesOnVerifierServiceExceptionMultipleStatements1()
+        {
+            var source = string.Join(
+                Environment.NewLine,
+                "class ClassName {",
+                "  [TemplatedTestMethod]",
+                "  void MethodName() {",
+                "    Console.WriteLine(\"original line 1\");",
+                "    Console.WriteLine(\"original line 2\");",
+                "  }",
+                "}");
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node3 = root.AllDescendantNodes<BlockSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.HasTemplatedAttribute(node1).Returns(true);
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
+            syntaxResolver.GetAssociatedExceptionType(node2).Returns("AssertFailedException");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node3).Returns(x => throw new VerifierServiceException("message for user"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node1);
+
+            var expectedSource = string.Join(
+                Environment.NewLine,
+                "[TestMethod]",
+                "  void MethodName() {",
+                "    // == Failed To Compile ==",
+                "    // Console.WriteLine(\"original line 1\");",
+                "    // Console.WriteLine(\"original line 2\");",
+                "    throw new AssertFailedException(\"message for user\");",
+                "  }");
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
+
+        [TestMethod("Visit replaces body of method with templated attributes on VerifierServiceException (multiple statements 2)")]
+        public void Visit_ReplacesBodyOfMethodWithTemplatedAttributesOnVerifierServiceExceptionMultipleStatements2()
         {
             var source = string.Join(
                 Environment.NewLine,
@@ -186,20 +381,13 @@ namespace TestTools_Tests.Structure
             var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
             var node3 = root.AllDescendantNodes<BlockSyntax>().First();
 
-            var replacedSource = string.Join(
-                Environment.NewLine,
-                "  {",
-                "    Console.WriteLine(\"translated line 1\");",
-                "    ",
-                "    Console.WriteLine(\"translated line 2\");",
-                "  }");
             var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
             syntaxResolver.HasTemplatedAttribute(node1).Returns(true);
             syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
             syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
             syntaxResolver.GetAssociatedExceptionType(node2).Returns("AssertFailedException");
             var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
-            statementRewriter.VisitBlock(node3).Returns(x => throw new VerifierServiceException("message for user"));
+            statementRewriter.Visit(node3).Returns(x => throw new VerifierServiceException("message for user"));
             var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
 
             var translatedNode = rewriter.Visit(node1);
@@ -214,7 +402,47 @@ namespace TestTools_Tests.Structure
                 "    // Console.WriteLine(\"original line 2\");",
                 "    throw new AssertFailedException(\"message for user\");",
                 "  }");
-            Assert.AreEqual(expectedSource, translatedNode.ToString());
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
+        [TestMethod("Visit replaces body of method with templated attributes on VerifierServiceException (multiple statements 3)")]
+        public void Visit_ReplacesBodyOfMethodWithTemplatedAttributesOnVerifierServiceExceptionMultipleStatements3()
+        {
+            var source = string.Join(
+                Environment.NewLine,
+                "class ClassName {",
+                "  [TemplatedTestMethod]",
+                "  void MethodName() {",
+                "    Console.WriteLine(\"original line 1\");",
+                "Console.WriteLine(\"original line 2\");",
+                "  }",
+                "}");
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node3 = root.AllDescendantNodes<BlockSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.HasTemplatedAttribute(node1).Returns(true);
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestMethod");
+            syntaxResolver.GetAssociatedExceptionType(node2).Returns("AssertFailedException");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node3).Returns(x => throw new VerifierServiceException("message for user"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node1);
+
+            var expectedSource = string.Join(
+                Environment.NewLine,
+                "[TestMethod]",
+                "  void MethodName() {",
+                "    // == Failed To Compile ==",
+                "    // Console.WriteLine(\"original line 1\");",
+                "    // Console.WriteLine(\"original line 2\");",
+                "    throw new AssertFailedException(\"message for user\");",
+                "  }");
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
     }
 }
