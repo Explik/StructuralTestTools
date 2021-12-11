@@ -1,27 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<NuSpecFile>Explik.StructuralTestTools.MSBuild.nuspec</NuSpecFile>
+  <PropertyGroup>
+	<TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<NuSpecFile>Explik.StructuralTestTools.MSBuild.nuspec</NuSpecFile>
 
-		<NoPackageAnalysis>true</NoPackageAnalysis>
+	<NoPackageAnalysis>true</NoPackageAnalysis>
 
-		<!-- Note that https://github.com/NuGet/Home/issues/4694 prevents this from actually working. -->
-		<developmentDependency>true</developmentDependency>
+	<!-- Note that https://github.com/NuGet/Home/issues/4694 prevents this from actually working. -->
+	<developmentDependency>true</developmentDependency>
 
-		<!-- We're going to include it by virtue of sending the whole bin dir to the build folder. -->
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	</PropertyGroup>
+	<!-- We're going to include it by virtue of sending the whole bin dir to the build folder. -->
+	<IncludeBuildOutput>false</IncludeBuildOutput>
+	<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
   
   <!-- Sets up package variables -->
   <Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec">
-		<PropertyGroup>
-			<NuspecProperties>$(NuspecProperties);outputPath=$(OutputPath)</NuspecProperties>
-		</PropertyGroup>
-	</Target>
+	<PropertyGroup>
+	  <NuspecProperties>$(NuspecProperties);outputPath=$(OutputPath)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
 
   <!-- Replaces the output files of Explik.Structural.MSBuild.Tasks output with the files of Explik.StructuralTestTools.MSBuild project, like a ProjectReference -->
   <Target Name="GenerateBuildOutputs">
@@ -36,7 +36,7 @@
 	
 	<Message Importance="high" Text="Deleting existing output files" />
 	<Delete Files="@(ExistingFiles)">
-		<Output TaskParameter="DeletedFiles" ItemName="DeletedFiles" />
+	  <Output TaskParameter="DeletedFiles" ItemName="DeletedFiles" />
 	</Delete>
 	<Message Importance="high" Text="Deleted files: @(DeletedFiles)" />
 	  
@@ -44,7 +44,10 @@
     <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; &quot;$(ProjectFile)&quot;" />
 	
 	<Message Text="Copying new output files to output folder" Importance="high" />
-    <Copy SourceFiles="@(NewFiles)" DestinationFolder="$(OutputPath)\%(RecursiveDir)" />
+	<Copy SourceFiles="@(NewFiles)" DestinationFolder="$(OutputPath)\%(RecursiveDir)">
+	  <Output TaskParameter="CopiedFiles" ItemName="CopiedFiles"/>
+	</Copy>
+	<Message Importance="high" Text="Copied files: @(CopiedFiles)" />
   </Target>
 
   <!-- Packs Explik.StructuralTestTools.Build output into nuget package -->
