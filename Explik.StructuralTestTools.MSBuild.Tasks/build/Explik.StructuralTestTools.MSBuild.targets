@@ -16,15 +16,15 @@
 	<Target Name="BeforeCompile">
 		<Message Importance="low" Text="ShouldRun = $(ShouldRun)" />
 		<Message Importance="low" Text="ExePath = $(ExePath)" />
+		<Message Importance="low" Text="MSBuildSDKsPath = $(MSBuildSDKsPath)" />
 		<Message Importance="low" Text="SolutionPath = $(SolutionPath)" />
 		<Message Importance="low" Text="MSBuildProjectName = $(MSBuildProjectName)" />
-		<Message Importance="low" Text="MSBuildSDKsPath = $(MSBuildSDKsPath)" />
 		<Message Importance="low" Text="ConfigPath = $(ConfigPath)" />
-		<Message Importance="low" Text='Command = "$(ExePath)" "$(MSBuildVersion)" "$(SolutionPath)" "$(MSBuildSDKsPath)" "$(ConfigPath)"' />
+		<Message Importance="low" Text='Command = "$(ExePath)" "$(MSBuildSDKsPath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' />
 
 		<Exec Condition="$(ShouldRun)" 
-			  Command='"$(ExePath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(MSBuildSDKsPath)" "$(ConfigPath)"' 
+			  Command='"$(ExePath)" "$(MSBuildToolsPath)" "$(SolutionPath)" "$(MSBuildProjectName)" "$(ConfigPath)"' 
 			  ConsoleToMSBuild="true" 
-			  ContinueOnError="true"/>
+			  ContinueOnError="true" />
 	</Target>
 </Project>

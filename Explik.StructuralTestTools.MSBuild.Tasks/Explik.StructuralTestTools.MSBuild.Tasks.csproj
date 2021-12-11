@@ -23,28 +23,38 @@
 		</PropertyGroup>
 	</Target>
 
-  <!-- Builds Explik.StructuralTestTools.MSBuild project, like ProjectReference, but without referencing it directly -->
+  <!-- Replaces the output files of Explik.Structural.MSBuild.Tasks output with the files of Explik.StructuralTestTools.MSBuild project, like a ProjectReference -->
   <Target Name="GenerateBuildOutputs">
     <PropertyGroup>
       <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</SolutionDir>
       <ProjectFile>$(SolutionDir)\Explik.StructuralTestTools.MSBuild\Explik.StructuralTestTools.MSBuild.csproj</ProjectFile>
     </PropertyGroup>
     <ItemGroup>
-       <ProjectOutputFiles Include="$(SolutionDir)\Explik.StructuralTestTools.MSBuild\bin\$(Configuration)\net5.0\**\*.*" />
+	  <ExistingFiles Include="$(OutputPath)**\*.*"/>
+      <NewFiles Include="$(SolutionDir)\Explik.StructuralTestTools.MSBuild\bin\$(Configuration)\net5.0\**\*.*" />
     </ItemGroup>
-
-    <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; &quot;$(ProjectFile)&quot;" />    
-    <Copy SourceFiles="@(ProjectOutputFiles)" DestinationFolder="$(OutputPath)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+	
+	<Message Importance="high" Text="Deleting existing output files" />
+	<Delete Files="@(ExistingFiles)">
+		<Output TaskParameter="DeletedFiles" ItemName="DeletedFiles" />
+	</Delete>
+	<Message Importance="high" Text="Deleted files: @(DeletedFiles)" />
+	  
+	<Message Text="Building new output files from project $(ProjectFile)" Importance="high" />
+    <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; &quot;$(ProjectFile)&quot;" />
+	
+	<Message Text="Copying new output files to output folder" Importance="high" />
+    <Copy SourceFiles="@(NewFiles)" DestinationFolder="$(OutputPath)\%(RecursiveDir)" />
   </Target>
 
   <!-- Packs Explik.StructuralTestTools.Build output into nuget package -->
-	<Target Name="PackBuildOutputs" DependsOnTargets="GenerateBuildOutputs;SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup;">
+  <Target Name="PackBuildOutputs" DependsOnTargets="GenerateBuildOutputs;SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup;">
     <ItemGroup>
-			<TfmSpecificPackageFile Include="$(OutputPath)**\*.dll">
-				<PackagePath>build\</PackagePath>
-			</TfmSpecificPackageFile>
-		</ItemGroup>
-	</Target>
+      <TfmSpecificPackageFile Include="$(OutputPath)**\*.dll">
+	    <PackagePath>build\</PackagePath>
+	  </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
 	
   <ItemGroup>
     <None Include="build\**">

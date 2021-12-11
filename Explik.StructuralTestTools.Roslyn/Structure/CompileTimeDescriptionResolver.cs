@@ -8,6 +8,13 @@ using System.Reflection;
 
 namespace Explik.StructuralTestTools
 {
+    public class SyntaxResolutionException : Exception
+    {
+        public SyntaxResolutionException() : base() { }
+
+        public SyntaxResolutionException(string message) : base(message) { }
+    }
+
     public class CompileTimeDescriptionResolver : ICompileTimeDescriptionResolver
     {
         Compilation _compilation;
@@ -22,6 +29,9 @@ namespace Explik.StructuralTestTools
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
 
+            if (methodSymbol == null)
+                throw new SyntaxResolutionException("Could not resolve method in " + node.ToString());
+
             return new CompileTimeConstructorDescription(_compilation, methodSymbol);
         }
 
@@ -29,6 +39,9 @@ namespace Explik.StructuralTestTools
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = semanticModel.GetDeclaredSymbol(node);
+
+            if (methodSymbol == null)
+                throw new SyntaxResolutionException("Could not resolve method in " + node.ToString());
 
             return new CompileTimeConstructorDescription(_compilation, methodSymbol);
         }
@@ -61,6 +74,9 @@ namespace Explik.StructuralTestTools
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
 
+            if (methodSymbol == null)
+                throw new SyntaxResolutionException("Could not resolve method in " + node.ToString());
+
             return new CompileTimeMethodDescription(_compilation, methodSymbol);
         }
 
@@ -68,6 +84,9 @@ namespace Explik.StructuralTestTools
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = semanticModel.GetDeclaredSymbol(node);
+
+            if (methodSymbol == null)
+                throw new SyntaxResolutionException("Could not resolve method in " + node.ToString());
 
             return new CompileTimeMethodDescription(_compilation, methodSymbol);
         }
@@ -113,6 +132,9 @@ namespace Explik.StructuralTestTools
             var semanticModel = _compilation.GetSemanticModel(node.ElementType.SyntaxTree, ignoreAccessibility: true);
             var typeModel = semanticModel.GetTypeInfo(node.ElementType).Type;
 
+            if (typeModel == null)
+                throw new SyntaxResolutionException("Could not resolve type of " + node.ToString());
+
             return new CompileTimeTypeDescription(_compilation, typeModel);
         }
 
@@ -120,6 +142,9 @@ namespace Explik.StructuralTestTools
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var typeModel = semanticModel.GetTypeInfo(node.Type).Type;
+
+            if (typeModel == null)
+                throw new SyntaxResolutionException("Could not resolve type of " + node.ToString());
 
             return new CompileTimeTypeDescription(_compilation, typeModel);
         }
@@ -129,6 +154,9 @@ namespace Explik.StructuralTestTools
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var typeModel = semanticModel.GetTypeInfo(node.Type).Type;
 
+            if (typeModel == null)
+                throw new SyntaxResolutionException("Could not resolve type of " + node.ToString());
+
             return new CompileTimeTypeDescription(_compilation, typeModel);
         }
 
@@ -136,6 +164,9 @@ namespace Explik.StructuralTestTools
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var typeModel = semanticModel.GetDeclaredSymbol(node);
+
+            if (typeModel == null)
+                throw new SyntaxResolutionException("Could not resolve type of " + node.ToString());
 
             return new CompileTimeTypeDescription(_compilation, typeModel);
         }
@@ -145,6 +176,9 @@ namespace Explik.StructuralTestTools
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var typeModel = semanticModel.GetTypeInfo(node.Type).Type;
 
+            if (typeModel == null)
+                throw new SyntaxResolutionException("Could not resolve type of " + node.ToString());
+
             return new CompileTimeTypeDescription(_compilation, typeModel);
         }
 
@@ -153,6 +187,9 @@ namespace Explik.StructuralTestTools
             var semanticModel = _compilation.GetSemanticModel(node.Type.SyntaxTree, ignoreAccessibility: true);
             var typeSymbol = semanticModel.GetTypeInfo(node.Type).Type;
 
+            if (typeSymbol == null)
+                throw new SyntaxResolutionException("Could not resolve type of " + node.ToString());
+
             return new CompileTimeTypeDescription(_compilation, typeSymbol);
         }
 
@@ -160,8 +197,11 @@ namespace Explik.StructuralTestTools
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var attributeSymbolInfo = semanticModel.GetSymbolInfo(node);
-            var attributeSymbol = attributeSymbolInfo.Symbol ?? attributeSymbolInfo.CandidateSymbols.First();
-            
+            var attributeSymbol = attributeSymbolInfo.Symbol ?? attributeSymbolInfo.CandidateSymbols.FirstOrDefault();
+
+            if (attributeSymbol == null)
+                throw new SyntaxResolutionException("Could not resolve type of " + node.ToString() + "at " + node.GetLocation().ToString());
+
             return new CompileTimeTypeDescription(_compilation, attributeSymbol.ContainingType);
         }
     }

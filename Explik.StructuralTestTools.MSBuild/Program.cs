@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.Text;
 using Explik.StructuralTestTools;
 using Explik.StructuralTestTools.TypeSystem;
+using System.Diagnostics;
 
 namespace Explik.StructuralTestTools
 {
@@ -23,16 +24,37 @@ namespace Explik.StructuralTestTools
             if (args.Length != 4)
                 throw new ArgumentException();
 
-            TemplateUnitTests(args[0], args[1], args[2], args[3]);
+            Run(args[0], args[1], args[2], args[3]);
         }
 
-        public static void TemplateUnitTests(string solutionPath, string projectName, string msbuildVersion, string configPath)
+        public static void Run(string msbuildPath, string solutionPath, string projectName, string configPath)
         {
-            // Registers the latest MSBuild.exe 
-            var instances = MSBuildLocator.QueryVisualStudioInstances().ToArray();
-            var instance = instances.OrderByDescending(i => i.Version).First() ;
-            MSBuildLocator.RegisterInstance(instance);
+            try
+            {
+                TemplateUnitTests(msbuildPath, solutionPath, projectName, configPath);
+            }
+            catch (Exception ex)
+            {
+                var configFile = new FileInfo(configPath);
+                var configDirectory = configFile.Directory;
 
+                File.WriteAllText(configDirectory + "/StructuralTestTools-log.txt", ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+        }
+        
+        private static void TemplateUnitTests(string msbuildPath, string solutionPath, string projectName, string configPath)
+        {
+            // Registers the MSBuild.exe pointed to by msbuildPath
+            var instaces = MSBuildLocator.QueryVisualStudioInstances();
+
+            if (!instaces.Any())
+                throw new InvalidOperationException("No instances of compatitable versions of Visual Studio found");
+
+            MSBuildLocator.RegisterMSBuildPath(instaces.Select(s => s.MSBuildPath).ToArray());
+
+            if (MSBuildLocator.CanRegister)
+                throw new InvalidOperationException("Failed to load MSBuild at " + msbuildPath);
+            
             RunTemplateUnitTests(solutionPath, projectName, configPath);
         }
         
