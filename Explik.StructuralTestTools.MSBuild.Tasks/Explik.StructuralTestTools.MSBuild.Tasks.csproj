@@ -41,7 +41,7 @@
 	<Message Importance="high" Text="Deleted files: @(DeletedFiles)" />
 	  
 	<Message Text="Building new output files from project $(ProjectFile)" Importance="high" />
-    <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; &quot;$(ProjectFile)&quot;" />
+    <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; &quot;$(ProjectFile)&quot; -property:Configuration=$(Configuration)" />
 	
 	<Message Text="Copying new output files to output folder" Importance="high" />
 	<Copy SourceFiles="@(NewFiles)" DestinationFolder="$(OutputPath)\%(RecursiveDir)">
