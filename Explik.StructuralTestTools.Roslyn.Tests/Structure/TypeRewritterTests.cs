@@ -1549,7 +1549,7 @@ namespace TestTools_Tests.Structure
 
             Assert.AreEqual("TestTypes.TranslatedGenericClass<TestTypes.TranslatedTypeArgumentClass>.StaticPropertyWithTranslatedName", translatedNode.ToSource());
         }
-
+        
         [TestMethod("Visit rewrites type arguments of translatable method")]
         public void VisitiMemberAccessExpression_RewritesTypeArgumentsOfTranslatableMethod()
         {
@@ -1566,6 +1566,8 @@ namespace TestTools_Tests.Structure
 
             Assert.AreEqual("instance.GenericMethod<TestTypes.TranslatedTypeArgumentClass>", translatedNode.ToSource());
         }
+
+        // TODO Make Visit rewrites infered type arguments of translatable method
 
         [TestMethod("Visit rewrites type arguments of translatable static method")]
         public void VisitiMemberAccessExpression_RewritesTypeArgumentsOfTranslatableStaticMethod()
@@ -1586,6 +1588,8 @@ namespace TestTools_Tests.Structure
 
             Assert.AreEqual("TestTypes.TranslatedClass.StaticGenericMethod<TestTypes.TranslatedTypeArgumentClass>", translatedNode.ToSource());
         }
+
+        // TODO Make Visit rewrites infered type arguments of translatable method
 
         [TestMethod("Visit verifies translatable event subscription")]
         public void Visit_VerifiesTranslatableEventSubscription()

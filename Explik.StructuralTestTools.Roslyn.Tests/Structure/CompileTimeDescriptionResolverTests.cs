@@ -1,17 +1,11 @@
 ﻿using Explik.StructuralTestTools;
 using Explik.StructuralTestTools.MSTest;
 using Explik.StructuralTestTools.TypeSystem;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestTools_Tests.Structure
 {
@@ -22,10 +16,10 @@ namespace TestTools_Tests.Structure
         public void GetConstructorDescription_ReturnsCorrectlyForObjectCreationExpressionSyntax()
         {
             var source = @"
-new Student(); 
-public class Student 
-{ 
-    public Student() {} 
+new Student();
+public class Student
+{
+    public Student() {}
     public Student(object arg) {}
 }";
             var script = CSharpScript.Create(source);
@@ -44,7 +38,7 @@ public class Student
         public void GetConstructorDescription_ReturnsCorrectlyForConstructorDeclarationSyntax()
         {
             var source = @"
-public class ClassRoom 
+public class ClassRoom
 {
     public ClassRoom(string name) {}
 }";
@@ -82,7 +76,7 @@ public class ClassRoom
             var source = @"
 FireAlarm.Emergency += Console.Write(""Emergency!"");
 public class FireAlarm
-{ 
+{
     public static event EventHandler Emergency;
 }";
             var script = CSharpScript.Create(source);
@@ -104,7 +98,7 @@ public class FireAlarm
             var source = @"
 Grade.MinValue;
 public class Grade
-{ 
+{
     public static int MinValue;
     public static int MaxValue;
 }";
@@ -127,7 +121,7 @@ public class Grade
             var source = @"
 Teacher.Explain();
 public class Teacher
-{ 
+{
     public static void Explain() {};
     public static void Explain(int duration) {};
 }";
@@ -151,7 +145,7 @@ public class Teacher
             var source = @"
 Principal.FullName;
 public class Principal
-{ 
+{
     public static string FullName { get; set; }
 }";
             var script = CSharpScript.Create(source);
@@ -172,7 +166,7 @@ public class Principal
             var source = @"
 Pupil.MakeHomeWork();
 public class Pupil
-{ 
+{
     public static void MakeHomeWork() {};
     public static void MakeHomeWork(int duration) {};
 }";
@@ -209,11 +203,11 @@ public class Pupil
             var source = @"
 (new Page())[0];
 public class Page
-{ 
-    public string this[int n] 
-    { 
-        get { return null; } 
-        set {} 
+{
+    public string this[int n]
+    {
+        get { return null; }
+        set {}
     }
 }
 ";
@@ -250,7 +244,7 @@ public class TeacherTests { }
         public void IsTemplatedAttribute_ReturnsFalseForMSTestTestMethod()
         {
             var source = @"
-public class PrincipleTests { 
+public class PrincipleTests {
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
     public void FullName_ReturnsExpectedValue() { }
 }
@@ -286,7 +280,7 @@ public class PupilTests { }
         public void IsTemplatedAttribute_ReturnsTrueForTemplatedTestMethod()
         {
             var source = @"
-public class ClassRoomTests { 
+public class ClassRoomTests {
     [Explik.StructuralTestTools.MSTest.TemplatedTestMethod]
     public void Capacity_ReturnsExpectedValue() { }
 }
@@ -339,7 +333,7 @@ public class PupilTests { }
         public void HasTemplatedAttribute_ReturnsFalseForMSTestTestMethod()
         {
             var source = @"
-public class PrincipleTests { 
+public class PrincipleTests {
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
     public void FullName_ReturnsExpectedValue() { }
 }
@@ -358,7 +352,7 @@ public class PrincipleTests {
         public void HasTemplatedAttribute_ReturnsTrueForTemplatedTestMethod()
         {
             var source = @"
-public class ClassRoomTests { 
+public class ClassRoomTests {
     [Explik.StructuralTestTools.MSTest.TemplatedTestMethod]
     public void Capacity_ReturnsExpectedValue() { }
 }
@@ -396,7 +390,7 @@ public class PupilTests { }
         public void GetAssociatedAttributeType_ReturnsCorrectlyForTemplatedTestMethod()
         {
             var source = @"
-public class ClassRoomTests { 
+public class ClassRoomTests {
     [Explik.StructuralTestTools.MSTest.TemplatedTestMethod]
     public void Capacity_ReturnsExpectedValue() { }
 }
@@ -417,7 +411,7 @@ public class ClassRoomTests {
         public void GetAssociatedExceptionType_ReturnsCorrectlyForTemplatedTestMethod()
         {
             var source = @"
-public class ClassRoomTests { 
+public class ClassRoomTests {
     [Explik.StructuralTestTools.MSTest.TemplatedTestMethod]
     public void Capacity_ReturnsExpectedValue() { }
 }
