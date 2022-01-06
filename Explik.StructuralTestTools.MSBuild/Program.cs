@@ -24,6 +24,8 @@ namespace Explik.StructuralTestTools
             if (args.Length != 4)
                 throw new ArgumentException();
 
+            //Debugger.Launch();
+
             Run(args[0], args[1], args[2], args[3]);
         }
 
@@ -54,10 +56,40 @@ namespace Explik.StructuralTestTools
 
             if (MSBuildLocator.CanRegister)
                 throw new InvalidOperationException("Failed to load MSBuild at " + msbuildPath);
-            
-            RunTemplateUnitTests(solutionPath, projectName, configPath);
+
+            CreateSeperateWorkspace(solutionPath, out var newSolutionPath);
+            RunTemplateUnitTests(newSolutionPath, projectName, configPath);
+            //DeleteSeperateWorkspace(newSolutionPath);
         }
-        
+
+        private static void CreateSeperateWorkspace(string solutionPath, out string newSolutionPath)
+        {
+            var solutionFile = new FileInfo(solutionPath);
+            var solutionDirectory = solutionFile.Directory;
+
+            var newSolutionDirectory = new DirectoryInfo(solutionDirectory.Parent.ToString() + "\\TEMP");
+            if (newSolutionDirectory.Exists) newSolutionDirectory.Delete(true);
+            CopyDictionary(solutionDirectory, newSolutionDirectory);
+
+            newSolutionPath = newSolutionDirectory.FullName + "\\" + solutionFile.Name;
+        }
+
+        private static void DeleteSeperateWorkspace(string newSolutionPath)
+        {
+            new FileInfo(newSolutionPath).Directory.Delete(true);
+        }
+
+        private static void CopyDictionary(DirectoryInfo source, DirectoryInfo target)
+        {
+            Directory.CreateDirectory(target.FullName);
+
+            foreach (var file in source.GetFiles())
+                File.Copy(file.FullName, target.FullName + "\\" + file.Name);
+
+            foreach(var directory in source.GetDirectories())
+                CopyDictionary(directory, new DirectoryInfo(target.FullName + "\\" + directory.Name));
+        }
+
         private static void RunTemplateUnitTests(string solutionPath, string projectName, string configPath)
         {
             var configFile = new FileInfo(configPath);

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>Explik.StructuralTestTools.MSBuild</id>
-		<version>1.0.8-beta3</version>
+		<version>1.0.8-beta15</version>
 		<title>Explik.StructuralTestTools.MSBuild</title>
 		<authors>Explik</authors>
 		<owners>explik</owners>
@@ -17,7 +17,7 @@
 	</metadata>
 	
 	<files>
-		<file src="$outputPath$netstandard1.6\**\*" target="build\" />
+		<file src="$outputPath$net46\**\*" target="build\" />
 		<file src="build\Explik.StructuralTestTools.MSBuild.targets" target="build\Explik.StructuralTestTools.MSBuild.targets" />
 		<file src="buildCrossTargeting\Explik.StructuralTestTools.MSBuild.targets" target="buildCrossTargeting\Explik.StructuralTestTools.MSBuild.targets" />
 	</files>
