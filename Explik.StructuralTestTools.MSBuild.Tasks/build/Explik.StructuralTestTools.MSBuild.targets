@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project InitialTargets="BeforeCompile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project InitialTargets="TemplateUnitTests" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 	<PropertyGroup>
 		<GenerateAssemblyVersionInfo Condition=" '$(GenerateAssemblyVersionInfo)' == '' and '$(TargetExt)' != '.dll' and '$(TargetExt)' != '.exe'">false</GenerateAssemblyVersionInfo>
 		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
@@ -13,7 +13,7 @@
 		<ShouldRun Condition="'$(SolutionPath)' != '*Undefined*'">true</ShouldRun>
 	</PropertyGroup>
 
-	<Target Name="BeforeCompile">
+	<Target Name="TemplateUnitTests" BeforeTargets="BeforeCompile">
 		<Message Importance="low" Text="ShouldRun = $(ShouldRun)" />
 		<Message Importance="low" Text="ExePath = $(ExePath)" />
 		<Message Importance="low" Text="MSBuildSDKsPath = $(MSBuildSDKsPath)" />
