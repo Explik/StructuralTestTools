@@ -4,21 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace TestTools_Tests
 {
     [TestClass]
     public class PracticalTestTests
     {
-        string msbuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin";
         string solutionPath = @"C:\Users\OVS\source\repos\Explik\structural-test-tools\Explik.StructuralTestTools.PracticalTests\Explik.StructuralTestTools.PracticalTests.sln";
-        string projectName = @"Explik.StructuralTestTools.PracticalTests";
+        string projectPath = @"C:\Users\OVS\source\repos\Explik\structural-test-tools\Explik.StructuralTestTools.PracticalTests\Explik.StructuralTestTools.PracticalTests.csproj";
         string configPath = @"C:\Users\OVS\source\repos\Explik\structural-test-tools\Explik.StructuralTestTools.PracticalTests\TestToolsConfig.xml";
 
         [TestMethod]
-        public void UnitTestTemplator_Debug()
+        public async Task UnitTestTemplator_Debug()
         {
-             Program.Run(msbuildPath, solutionPath, projectName, configPath);
+             await Program.Run(solutionPath, projectPath, configPath);
         }
 
         [TestMethod]
@@ -29,7 +29,7 @@ namespace TestTools_Tests
             using (var program = new Process())
             {
                 program.StartInfo.FileName = programPath;
-                program.StartInfo.Arguments = $"\"{msbuildPath}\" \"{solutionPath}\" \"{projectName}\" \"{configPath}\"";
+                program.StartInfo.Arguments = $"\"{solutionPath}\" \"{projectPath}\" \"{configPath}\"";
                 program.StartInfo.UseShellExecute = false;
                 program.StartInfo.RedirectStandardOutput = true;
                 program.StartInfo.RedirectStandardError = true;
@@ -52,7 +52,7 @@ namespace TestTools_Tests
             using (var program = new Process())
             {
                 program.StartInfo.FileName = programPath;
-                program.StartInfo.Arguments = $"\"{msbuildPath}\" \"{solutionPath}\" \"{projectName}\" \"{configPath}\"";
+                program.StartInfo.Arguments = $"\"{solutionPath}\" \"{projectPath}\" \"{configPath}\"";
                 program.StartInfo.UseShellExecute = false;
                 program.StartInfo.RedirectStandardOutput = true;
                 program.StartInfo.RedirectStandardError = true;
