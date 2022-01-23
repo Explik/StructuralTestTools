@@ -281,7 +281,7 @@ namespace Explik.StructuralTestTools
             // Potentially rewritting expression
             ExpressionSyntax newExpression = newExpression = (ExpressionSyntax)Visit(node.Expression);
 
-            return node.WithName(newName).WithExpression(newExpression);
+            return node.WithName(newName).WithExpression(newExpression).WithTriviaFrom(node);
         }
 
         public override SyntaxNode VisitTypeOfExpression(TypeOfExpressionSyntax node)
@@ -312,7 +312,7 @@ namespace Explik.StructuralTestTools
 
             // Potentially rewritting type
             var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
-            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType).WithTriviaFrom(node.Type);
 
             // Potentially rewritting variable declators
             var newVariables = SyntaxFactory.SeparatedList(node.Variables.Select(Visit).OfType<VariableDeclaratorSyntax>());

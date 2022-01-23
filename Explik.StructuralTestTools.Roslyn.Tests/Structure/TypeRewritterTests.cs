@@ -2590,6 +2590,24 @@ namespace TestTools_Tests.Structure
             structureService.Received().VerifyType(OriginalType);
         }
 
+
+        [TestMethod("Visit preserves whitespace when rewriting type of translatable variable")]
+        public void Visit_PreservesWhitespaceWhenRewritingTypeOfTranslatableVariable()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("     TestTypes.OriginalClass   instance  ").GetRoot();
+            var node = root.AllDescendantNodes<VariableDeclarationSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetTypeDescription(node).Returns(OriginalType);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateType(OriginalType).Returns(TranslatedType);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            var translatedNode = rewriter.Visit(node);
+
+            Assert.AreEqual("     TestTypes.TranslatedClass   instance  ", translatedNode.ToFullString());
+        }
+
         #endregion
     }
 }
