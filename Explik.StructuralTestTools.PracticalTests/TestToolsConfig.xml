@@ -2,4 +2,12 @@
 <Config>
   <FromNamespace>Lecture_2_Solutions</FromNamespace>
   <ToNamespace>Lecture_2</ToNamespace>
+
+  <TemplateFiles>
+    <TemplateFile>./Templates/Exercise_1_Tests_Template.cs</TemplateFile>
+    <TemplateFile>./Templates/Exercise_2_Tests_Template.cs</TemplateFile>
+    <TemplateFile>./Templates/Exercise_3_Tests_Template.cs</TemplateFile>
+    <TemplateFile>./Templates/Exercise_4_Tests_Template.cs</TemplateFile>
+    <TemplateFile>./Templates/TestHelper.cs</TemplateFile>
+  </TemplateFiles>
 </Config>

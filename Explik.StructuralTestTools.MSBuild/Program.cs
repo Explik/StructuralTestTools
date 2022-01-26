@@ -25,7 +25,7 @@ namespace Explik.StructuralTestTools
             try
             {
                 var configurationService = new ConfigurationService(fileService, logService);
-                var compilationService = new CompilationService(fileService, logService);
+                var compilationService = new CompilationService(configurationService, fileService, logService);
                 var templateService = new TemplateService(fileService, logService);
 
                 var compilation = await compilationService.GetCompilation();

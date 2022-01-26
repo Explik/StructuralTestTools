@@ -4,10 +4,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Lecture_2_Tests</RootNamespace>
   </PropertyGroup>
+	
+  <ItemGroup>
+    <Compile Remove="Templates\**" />
+    <EmbeddedResource Remove="Templates\**" />
+    <None Remove="Templates\**" />
+  </ItemGroup>
 
   <ItemGroup>
 	<PackageReference Include="Explik.StructuralTestTools.Core" Version="1.0.2" />
-	<PackageReference Include="Explik.StructuralTestTools.MSBuild" Version="1.0.7">
+	<PackageReference Include="Explik.StructuralTestTools.MSBuild" Version="1.0.8-beta26">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>

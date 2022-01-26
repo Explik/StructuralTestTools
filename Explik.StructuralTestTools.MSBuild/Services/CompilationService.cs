@@ -14,6 +14,7 @@ namespace Explik.StructuralTestTools.MSBuild
     {
         private readonly IFileService _fileService;
         private readonly ILogService _logService;
+        private readonly IConfigurationService _configurationService;
 
         static CompilationService()
         {
@@ -28,12 +29,14 @@ namespace Explik.StructuralTestTools.MSBuild
                 throw new InvalidOperationException("Failed to load MSBuild");
         }
 
-        public CompilationService(IFileService fileService): this(fileService, null)
+        public CompilationService(IConfigurationService configurationService, IFileService fileService): 
+            this(configurationService, fileService, null)
         {
         }
         
-        public CompilationService(IFileService fileService, ILogService logService)
+        public CompilationService(IConfigurationService configurationService, IFileService fileService, ILogService logService)
         {
+            _configurationService = configurationService;
             _fileService = fileService;
             _logService = logService;
         }
@@ -50,8 +53,9 @@ namespace Explik.StructuralTestTools.MSBuild
 
                 foreach (Project project in GetProjects(solution, projectPath))
                 {
-                    AddProjectDocuments(project, skipGeneratedFiles: project.FilePath == projectPath);
-                    compilation = await project.GetCompilationAsync();
+                    var isTargetProject = project.FilePath == projectPath;
+                    var projectWithDocuments = await AddProjectDocuments(project, isTargetProject);
+                    compilation = await projectWithDocuments.GetCompilationAsync();
                 }
             }
             return compilation;
@@ -80,30 +84,42 @@ namespace Explik.StructuralTestTools.MSBuild
         }
 
         // Adds documents to project as some project formats do not include documents by default
-        private void AddProjectDocuments(Project project, bool skipGeneratedFiles)
+        private async Task<Project> AddProjectDocuments(Project project, bool isTargetProject)
         {
+            Project output = project;
+
             // Some project formats do not include files to compile, so the .cs files contained in the project
             // directory are included by default.
-            if (project.DocumentIds.Count == 0)
+            if (output.DocumentIds.Count == 0)
             {
-                var projectFile = new FileInfo(project.FilePath);
+                var projectFile = new FileInfo(output.FilePath);
                 var csFiles = projectFile.Directory.GetFiles("*.cs", SearchOption.AllDirectories);
 
                 foreach (var csFile in csFiles)
                 {
-                    project = project.AddDocument(csFile.FullName, File.ReadAllText(csFile.FullName)).Project;
+                    output = output.AddDocument(csFile.FullName, File.ReadAllText(csFile.FullName)).Project;
                 }
             }
-
-            // Removing generated files from earlier run as these might cause the compilation to fail.
-            if(skipGeneratedFiles)
+            
+            if(isTargetProject)
             {
-                var generatedDocuments = project.Documents.Where(d => d.Name.EndsWith(".g.cs"));
+                // Removing generated files from earlier run as these might cause the compilation to fail.
+                var generatedDocuments = output.Documents.Where(d => d.Name.EndsWith(".g.cs"));
                 foreach (var document in generatedDocuments)
                 {
-                    project = project.RemoveDocument(document.Id);
+                    output = output.RemoveDocument(document.Id);
+                }
+
+                // Adding templates files from configuration
+                var configuration = await _configurationService.GetConfiguration(null);
+                var templateFiles = configuration.TemplateFiles;
+
+                foreach (var templateFile in templateFiles)
+                {
+                    output = output.AddDocument(templateFile.FullName, File.ReadAllText(templateFile.FullName)).Project;
                 }
             }
+            return output;
         }
     }
 }

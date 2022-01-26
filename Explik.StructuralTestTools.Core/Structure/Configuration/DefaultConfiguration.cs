@@ -1,4 +1,5 @@
 ﻿using Explik.StructuralTestTools.TypeSystem;
+using System.IO;
 
 namespace Explik.StructuralTestTools
 {
@@ -6,9 +7,13 @@ namespace Explik.StructuralTestTools
     {
         public NamespaceDescription GlobalNamespace { get; set; }
 
-        public NamespaceDescription FromNamespace => GlobalNamespace.GetNamespace("FromNamespace");
+        public NamespaceDescription FromNamespace => GlobalNamespace?.GetNamespace("FromNamespace");
 
-        public NamespaceDescription ToNamespace => GlobalNamespace.GetNamespace("ToNamespace");
+        public NamespaceDescription ToNamespace => GlobalNamespace?.GetNamespace("ToNamespace");
+
+        public FileInfo ProjectFile { get; set; }
+
+        public FileInfo[] TemplateFiles => new FileInfo[0];
 
         public ITypeTranslator TypeTranslator => new SameNameTypeTranslator();
 

@@ -1,6 +1,7 @@
 ﻿using Explik.StructuralTestTools.TypeSystem;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -16,6 +17,8 @@ namespace Explik.StructuralTestTools
             root = XElement.Parse(xml);
         }
 
+        public FileInfo ProjectFile { get; set; }
+
         public NamespaceDescription GlobalNamespace { get; set; }
 
         public NamespaceDescription FromNamespace
@@ -27,7 +30,7 @@ namespace Explik.StructuralTestTools
                 if (fromNamespaceElement == null)
                     return null;
 
-                return GlobalNamespace.GetNamespace(fromNamespaceElement.Value);
+                return GlobalNamespace?.GetNamespace(fromNamespaceElement.Value);
             }
         }
 
@@ -40,8 +43,34 @@ namespace Explik.StructuralTestTools
                 if (toNamespaceElement == null)
                     return null;
 
-                return GlobalNamespace.GetNamespace(toNamespaceElement.Value);
+                return GlobalNamespace?.GetNamespace(toNamespaceElement.Value);
             }
+        }
+
+        public FileInfo[] TemplateFiles 
+        { 
+            get 
+            {
+                var output = new List<FileInfo>();
+                var templatesElement = root.Element("TemplateFiles");
+                var templateElements = templatesElement?.Elements("TemplateFile");
+
+                if (templateElements == null)
+                    return null;
+
+                foreach(var templateElement in templateElements)
+                {
+                    string templateAbsolutePath;
+                    if (!Path.IsPathRooted(templateElement.Value))
+                    {
+                        templateAbsolutePath = Path.Combine(ProjectFile?.DirectoryName ?? "", templateElement.Value);
+                    }
+                    else templateAbsolutePath = templateElement.Value;
+
+                    output.Add(new FileInfo(templateAbsolutePath));
+                }
+                return output.ToArray();
+            } 
         }
 
         public ITypeTranslator TypeTranslator

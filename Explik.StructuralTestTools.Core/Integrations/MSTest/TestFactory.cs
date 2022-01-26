@@ -29,7 +29,7 @@ namespace Explik.StructuralTestTools.MSTest
         public static TestFactory CreateFromConfigurationFile(string pathToConfigFile)
         {
             var configFileContent = File.ReadAllText(pathToConfigFile);
-            var configuration = Configuration.CreateFromXMLWithDefaults(new RuntimeNamespaceDescription(""), configFileContent);
+            var configuration = Configuration.CreateFromXMLWithDefaults(new RuntimeNamespaceDescription(""), null, configFileContent);
             var verifierService = new VerifierService()
             {
                 ExceptionType = RuntimeTypeDescription.Create("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException").Type

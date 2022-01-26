@@ -33,13 +33,13 @@ namespace Explik.StructuralTestTools.MSBuild
                 _logService?.LogInfo("Using configuration from file " + configFile.FullName);
                 
                 var configContent = await File.ReadAllTextAsync(configFile.FullName);
-                return Configuration.CreateFromXMLWithDefaults(globalNamespace, configContent);
+                return Configuration.CreateFromXMLWithDefaults(globalNamespace, _fileService.GetProjectFile(), configContent);
             }
             else
             {
                 _logService?.LogInfo("Using default configuration due to no config file found");
 
-                return Configuration.CreateDefault(globalNamespace);
+                return Configuration.CreateDefault(globalNamespace, _fileService.GetProjectFile());
             }
         }
     }
