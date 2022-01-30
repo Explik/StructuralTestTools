@@ -2345,6 +2345,26 @@ namespace TestTools_Tests.Structure
             Assert.AreEqual("typeof(TestTypes.TranslatedClass)", translatedNode.ToSource());
         }
 
+        [TestMethod("Visit rewrites type of translatable typeof with using directives")]
+        public void Visit_RewritesTypeOfTranslatableTypeOfWithUsingDirectives()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("using TestTypes; typeof(OriginalClass)").GetRoot();
+            var node1 = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+            var node2 = root.AllDescendantNodes<TypeOfExpressionSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetNamespaceDescription(node1).Returns(ConstantNamespace);
+            resolver.GetTypeDescription(node2).Returns(OriginalType);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateNamespace(ConstantNamespace).Returns(ConstantNamespace);
+            structureService.TranslateType(OriginalType).Returns(TranslatedType);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            var translatedNode = rewriter.Visit(root);
+
+            Assert.AreEqual("using TestTypes; typeof(TranslatedClass)", translatedNode.ToString());
+        }
+
         [TestMethod("Visit rewrites array type of translatable typeof")]
         public void Visit_RewritesArrayTypeOfTranlatableTypeOf()
         {
@@ -2521,6 +2541,26 @@ namespace TestTools_Tests.Structure
             Assert.AreEqual("TestTypes.TranslatedClass instance", translatedNode.ToSource());
         }
 
+        [TestMethod("Visit rewrites type of translatable variable with using directives")]
+        public void Visit_RewritesTypeOfTranslatableVariableWithUsingDirectives()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("using TestTypes; OriginalClass instance").GetRoot();
+            var node1 = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+            var node2 = root.AllDescendantNodes<VariableDeclarationSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetNamespaceDescription(node1).Returns(ConstantNamespace);
+            resolver.GetTypeDescription(node2).Returns(OriginalType);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateNamespace(ConstantNamespace).Returns(ConstantNamespace);
+            structureService.TranslateType(OriginalType).Returns(TranslatedType);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            var translatedNode = rewriter.Visit(root);
+
+            Assert.AreEqual("using TestTypes; TranslatedClass instance", translatedNode.ToFullString());
+        }
+
         [TestMethod("Visit rewrites array type of translatable variable")]
         public void Visit_RewritesArrayTypeOfTranslatableVariable()
         {
@@ -2606,7 +2646,7 @@ namespace TestTools_Tests.Structure
 
             Assert.AreEqual("     TestTypes.TranslatedClass   instance  ", translatedNode.ToFullString());
         }
-
+        
         #endregion
 
         #region VisitUsingDirective

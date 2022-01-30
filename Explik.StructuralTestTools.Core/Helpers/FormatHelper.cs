@@ -10,6 +10,27 @@ namespace Explik.StructuralTestTools.Helpers
 {
     public static class FormatHelper
     {
+        private static Dictionary<TypeDescription, string> BuiltinTypes = new Dictionary<TypeDescription, string>()
+        {
+            [new RuntimeTypeDescription(typeof(void))] = "void",
+            [new RuntimeTypeDescription(typeof(bool))] = "bool",
+            [new RuntimeTypeDescription(typeof(int))] = "int",
+            [new RuntimeTypeDescription(typeof(byte))] = "byte",
+            [new RuntimeTypeDescription(typeof(sbyte))] = "sbyte",
+            [new RuntimeTypeDescription(typeof(char))] = "char",
+            [new RuntimeTypeDescription(typeof(decimal))] = "decimal",
+            [new RuntimeTypeDescription(typeof(double))] = "double",
+            [new RuntimeTypeDescription(typeof(float))] = "float",
+            [new RuntimeTypeDescription(typeof(int))] = "int",
+            [new RuntimeTypeDescription(typeof(uint))] = "uint",
+            [new RuntimeTypeDescription(typeof(long))] = "long",
+            [new RuntimeTypeDescription(typeof(ulong))] = "ulong",
+            [new RuntimeTypeDescription(typeof(short))] = "short",
+            [new RuntimeTypeDescription(typeof(ushort))] = "ushort",
+            [new RuntimeTypeDescription(typeof(string))] = "string",
+            [new RuntimeTypeDescription(typeof(object))] = "object"
+        };
+
         private readonly static Dictionary<Type, Func<object, string>> LiteralRepresentations = new Dictionary<Type, Func<object, string>>()
         {
             //[null] = (o) => "null",
@@ -147,40 +168,24 @@ namespace Explik.StructuralTestTools.Helpers
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            Dictionary<TypeDescription, string> BuiltinTypes = new Dictionary<TypeDescription, string>()
-            {
-                [new RuntimeTypeDescription(typeof(void))] = "void",
-                [new RuntimeTypeDescription(typeof(bool))] = "bool",
-                [new RuntimeTypeDescription(typeof(int))] = "int",
-                [new RuntimeTypeDescription(typeof(byte))] = "byte",
-                [new RuntimeTypeDescription(typeof(sbyte))] = "sbyte",
-                [new RuntimeTypeDescription(typeof(char))] = "char",
-                [new RuntimeTypeDescription(typeof(decimal))] = "decimal",
-                [new RuntimeTypeDescription(typeof(double))] = "double",
-                [new RuntimeTypeDescription(typeof(float))] = "float",
-                [new RuntimeTypeDescription(typeof(int))] = "int",
-                [new RuntimeTypeDescription(typeof(uint))] = "uint",
-                [new RuntimeTypeDescription(typeof(long))] = "long",
-                [new RuntimeTypeDescription(typeof(ulong))] = "ulong",
-                [new RuntimeTypeDescription(typeof(short))] = "short",
-                [new RuntimeTypeDescription(typeof(ushort))] = "ushort",
-                [new RuntimeTypeDescription(typeof(string))] = "string",
-                [new RuntimeTypeDescription(typeof(object))] = "object"
-            };
-
             if (BuiltinTypes.ContainsKey(type))
             {
                 return BuiltinTypes[type];
             }
             else if (type.IsGenericType)
             {
+                if (type.FullName.Contains("System.Nullable"))
+                {
+                    string typeArgument = FormatFullTypeName(type.GetGenericArguments().Single());
+                    return typeArgument + "?";
+                }
                 // This is based on https://stackoverflow.com/questions/1533115/get-generictype-name-in-good-format-using-reflection-on-c-sharp
-                string typeName = type.Name.Substring(0, type.Name.IndexOf('`'));
-                string[] typeArguments = type.GetGenericArguments().Select(FormatType).ToArray();
+                string typeName = type.FullName.Substring(0, type.FullName.IndexOf('`')).Replace("+", ".").Replace(" ", "");
+                string[] typeArguments = type.GetGenericArguments().Select(FormatFullTypeName).ToArray();
 
                 return string.Format("{0}<{1}>", typeName, string.Join(", ", typeArguments));
             }
-            return type.Name;
+            return type.Name.Replace("+", ".").Replace(" ", "");
         }
 
         public static string FormatFullTypeName(TypeDescription type)
@@ -188,26 +193,7 @@ namespace Explik.StructuralTestTools.Helpers
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            Dictionary<TypeDescription, string> BuiltinTypes = new Dictionary<TypeDescription, string>()
-            {
-                [new RuntimeTypeDescription(typeof(void))] = "void",
-                [new RuntimeTypeDescription(typeof(bool))] = "bool",
-                [new RuntimeTypeDescription(typeof(int))] = "int",
-                [new RuntimeTypeDescription(typeof(byte))] = "byte",
-                [new RuntimeTypeDescription(typeof(sbyte))] = "sbyte",
-                [new RuntimeTypeDescription(typeof(char))] = "char",
-                [new RuntimeTypeDescription(typeof(decimal))] = "decimal",
-                [new RuntimeTypeDescription(typeof(double))] = "double",
-                [new RuntimeTypeDescription(typeof(float))] = "float",
-                [new RuntimeTypeDescription(typeof(int))] = "int",
-                [new RuntimeTypeDescription(typeof(uint))] = "uint",
-                [new RuntimeTypeDescription(typeof(long))] = "long",
-                [new RuntimeTypeDescription(typeof(ulong))] = "ulong",
-                [new RuntimeTypeDescription(typeof(short))] = "short",
-                [new RuntimeTypeDescription(typeof(ushort))] = "ushort",
-                [new RuntimeTypeDescription(typeof(string))] = "string",
-                [new RuntimeTypeDescription(typeof(object))] = "object"
-            };
+            
 
             if (BuiltinTypes.ContainsKey(type))
             {

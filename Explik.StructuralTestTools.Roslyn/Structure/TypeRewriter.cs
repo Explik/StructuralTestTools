@@ -75,6 +75,8 @@ namespace Explik.StructuralTestTools
             MemberVerificationAspect.PropertyType
         };
 
+        private readonly Dictionary<SyntaxTree, NamespaceDescription[]> _importedNamespacesCache = new Dictionary<SyntaxTree, NamespaceDescription[]>();
+
         public TypeRewriter(ICompileTimeDescriptionResolver resolver, IStructureService structureService)
         {
             _resolver = resolver;
@@ -95,8 +97,7 @@ namespace Explik.StructuralTestTools
             var innerMostType = translatedType;
             while (innerMostType.IsArray)
                 innerMostType = innerMostType.GetElementType();
-            var formattedTranslatedType = FormatHelper.FormatFullTypeName(innerMostType);
-            var newElementType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+            var newElementType = GetTypeSyntax(innerMostType, node.SyntaxTree);
 
             return node.WithElementType(newElementType);
         }
@@ -111,8 +112,7 @@ namespace Explik.StructuralTestTools
 
             _structureService.VerifyType(originalType);
 
-            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
-            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+            var newType = GetTypeSyntax(translatedType, node.SyntaxTree);
 
             return node.WithType(newType);
         }
@@ -127,8 +127,7 @@ namespace Explik.StructuralTestTools
 
             _structureService.VerifyType(originalType);
 
-            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
-            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+            var newType = GetTypeSyntax(translatedType, node.SyntaxTree);
 
             return node.WithType(newType);
         }
@@ -170,8 +169,7 @@ namespace Explik.StructuralTestTools
                 MemberVerificationAspect.ConstructorAccessLevel);
 
             // Potentially rewritting type
-            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
-            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+            var newType = GetTypeSyntax(translatedType, node.SyntaxTree);
 
             // Potentially rewritting method arguments
             var newArguments = SyntaxFactory.SeparatedList(node.ArgumentList.Arguments.Select(Visit).OfType<ArgumentSyntax>());
@@ -237,11 +235,7 @@ namespace Explik.StructuralTestTools
             {
                 var name = typeDescription2.Name.Substring(0, typeDescription2.Name.IndexOf('`'));
                 var identifier = SyntaxFactory.Identifier(name); 
-                var typeArguments = typeDescription2.GetGenericArguments().Select(typeArgument =>
-                {
-                    var formattedTypeArgumentName = FormatHelper.FormatFullTypeName(typeArgument);
-                    return SyntaxFactory.ParseTypeName(formattedTypeArgumentName);
-                });
+                var typeArguments = typeDescription2.GetGenericArguments().Select(t => GetTypeSyntax(t, node.SyntaxTree));
                 var typeArgumentList = SyntaxFactory.TypeArgumentList(SyntaxFactory.SeparatedList(typeArguments));
                 newName = SyntaxFactory.GenericName(identifier, typeArgumentList);
             }
@@ -260,11 +254,7 @@ namespace Explik.StructuralTestTools
             else if (translatedMember is MethodDescription methodDescription2 && methodDescription2.IsGenericMethod)
             {
                 var identifier = SyntaxFactory.Identifier(methodDescription2.Name);
-                var typeArguments = methodDescription2.GetGenericArguments().Select(typeArgument =>
-                {
-                    var formattedTypeArgumentName = FormatHelper.FormatFullTypeName(typeArgument);
-                    return SyntaxFactory.ParseTypeName(formattedTypeArgumentName);
-                });
+                var typeArguments = methodDescription2.GetGenericArguments().Select(t => GetTypeSyntax(t, node.SyntaxTree));
                 var typeArgumentList = SyntaxFactory.TypeArgumentList(SyntaxFactory.SeparatedList(typeArguments));
                 newName = SyntaxFactory.GenericName(identifier, typeArgumentList);
             }
@@ -294,8 +284,7 @@ namespace Explik.StructuralTestTools
 
             _structureService.VerifyType(originalType);
 
-            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
-            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType);
+            var newType = GetTypeSyntax(translatedType, node.SyntaxTree);
 
             return node.WithType(newType);
         }
@@ -324,8 +313,7 @@ namespace Explik.StructuralTestTools
             _structureService.VerifyType(originalType);
 
             // Potentially rewritting type
-            var formattedTranslatedType = FormatHelper.FormatFullTypeName(translatedType);
-            var newType = SyntaxFactory.ParseTypeName(formattedTranslatedType).WithTriviaFrom(node.Type);
+            var newType = GetTypeSyntax(translatedType, node.SyntaxTree).WithTriviaFrom(node.Type);
 
             // Potentially rewritting variable declators
             var newVariables = SyntaxFactory.SeparatedList(node.Variables.Select(Visit).OfType<VariableDeclaratorSyntax>());
@@ -333,41 +321,44 @@ namespace Explik.StructuralTestTools
             return node.WithType(newType).WithVariables(newVariables);
         }
 
-        private SimpleNameSyntax GetNameSyntax(MethodDescription methodDescription)
+        private TypeSyntax GetTypeSyntax(TypeDescription typeDescription, SyntaxTree syntaxTree)
         {
-            if (methodDescription.IsGenericMethod)
-            {
-                var methodName = SyntaxFactory.Identifier(methodDescription.Name);
-                var typeArguments = methodDescription.GetGenericArguments().Select(t => GetTypeSyntax(t)).ToArray();
-                var seperatedList = SyntaxFactory.SeparatedList(typeArguments);
-                var typeArgumentList = SyntaxFactory.TypeArgumentList(seperatedList);
-
-                return SyntaxFactory.GenericName(methodName, typeArgumentList);
-            }
-            return SyntaxFactory.IdentifierName(methodDescription.Name); ;
-        }
-
-        private TypeSyntax GetTypeSyntax(TypeDescription typeDescription)
-        {
-            if (typeDescription.IsGenericType)
+            if (typeDescription.IsGenericType && typeDescription.FullName == "System.Nullable")
             {
                 // Compiler is to add ` to indicate arity for generic types, however as this is not part
                 // of return C# syntax it and all subsquent characters are removed
                 var litteralTypeName = typeDescription.Name.Split('`').First();
 
                 var typeName = SyntaxFactory.Identifier(litteralTypeName);
-                var typeArguments = typeDescription.GetGenericArguments().Select(t => GetTypeSyntax(t)).ToArray();
+                var typeArguments = typeDescription.GetGenericArguments().Select(t => GetTypeSyntax(t, syntaxTree)).ToArray();
                 var seperatedList = SyntaxFactory.SeparatedList(typeArguments);
                 var typeArgumentList = SyntaxFactory.TypeArgumentList(seperatedList);
 
                 return SyntaxFactory.GenericName(typeName, typeArgumentList);
             }
-            if (typeDescription.IsArray)
+            else
             {
-                var elementType = GetTypeSyntax(typeDescription.GetElementType());
-                SyntaxFactory.ArrayType(elementType);
+                var isNamespaceImported = IsNamespaceImported(typeDescription.Namespace, syntaxTree);
+                var litteralTypeName = isNamespaceImported ? FormatHelper.FormatType(typeDescription) : FormatHelper.FormatFullTypeName(typeDescription);
+                return SyntaxFactory.ParseTypeName(litteralTypeName);
             }
-            return SyntaxFactory.ParseTypeName(typeDescription.FullName);
+        }
+
+        private bool IsNamespaceImported(string @namespace, SyntaxTree syntaxTree)
+        {
+            var importedNamespaces = GetImportedNamespaces(syntaxTree);
+            return importedNamespaces.Any(n => n.Name == @namespace);
+        }
+
+        private NamespaceDescription[] GetImportedNamespaces(SyntaxTree syntaxTree)
+        {
+            if (_importedNamespacesCache.ContainsKey(syntaxTree))
+                return _importedNamespacesCache[syntaxTree];
+
+            var usingDirectives = syntaxTree.GetRoot().AllDescendantNodes<UsingDirectiveSyntax>();
+            var namespaceDescriptions = usingDirectives.Select(_resolver.GetNamespaceDescription).ToArray();
+            _importedNamespacesCache[syntaxTree] = namespaceDescriptions;
+            return namespaceDescriptions;
         }
 
         private bool IsAssigment(SyntaxNode node)
