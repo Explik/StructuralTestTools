@@ -204,5 +204,16 @@ namespace Explik.StructuralTestTools
 
             return new CompileTimeTypeDescription(_compilation, attributeSymbol.ContainingType);
         }
+
+        public NamespaceDescription GetNamespaceDescription(UsingDirectiveSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var namespaceSymbol = semanticModel.GetSymbolInfo(node.Name).Symbol as INamespaceSymbol;
+
+            if (namespaceSymbol == null)
+                throw new SyntaxResolutionException("Could not resolve namespace of " + node.ToString());
+
+            return new CompileTimeNamespaceDescription(_compilation, namespaceSymbol);
+        }
     }
 }

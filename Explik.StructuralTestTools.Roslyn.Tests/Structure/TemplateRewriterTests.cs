@@ -16,6 +16,22 @@ namespace TestTools_Tests.Structure
     [TestClass]
     public class TemplateRewriterTests
     {
+        [TestMethod("Visit replaces using directive")]
+        public void Visit_ReplaceUsingDirective()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("using OriginalNamespace").GetRoot();
+            var node = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node).Returns(SyntaxFactory.ParseStatement("using TranslatedNamespace"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node);
+
+            var expectedSource = "using TranslatedNamespace";
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
         [TestMethod("Visit removes _Template from class name")]
         public void Visit_RemovesUnderscoreTemplateFromClassName()
         { 
@@ -361,7 +377,6 @@ namespace TestTools_Tests.Structure
                 "  }");
             AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
-
 
         [TestMethod("Visit replaces body of method with templated attributes on VerifierServiceException (multiple statements 2)")]
         public void Visit_ReplacesBodyOfMethodWithTemplatedAttributesOnVerifierServiceExceptionMultipleStatements2()

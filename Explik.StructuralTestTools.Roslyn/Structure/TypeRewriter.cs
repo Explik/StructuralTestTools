@@ -300,6 +300,19 @@ namespace Explik.StructuralTestTools
             return node.WithType(newType);
         }
 
+        public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
+        {
+            var originalNamespace = _resolver.GetNamespaceDescription(node);
+            var translatedNamespace = _structureService.TranslateNamespace(originalNamespace);
+
+            if(originalNamespace == translatedNamespace)
+                return base.VisitUsingDirective(node);
+
+            var newName = SyntaxFactory.ParseName(translatedNamespace.Name).WithTriviaFrom(node.Name);
+
+            return node.WithName(newName);
+        }
+
         public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
         {
             var originalType = _resolver.GetTypeDescription(node);

@@ -8,5 +8,6 @@ namespace Explik.StructuralTestTools
 {
     public interface IStructureService : ITypeTranslatorService, ITypeVerifierService, IMemberTranslatorService, IMemberVerifierService
     {
+        NamespaceDescription TranslateNamespace(NamespaceDescription @namespace);
     }
 }

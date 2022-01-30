@@ -428,6 +428,21 @@ public class ClassRoomTests {
             Assert.AreEqual("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException", typeName);
         }
 
+        [TestMethod("GetNamespaceDescription returns namespace for UsingDirective")]
+        public void GetNamespaceDescription_ReturnsNamespaceForUsingDirective()
+        {
+            var source = "using System";
+            var script = CSharpScript.Create(source);
+            var compilation = script.GetCompilation();
+            var syntaxTree = compilation.SyntaxTrees.Single();
+            var node = syntaxTree.GetRoot().AllDescendantNodes<UsingDirectiveSyntax>().Single();
+            var resolver = new CompileTimeDescriptionResolver(compilation);
+
+            var namespaceDescription = resolver.GetNamespaceDescription(node);
+
+            Assert.AreEqual("System", namespaceDescription.Name);
+        }
+
         [TestMethod("GetTypeDescription returns element type for ArrayTypeSyntax")]
         public void GetTypeDescription_ReturnsElementTypeForArrayTypeSyntax()
         {

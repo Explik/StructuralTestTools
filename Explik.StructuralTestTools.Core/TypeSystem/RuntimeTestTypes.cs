@@ -10,6 +10,10 @@ namespace Explik.StructuralTestTools
     /// </summary>
     public static class RuntimeTestTypes
     {
+        public static readonly RuntimeNamespaceDescription ConstantNamespace = new RuntimeNamespaceDescription("ConstantNamespace");
+        public static readonly RuntimeNamespaceDescription OriginalNamespace = new RuntimeNamespaceDescription("OriginalNamespace");
+        public static readonly RuntimeNamespaceDescription TranslatedNamespace = new RuntimeNamespaceDescription("TranslatedNamespace");
+
         public static readonly RuntimeTypeDescription ConstantType = new RuntimeTypeDescription(typeof(ConstantClass));
         public static readonly RuntimeTypeDescription OriginalType = new RuntimeTypeDescription(typeof(OriginalClass));
         public static readonly RuntimeTypeDescription TranslatedType = new RuntimeTypeDescription(typeof(TranslatedClass));

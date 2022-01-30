@@ -17,7 +17,6 @@ namespace TestTools_Tests.Structure
     [TestClass]
     public class TypeRewritterTests
     {
-        // TODO Add syntax preservation
         private ref MemberVerificationAspect[] CreateEquvilantArg(MemberVerificationAspect[] expected)
         {
             var orderedExpected = expected.OrderBy(a => a.ToString());
@@ -2608,6 +2607,62 @@ namespace TestTools_Tests.Structure
             Assert.AreEqual("     TestTypes.TranslatedClass   instance  ", translatedNode.ToFullString());
         }
 
+        #endregion
+
+        #region VisitUsingDirective
+
+        [TestMethod("Visit does not rewrite non-translatable namespace in using directive")]
+        public void Visit_DoesNotRewriteNonTranslatableNamespaceInUsingDirective()
+        {
+
+            var root = SyntaxFactory.ParseSyntaxTree("using ConstantNamespace").GetRoot();
+            var node = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetNamespaceDescription(node).Returns(ConstantNamespace);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateNamespace(ConstantNamespace).Returns(ConstantNamespace);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            var translatedNode = rewriter.Visit(node);
+
+            Assert.AreEqual("using ConstantNamespace", translatedNode.ToSource());
+        }
+
+        [TestMethod("Visit rewrites translatable namespace in using directive")]
+        public void VisitRewritesTranslatableNamespaceInUsingDirective()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("using OriginalNamespace").GetRoot();
+            var node = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetNamespaceDescription(node).Returns(OriginalNamespace);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateNamespace(OriginalNamespace).Returns(TranslatedNamespace);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            var translatedNode = rewriter.Visit(node);
+
+            Assert.AreEqual("using TranslatedNamespace", translatedNode.ToSource());
+        }
+
+        [TestMethod("Visit preserves whitespace when rewriting namespace in using directive")]
+        public void Visit_PreservcesWhitespaceWhenRewritingNamespaceInUsingDirective()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree(" using  OriginalNamespace   ").GetRoot();
+            var node = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetNamespaceDescription(node).Returns(OriginalNamespace);
+            var structureService = Substitute.For<IStructureService>();
+            structureService.TranslateNamespace(OriginalNamespace).Returns(TranslatedNamespace);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            var translatedNode = rewriter.Visit(node);
+
+            Assert.AreEqual(" using  TranslatedNamespace   ", translatedNode.ToFullString());
+        }
+        
         #endregion
     }
 }

@@ -31,6 +31,8 @@ namespace Explik.StructuralTestTools
 
         string GetAssociatedExceptionType(AttributeSyntax node);
 
+        NamespaceDescription GetNamespaceDescription(UsingDirectiveSyntax node);
+
         TypeDescription GetTypeDescription(ArrayTypeSyntax node);
 
         TypeDescription GetTypeDescription(CastExpressionSyntax node);

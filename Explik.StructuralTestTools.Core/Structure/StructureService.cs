@@ -40,6 +40,11 @@ namespace Explik.StructuralTestTools
 
         public VerifierService StructureVerifier { get; set; }
 
+        public NamespaceDescription TranslateNamespace(NamespaceDescription @namespace)
+        {
+            return (@namespace == _fromNamespace) ? _toNamespace : @namespace;
+        }
+
         public TypeDescription TranslateType(TypeDescription type)
         {
             if (type.Namespace != _fromNamespace.Name)
