@@ -16,7 +16,8 @@ namespace TestTools_Tests.Structure
     [TestClass]
     public class TemplateRewriterTests
     {
-        [TestMethod("Visit replaces using directive")]
+        // This feature has been disabled
+        //[TestMethod("Visit replaces using directive")]
         public void Visit_ReplaceUsingDirective()
         {
             var root = SyntaxFactory.ParseSyntaxTree("using OriginalNamespace").GetRoot();

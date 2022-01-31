@@ -106,10 +106,10 @@ namespace Explik.StructuralTestTools
             return node.WithBody(newBody).WithAttributeLists(newAttributeLists).WithTriviaFrom(node);
         }
 
-        public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
-        {
-            return _statementRewriter.Visit(node);
-        }
+        //public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
+        //{
+        //    return _statementRewriter.Visit(node);
+        //}
 
         private string CreateComment(string text, SyntaxNode triviaNode)
         {
