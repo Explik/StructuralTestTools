@@ -8,6 +8,7 @@ using System.Text;
 using Explik.StructuralTestTools;
 using Microsoft.CodeAnalysis.Text;
 using System.IO;
+using Explik.StructuralTestTools.TypeSystem;
 
 namespace Explik.StructuralTestTools
 {
@@ -16,6 +17,8 @@ namespace Explik.StructuralTestTools
     {
         private ICompileTimeDescriptionResolver _resolver;
         private CSharpSyntaxRewriter _statementRewriter;
+
+        private readonly Dictionary<SyntaxTree, NamespaceDescription[]> _importedNamespacesCache = new Dictionary<SyntaxTree, NamespaceDescription[]>();
 
         public TemplateRewriter(ICompileTimeDescriptionResolver syntaxResolver, CSharpSyntaxRewriter statementRewriter)
         {
@@ -56,10 +59,29 @@ namespace Explik.StructuralTestTools
 
             // Rewritting templated-attribute type to non-templated-attribute type
             var attributeTypeName = _resolver.GetAssociatedAttributeType(node);
-            var newName = SyntaxFactory.IdentifierName(attributeTypeName);
+            var attributeNamespace = string.Join(".", attributeTypeName.Split('.').Take(attributeTypeName.Count(c => c == '.')));
+            var attributeName = IsNamespaceImported(attributeNamespace, node.SyntaxTree) ? attributeTypeName.Replace(attributeNamespace + ".", "") : attributeTypeName;
+            var newName = SyntaxFactory.IdentifierName(attributeName);
             var newNameWithTrivia = newName.WithTriviaFrom(node);
 
             return node.WithName(newNameWithTrivia);
+        }
+
+        private bool IsNamespaceImported(string @namespace, SyntaxTree syntaxTree)
+        {
+            var importedNamespaces = GetImportedNamespaces(syntaxTree);
+            return importedNamespaces.Any(n => n.Name == @namespace);
+        }
+
+        private NamespaceDescription[] GetImportedNamespaces(SyntaxTree syntaxTree)
+        {
+            if (_importedNamespacesCache.ContainsKey(syntaxTree))
+                return _importedNamespacesCache[syntaxTree];
+
+            var usingDirectives = syntaxTree.GetRoot().AllDescendantNodes<UsingDirectiveSyntax>();
+            var namespaceDescriptions = usingDirectives.Select(_resolver.GetNamespaceDescription).ToArray();
+            _importedNamespacesCache[syntaxTree] = namespaceDescriptions;
+            return namespaceDescriptions;
         }
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -156,5 +178,7 @@ namespace Explik.StructuralTestTools
             
             return leadingTrivia + $"throw new {exceptionTypeName}(\"{ex.Message}\");" + Environment.NewLine;
         }
+
+        
     }
 }

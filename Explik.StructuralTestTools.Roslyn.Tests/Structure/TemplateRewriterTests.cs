@@ -1,4 +1,5 @@
 ﻿using Explik.StructuralTestTools;
+using Explik.StructuralTestTools.TypeSystem;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -84,42 +85,96 @@ namespace TestTools_Tests.Structure
         [TestMethod("Visit replace name of templated attributes on class")]
         public void Visit_ReplacesNameOfTemplatedAttributesOnClass()
         {
-            var source = "[TemplatedTestClass] class ClassName { }";
+            var source = "[Namespace.TemplatedTestClass] class ClassName { }";
             var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
             var node1 = root.AllDescendantNodes<ClassDeclarationSyntax>().First();
             var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
             
             var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
             syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
-            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestClass");
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("Namespace.TestClass");
             var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
             var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
 
-            var translatedNode = rewriter.Visit(node1);
+            var translatedNode = rewriter.Visit(root);
 
-            var expectedSource = "[TestClass] class ClassName { }";
+            var expectedSource = "[Namespace.TestClass] class ClassName { }";
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
+        [TestMethod("Visit replace name of templated attributes on class with using directive")]
+        public void Visit_ReplacesNameOfTemplatedAttributesOnClassWithUsingDirective()
+        {
+            var source = "using Namespace; [TemplatedTestClass] class ClassName { }";
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.GetNamespaceDescription(node1).Returns(new RuntimeNamespaceDescription("Namespace"));
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("Namespace.TestClass");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(root);
+
+            var expectedSource = "using Namespace; [TestClass] class ClassName { }";
             AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
 
         [TestMethod("Visit replaces name of templated attributes on method")]
         public void Visit_ReplacesNameOfTemplatedAttributeOnMethod()
         {
-            var source = "class ClassName { [TemplatedTestMethod] void MethodName() {} }";
+            var source = "[Namespace.TemplatedTestClass] class ClassName { [Namespace.TemplatedTestMethod] void MethodName() {} }";
             var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
-            var node1 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
-            var node2 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node1 = root.AllDescendantNodes<AttributeSyntax>().ElementAt(0);
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().ElementAt(1);
+            var node3 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
 
             var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.IsTemplatedAttribute(node1).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node1).Returns("Namespace.TestClass");
             syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
-            syntaxResolver.GetAssociatedAttributeType(node2).Returns("TestClass");
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("Namespace.TestMethod");
+            syntaxResolver.HasTemplatedAttribute(node3).Returns(true);
             var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node3.Body).Returns(node3.Body);
             var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
 
-            var translatedNode = rewriter.Visit(node1);
+            var translatedNode = rewriter.Visit(root);
 
-            var expectedSource = "[TemplatedTestMethod] void MethodName() {}";
+            var expectedSource = "[Namespace.TestClass] class ClassName { [Namespace.TestMethod] void MethodName() {} }";
             AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
+
+        [TestMethod("Visit replaces name of templated attributes on method with using directive")]
+        public void Visit_ReplacesNameOfTemplatedAttributeOnMethodWithUsingDirective()
+        {
+            var source = "using Namespace; [TemplatedTestClass] class ClassName { [TemplatedTestMethod] void MethodName() {} }";
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+            var node2 = root.AllDescendantNodes<AttributeSyntax>().ElementAt(0);
+            var node3 = root.AllDescendantNodes<AttributeSyntax>().ElementAt(1);
+            var node4 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.GetNamespaceDescription(node1).Returns(new RuntimeNamespaceDescription("Namespace"));
+            syntaxResolver.IsTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node2).Returns("Namespace.TestClass");
+            syntaxResolver.IsTemplatedAttribute(node3).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node3).Returns("Namespace.TestMethod");
+            syntaxResolver.HasTemplatedAttribute(node4).Returns(true);
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node4.Body).Returns(node4.Body);
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(root);
+
+            var expectedSource = "using Namespace; [TestClass] class ClassName { [TestMethod] void MethodName() {} }";
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
 
         [TestMethod("Visit does not modify method body without templated attribute")]
         public void Visit_DoesNotModifyMethodBodyWithoutTemplatedAttribute()
