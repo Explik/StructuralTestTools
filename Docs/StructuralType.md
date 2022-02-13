@@ -66,9 +66,14 @@ public class Person {
 }
 ```
 
+As shown above, unit tests lack in certain areas  several flaws or 
 
+To summerize, unit tests are not 
 
-The unit test fails to provide 
+As shown above, unit test are fairly limited in the amount of feedback that they are able to give. The primary faults being two.
+1. Unit tests do not differentiate between similiar concepts in cases where they are functionally and syntactically equavilent. This is a problem due to some concepts like fields and properties having large overlaps, but still being important for students to be able differentiate.
+2. Unit tests may not be able to compile due to student error even when the student's own code compiles perfectly fine on its own. This is a problem due to error being displayed on the tests instead of in the students code where it originated. 
+3. A single unit test having an compile-time error will block all other unit tests from compilling. This can make it exceedingly difficult to find the errors, and blocks any possibilitý of intermittent feedback as anything less than full implementation will result in no feedback at all. 
 
 # A naive solution
 
