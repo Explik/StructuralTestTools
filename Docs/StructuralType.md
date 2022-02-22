@@ -1,7 +1,7 @@
 # Structural Tests
 
 ## Limitations of feedback 
-Regular unit tests can only provide feedback on whether a correct value has bene produced, so to see its limitations as a teaching tool let's propose a simple assignment for some students new to C#. The assignment will be to create a class Person with 3 properties FirstName, LastName and FullName, where FullName will be a combination of FirstName and LastName. This assignment will be evaluated by the simple unit test shown below. 
+Regular unit tests can only provide feedback on whether a correct value has been produced, so to see its limitations as a teaching tool let's propose a simple assignment for some students new to C#. The assignment will be to create a class Person with 3 properties FirstName, LastName and FullName, where FullName will be a combination of FirstName and LastName. This assignment will be evaluated by a simple unit test shown below. 
 
 ```C# 
 // The test that evaluates the students' answer
@@ -11,7 +11,7 @@ public void Person_FullNameReturnsCombinationOfFirstNameAndLastName() {
     FirstName = "Thomas",
     LastName = "Stevens"
   };
-  Assert.AreEqual("Thomas Stevens")
+  Assert.AreEqual("Thomas Stevens", Person.FullName)
 }
 ```
 
@@ -76,6 +76,38 @@ As shown above, unit test are fairly limited in the amount of feedback that they
 3. A single unit test having an compile-time error will block all other unit tests from compilling. This can make it exceedingly difficult to find the errors, and blocks any possibilitý of intermittent feedback as anything less than full implementation will result in no feedback at all. 
 
 # A naive solution
+One solution to the above mentioned problems is decoupling through Reflection. This technique allows for inspection of types and indirect manipulation of instances. It is used heavily within many libraries and information about it is easily available online. However, as can be seen below Reflection has a tendency to become quite lengthy and complex.  The length even shorthanded to some methods makes it time consuming to cover a single class and nearly unfeasable to cover an entire course. Moreover, the complexity can easily lead to mistakes requiring additional time being spent on ensuring that the tests are correct.
 
+```C#
+[TestMethod("Person.FullName returns combination of FirstName and LastName")]
+public void Person_FullNameReturnsCombinationOfFirstNameAndLastName() {
+  // Structural testing
+  var constructor = typeof(Person).GetConstructor(new Type[0]);
+  if (constructor == null) Assert.Fail("Person class does not have a default constructor");
+		
+  var firstname = typeof(Person).GetProperty("FirstName");
+  if (firstname == null) Assert.Fail("Class Person does not contain property FirstName");
+  if (firstname.PropertyType != typeof(string)) Assert.Fail("Property Person.FirstName is not of type string");
+  if (!firstname.CanWrite) Assert.Fail("Property Person.FirstName is not assignable");
+		
+  var lastname = typeof(Person).GetProperty("LastName");
+  if (lastname == null) Assert.Fail("Class Person does not contain property LastName");
+  if (lastname.PropertyType != typeof(string)) Assert.Fail("Property Person.LastName is not of type string");
+  if (!lastname.CanWrite) Assert.Fail("Property Person.LastName is not assignable");
+		
+  var fullname = typeof(Person).GetProperty("FullName");
+  if (fullname == null) Assert.Fail("Class Person does not contain property FullName");
+  if (fullname.PropertyType != typeof(string)) Assert.Fail("Property Person.FullName is not of type string");
+  if (!fullname.CanRead) Assert.Fail("Property Person.FullName is not readable");
+		
+  // Unit testing
+  var instance = Activator.CreateInstance(typeof(Person));
+  firstname.SetValue(instance, "Thomas");
+  lastname.SetValue(instance, "Stevens");
+  Assert.AreEqual("Thomas Stevens", fullname.GetValue(instance));
+}
+```
 
 # A proper solution 
+
+
