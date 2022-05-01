@@ -428,6 +428,19 @@ public class ClassRoomTests {
             Assert.AreEqual("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException", typeName);
         }
 
+        [TestMethod("GetNamespaceDescription returns null for static UsingDirectives")]
+        public void GetNamespaceDescriptionReturnsNullForStaticUsingDirectives()
+        {
+            var source = "using static System.Object";
+            var script = CSharpScript.Create(source);
+            var compilation = script.GetCompilation();
+            var syntaxTree = compilation.SyntaxTrees.Single();
+            var node = syntaxTree.GetRoot().AllDescendantNodes<UsingDirectiveSyntax>().Single();
+            var resolver = new CompileTimeDescriptionResolver(compilation);
+
+            Assert.IsNull(resolver.GetNamespaceDescription(node));
+        }
+
         [TestMethod("GetNamespaceDescription returns namespace for UsingDirective")]
         public void GetNamespaceDescription_ReturnsNamespaceForUsingDirective()
         {

@@ -356,7 +356,7 @@ namespace Explik.StructuralTestTools
                 return _importedNamespacesCache[syntaxTree];
 
             var usingDirectives = syntaxTree.GetRoot().AllDescendantNodes<UsingDirectiveSyntax>();
-            var namespaceDescriptions = usingDirectives.Select(_resolver.GetNamespaceDescription).ToArray();
+            var namespaceDescriptions = usingDirectives.Select(_resolver.GetNamespaceDescription).Where(n => n != null).ToArray();
             _importedNamespacesCache[syntaxTree] = namespaceDescriptions;
             return namespaceDescriptions;
         }

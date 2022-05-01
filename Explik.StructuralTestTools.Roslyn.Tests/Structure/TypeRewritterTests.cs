@@ -2669,6 +2669,23 @@ namespace TestTools_Tests.Structure
             Assert.AreEqual("using ConstantNamespace", translatedNode.ToSource());
         }
 
+        [TestMethod("Visit does not rewrite type in static using directive")]
+        public void Visit_DoesNotRewriteTypeInStaticUsingDirective()
+        {
+            var root = SyntaxFactory.ParseSyntaxTree("using static System.Object").GetRoot();
+            var node = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+
+            var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            resolver.GetNamespaceDescription(node).Returns(null as NamespaceDescription);
+            var structureService = Substitute.For<IStructureService>();
+            //structureService.TranslateNamespace(ConstantNamespace).Returns(ConstantNamespace);
+            var rewriter = new TypeRewriter(resolver, structureService);
+
+            var translatedNode = rewriter.Visit(node);
+            
+            Assert.AreEqual("using static System.Object", translatedNode.ToSource());
+        }
+
         [TestMethod("Visit rewrites translatable namespace in using directive")]
         public void VisitRewritesTranslatableNamespaceInUsingDirective()
         {

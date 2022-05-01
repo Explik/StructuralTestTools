@@ -208,12 +208,13 @@ namespace Explik.StructuralTestTools
         public NamespaceDescription GetNamespaceDescription(UsingDirectiveSyntax node)
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var namespaceSymbol = semanticModel.GetSymbolInfo(node.Name).Symbol as INamespaceSymbol;
+            var symbol = semanticModel.GetSymbolInfo(node.Name).Symbol;
 
-            if (namespaceSymbol == null)
-                throw new SyntaxResolutionException("Could not resolve namespace of " + node.ToString());
-
-            return new CompileTimeNamespaceDescription(_compilation, namespaceSymbol);
+            if (symbol is ITypeSymbol)
+                return null;
+            else if (symbol is INamespaceSymbol namespaceSymbol)
+                return new CompileTimeNamespaceDescription(_compilation, namespaceSymbol);
+            else throw new SyntaxResolutionException("Could not resolve namespace of \"" + node.ToString() + "\"");
         }
     }
 }
