@@ -292,7 +292,7 @@ namespace Explik.StructuralTestTools
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
         {
             var originalNamespace = _resolver.GetNamespaceDescription(node);
-            var translatedNamespace = _structureService.TranslateNamespace(originalNamespace);
+            var translatedNamespace = originalNamespace != null ? _structureService.TranslateNamespace(originalNamespace) : null;
 
             if(originalNamespace == translatedNamespace)
                 return base.VisitUsingDirective(node);

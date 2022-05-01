@@ -2678,7 +2678,6 @@ namespace TestTools_Tests.Structure
             var resolver = Substitute.For<ICompileTimeDescriptionResolver>();
             resolver.GetNamespaceDescription(node).Returns(null as NamespaceDescription);
             var structureService = Substitute.For<IStructureService>();
-            //structureService.TranslateNamespace(ConstantNamespace).Returns(ConstantNamespace);
             var rewriter = new TypeRewriter(resolver, structureService);
 
             var translatedNode = rewriter.Visit(node);
