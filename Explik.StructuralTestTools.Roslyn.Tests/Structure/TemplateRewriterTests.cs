@@ -515,5 +515,45 @@ namespace TestTools_Tests.Structure
                 "  }");
             AssertAreEqualSource(expectedSource, translatedNode.ToString());
         }
+
+        [TestMethod("Visit replace body of method with templated attributes on VerifierServiceException with using statement")]
+        public void VisitReplaceBodyOfMethodWithTemplatedAttributesOnVerifyServiceExceptionWithUsingStatement()
+        {
+            var source = string.Join(
+                Environment.NewLine,
+                "using Namespace;",
+                "class ClassName {",
+                "  [TemplatedTestMethod]",
+                "  void MethodName() { Assert.IsNull(Person.FirstName); }",
+                "}");
+            var root = SyntaxFactory.ParseSyntaxTree(source).GetRoot();
+            var node1 = root.AllDescendantNodes<UsingDirectiveSyntax>().First();
+            var node2 = root.AllDescendantNodes<MethodDeclarationSyntax>().First();
+            var node3 = root.AllDescendantNodes<AttributeSyntax>().First();
+            var node4 = root.AllDescendantNodes<BlockSyntax>().First();
+
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            syntaxResolver.GetNamespaceDescription(node1).Returns(new RuntimeNamespaceDescription("Namespace"));
+            syntaxResolver.HasTemplatedAttribute(node2).Returns(true);
+            syntaxResolver.IsTemplatedAttribute(node3).Returns(true);
+            syntaxResolver.GetAssociatedAttributeType(node3).Returns("TestMethod");
+            syntaxResolver.GetAssociatedExceptionType(node3).Returns("Namespace.AssertFailedException");
+            var statementRewriter = Substitute.For<CSharpSyntaxRewriter>(true);
+            statementRewriter.Visit(node4).Returns(x => throw new VerifierServiceException("message for user"));
+            var rewriter = new TemplateRewriter(syntaxResolver, statementRewriter);
+
+            var translatedNode = rewriter.Visit(node2);
+
+            var expectedSource = string.Join(
+                Environment.NewLine,
+                "[TestMethod]",
+                "  void MethodName() {",
+                "    // == Failed To Compile ==",
+                "    // Assert.IsNull(Person.FirstName);",
+                "    throw new AssertFailedException(\"message for user\");",
+                "  }");
+            AssertAreEqualSource(expectedSource, translatedNode.ToString());
+        }
+
     }
 }

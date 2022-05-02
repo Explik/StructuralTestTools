@@ -175,10 +175,10 @@ namespace Explik.StructuralTestTools
 
             var templatedAttribute = node.AttributeLists.SelectMany(l => l.Attributes).First(_resolver.IsTemplatedAttribute);
             var exceptionTypeName = _resolver.GetAssociatedExceptionType(templatedAttribute);
-            
-            return leadingTrivia + $"throw new {exceptionTypeName}(\"{ex.Message}\");" + Environment.NewLine;
-        }
+            var exceptionNamespace = string.Join(".", exceptionTypeName.Split('.').Take(exceptionTypeName.Count(c => c == '.')));
+            var exceptionName = IsNamespaceImported(exceptionNamespace, node.SyntaxTree) ? exceptionTypeName.Replace(exceptionNamespace + ".", "") : exceptionTypeName;
 
-        
+            return leadingTrivia + $"throw new {exceptionName}(\"{ex.Message}\");" + Environment.NewLine;
+        }
     }
 }
