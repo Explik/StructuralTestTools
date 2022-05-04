@@ -17,6 +17,7 @@ namespace Explik.StructuralTestTools
     {
         private ICompileTimeDescriptionResolver _resolver;
         private CSharpSyntaxRewriter _statementRewriter;
+        private NamespaceDescription _fromNamespace;
 
         private readonly Dictionary<SyntaxTree, NamespaceDescription[]> _importedNamespacesCache = new Dictionary<SyntaxTree, NamespaceDescription[]>();
 
@@ -24,6 +25,12 @@ namespace Explik.StructuralTestTools
         {
             _resolver = syntaxResolver;
             _statementRewriter = statementRewriter;
+        }
+
+        public TemplateRewriter(ICompileTimeDescriptionResolver syntaxResolver, CSharpSyntaxRewriter statementRewriter, NamespaceDescription fromNamespace)
+            : this(syntaxResolver, statementRewriter)
+        {
+            _fromNamespace = fromNamespace;
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -145,7 +152,8 @@ namespace Explik.StructuralTestTools
 
             var indent = node.Body.Statements.FirstOrDefault()?.GetLeadingTrivia().ToString() ?? "";
             var source = string.Join("", node.Body.Statements.Select(s => s.ToFullString()));
-            var lines = source.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var sourceWithoutFromNamespace = _fromNamespace != null ? source.Replace(_fromNamespace.Name + ".", "") : source;
+            var lines = sourceWithoutFromNamespace.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach(var line in lines)
             {

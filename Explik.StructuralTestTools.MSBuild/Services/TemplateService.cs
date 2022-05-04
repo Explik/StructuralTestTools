@@ -31,7 +31,7 @@ namespace Explik.StructuralTestTools.MSBuild
             var syntaxResolver = new CompileTimeDescriptionResolver(compilation);
             var structureService = new StructureService(configuration) { StructureVerifier = new VerifierService() };
             var typeRewriter = new TypeRewriter(syntaxResolver, structureService);
-            var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
+            var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter, configuration.FromNamespace);
 
             foreach (var syntaxTree in compilation.SyntaxTrees)
             {
